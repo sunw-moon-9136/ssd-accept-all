@@ -10,7 +10,6 @@ class OutputTest {
         boolean expected = true;
         boolean act = o.existFileCheck();
         assertEquals(expected, act);
-
     }
 
 
