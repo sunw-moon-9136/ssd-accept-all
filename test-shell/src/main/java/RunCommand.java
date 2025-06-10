@@ -13,14 +13,12 @@ public class RunCommand {
         runSSDCommand("W", lba, value);
     }
 
-    void runSSDCommand(String any, String any1, String any2) throws IOException, InterruptedException {
+    void runSSDCommand(String... args) throws IOException, InterruptedException {
         List<String> command = new ArrayList<>();
         command.add("java");
         command.add("-jar");
         command.add("ssd.jar");
-        command.add(any);
-        command.add(any1);
-        command.add(any2);
+        Collections.addAll(command, args);
 
         ProcessBuilder pb = new ProcessBuilder(command);
         pb.start().waitFor();
