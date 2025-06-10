@@ -1,8 +1,7 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -72,7 +71,7 @@ class TestShellTest {
     }
 
     private String getString(String input) {
-        InputStream testInput = new ByteArrayInputStream(input.getBytes());
-        return shell.runTestShell(testInput);
+        Scanner scanner = new Scanner(input);
+        return shell.runTestShell(scanner);
     }
 }
