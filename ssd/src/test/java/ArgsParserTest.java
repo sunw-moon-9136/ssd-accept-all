@@ -4,6 +4,15 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ArgsParserTest {
+    // TODO RuntimeException -> output.txt.에 Error를 저장하는 것으로 변경
+
+    @Test
+    void 인자의_맨앞이_R_혹은_W가_아니면_에러() {
+        String args[] = {"Q", "12"};
+
+        assertThrows(RuntimeException.class, () -> ArgsParser.main(args));
+    }
+
     @Test
     void 읽기요청의_인자는2개_입력값2개일때() {
 
