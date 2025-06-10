@@ -1,3 +1,4 @@
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -7,80 +8,71 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TestShellTest {
 
+    TestShell shell;
+
+    @BeforeEach
+    void setUp() {
+        shell = new TestShell();
+    }
+
     @Test
     void runTestShell_없는_Command_입력시_notCommand_반환() {
-        String input = "\n";
-        InputStream testInput = new ByteArrayInputStream(input.getBytes());
-        TestShell shell = new TestShell();
+        String expect = "notCommand";
+        String actual = getString("\n");
 
-        String result = shell.runTestShell(testInput);
-
-        assertEquals("notCommand", result);
+        assertEquals(expect, actual);
     }
 
     @Test
     void runTestShell_readCommand_입력시_read_반환() {
-        String input = "read\n";
-        InputStream testInput = new ByteArrayInputStream(input.getBytes());
-        TestShell shell = new TestShell();
+        String expect = "read";
+        String actual = getString(expect + "\n");
 
-        String result = shell.runTestShell(testInput);
-
-        assertEquals("read", result);
+        assertEquals(expect, actual);
     }
 
     @Test
     void runTestShell_writeCommand_입력시_write_반환() {
-        String input = "write\n";
-        InputStream testInput = new ByteArrayInputStream(input.getBytes());
-        TestShell shell = new TestShell();
+        String expect = "write";
+        String actual = getString(expect + "\n");
 
-        String result = shell.runTestShell(testInput);
-
-        assertEquals("write", result);
+        assertEquals(expect, actual);
     }
 
     @Test
     void runTestShell_fullreadCommand_입력시_fullread_반환() {
-        String input = "fullread\n";
-        InputStream testInput = new ByteArrayInputStream(input.getBytes());
-        TestShell shell = new TestShell();
+        String expect = "fullread";
+        String actual = getString(expect + "\n");
 
-        String result = shell.runTestShell(testInput);
-
-        assertEquals("fullread", result);
+        assertEquals(expect, actual);
     }
 
     @Test
     void runTestShell_fullwriteCommand_입력시_fullwrite_반환() {
-        String input = "fullwrite\n";
-        InputStream testInput = new ByteArrayInputStream(input.getBytes());
-        TestShell shell = new TestShell();
+        String expect = "fullwrite";
+        String actual = getString(expect + "\n");
 
-        String result = shell.runTestShell(testInput);
-
-        assertEquals("fullwrite", result);
+        assertEquals(expect, actual);
     }
 
     @Test
     void runTestShell_helpCommand_입력시_help_반환() {
-        String input = "help\n";
-        InputStream testInput = new ByteArrayInputStream(input.getBytes());
-        TestShell shell = new TestShell();
+        String expect = "help";
+        String actual = getString(expect + "\n");
 
-        String result = shell.runTestShell(testInput);
-
-        assertEquals("help", result);
+        assertEquals(expect, actual);
     }
 
     @Test
     void runTestShell_exitCommand_입력시_exit_반환() {
-        String input = "exit\n";
+        String expect = "exit";
+        String actual = getString(expect + "\n");
+
+        assertEquals(expect, actual);
+    }
+
+    private String getString(String input) {
         InputStream testInput = new ByteArrayInputStream(input.getBytes());
-        TestShell shell = new TestShell();
-
-        String result = shell.runTestShell(testInput);
-
-        assertEquals("exit", result);
+        return shell.runTestShell(testInput);
     }
 }
