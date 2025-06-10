@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class TestShellTest {
 
     @Test
-    void runTestShell_unknown_입력시_notCommand_반환() {
+    void runTestShell_없는_Command_입력시_notCommand_반환() {
         String input = "\n";
         InputStream testInput = new ByteArrayInputStream(input.getBytes());
         TestShell shell = new TestShell();
