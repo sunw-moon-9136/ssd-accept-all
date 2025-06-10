@@ -28,4 +28,14 @@ class RunCommandTest {
                 .isInstanceOf(IOException.class)
                 .hasMessageContaining("테스트");
     }
+
+    @Test
+    void read_호출시_SSDjar_호출되는지_확인() throws Exception {
+        RunCommand runCommand = spy(new RunCommand());
+        doNothing().when(runCommand).runSSDCommand(any(), any());
+
+        runCommand.read("read 3");
+
+        verify(runCommand).runSSDCommand("R", "3");
+    }
 }
