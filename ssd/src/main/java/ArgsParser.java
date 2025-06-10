@@ -1,11 +1,13 @@
-import java.util.Objects;
-
 public class ArgsParser {
+    public static boolean isValidModeCommand(String arg) {
+        return (arg.equals("R") || arg.equals("W"));
+    }
+
+    public static boolean isValidArgs(String[] args) {
+        return isValidModeCommand(args[0]);
+    }
+
     public static void main(String[] args) {
-        if (args[0].equals("R") || args[0].equals("W")) {
-;
-        } else {
-            throw new RuntimeException();
-        }
+        if(!isValidArgs(args)) throw new RuntimeException();
     }
 }
