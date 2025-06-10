@@ -23,5 +23,12 @@ public class RunCommand {
         ProcessBuilder pb = new ProcessBuilder(command);
         pb.start().waitFor();
     }
+
+    public void read(String s) throws IOException, InterruptedException {
+        String[] str = s.split("\\s+");
+        String lba = str[1];
+
+        runSSDCommand("R", lba);
+    }
 }
 
