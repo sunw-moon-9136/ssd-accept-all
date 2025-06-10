@@ -9,5 +9,10 @@ public class ArgsParser {
 
     public static void main(String[] args) {
         if(!isValidArgs(args)) throw new RuntimeException();
+        if(args[0] == "R") {
+            if(args.length != 2) throw new RuntimeException();
+        } else if(args[0] == "W") {
+
+        }
     }
 }
