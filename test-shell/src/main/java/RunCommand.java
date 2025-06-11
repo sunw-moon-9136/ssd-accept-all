@@ -20,27 +20,31 @@ public class RunCommand {
         };
     }
 
-    private boolean write(String[] parts) throws IOException, InterruptedException {
+    private boolean write(String[] parts) {
         return runSSDCommand("W", parts[1], parts[2]);
     }
 
-    private boolean read(String[] parts) throws IOException, InterruptedException {
+    private boolean read(String[] parts) {
         return runSSDCommand("R", parts[1]);
     }
 
-    boolean runSSDCommand(String... args) throws IOException, InterruptedException {
+    boolean runSSDCommand(String... args) {
         List<String> command = new ArrayList<>();
         command.add("java");
         command.add("-jar");
         command.add("ssd.jar");
         Collections.addAll(command, args);
 
-        ProcessBuilder pb = new ProcessBuilder(command);
-        Process process = pb.start();
+        try {
+            ProcessBuilder pb = new ProcessBuilder(command);
+            Process process = pb.start();
 
-        int exitCode = process.waitFor();
+            int exitCode = process.waitFor();
 
-        return exitCode == 0;
+            return exitCode == 0;
+        } catch (IOException | InterruptedException e) {
+            return false;
+        }
     }
 }
 
