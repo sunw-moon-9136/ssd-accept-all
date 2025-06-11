@@ -2,7 +2,7 @@ public class Output {
 
     //TODO
     final static String OUTPUT_FILE_PATH = "ssd_output.txt";
-    //final static String OUTPUT_FILE_PATH = "C:\\Users\\User\\Documents\\output.txt";
+    // final static String OUTPUT_FILE_PATH = "C:\\Users\\User\\Documents\\output.txt";
 
     private final DataReader dataReader;
 
@@ -45,6 +45,7 @@ public class Output {
             }
 
             if (commandLine.equals("read")) {
+                if (readResult == null || readResult.isEmpty()) return checkResult += "ERROR";
                 if (!readResult.contains("0x")) return checkResult += "ERROR";
                 if (readResult.contains("ERROR")) return checkResult += "ERROR";
                 checkResult += "LBA ";

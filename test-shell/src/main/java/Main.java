@@ -2,7 +2,7 @@ import java.util.Scanner;
 
 public class Main {
     public static RunCommand runCommand = new RunCommand();
-    public static Output output = new Output(new OutputFileReader(""));
+    public static Output output = new Output();
 
     public static void main(String[] args) {
         TestShell testShell = new TestShell(runCommand, output);

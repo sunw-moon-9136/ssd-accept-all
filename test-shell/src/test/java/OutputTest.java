@@ -185,9 +185,9 @@ class ActualTest {
 
     @Nested
     @DisplayName("명령어가 'read'일 때")
-    @Disabled
     class ReadTest {
 
+        @Disabled
         @Test
         void output_파일이_없을때_checkResult_ERROR() throws IOException {
 
@@ -196,6 +196,7 @@ class ActualTest {
             assertEquals("[read] ERROR", act);
 
         }
+
 
         @Test
         void 받은명령어가_READ이면_OUTPUT파일을_읽는다() throws IOException {
