@@ -14,17 +14,24 @@ public class TestShell {
         String command = input.nextLine().trim();
 
         if (isNullEmpty(command)) return INVALID_COMMAND;
-        if (isValidCommand(command)) return INVALID_COMMAND;
-        return command;
+
+        String[] parts = command.split("\\s+");
+        if (isValidCommand(parts)) return INVALID_COMMAND;
+
+        if (parts[0].equals("help")) {
+            System.out.println(Common.HELP_TEXT);
+            return "help";
+        }
+        if (parts[0].equals("exit")) return "exit";
+
+        return parts[0];
     }
 
     private boolean isNullEmpty(String command) {
         return command == null || command.isEmpty();
     }
 
-    private boolean isValidCommand(String command) {
-        String[] parts = command.split("\\s+");
-
+    private boolean isValidCommand(String[] parts) {
         if (checkRegisteredCommand(parts[0])) return true;
         if (Arrays.asList(ONE_LENGTH_COMMAND).contains(parts[0])) return isValidOneLength(parts);
         if (Arrays.asList(COMMAND_LBA).contains(parts[0])) return isValidCmdLBA(parts);

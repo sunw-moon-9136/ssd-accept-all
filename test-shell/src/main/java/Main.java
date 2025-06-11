@@ -6,11 +6,9 @@ public class Main {
 
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            String ret = testShell.runTestShell(scanner);
-            System.out.println("[" + ret + "]");
-
-            if (ret.equals("exit")) break;
+            if (testShell.runTestShell(scanner).equals("exit")) break;
         }
+        
         scanner.close();
     }
 }
