@@ -18,9 +18,9 @@ class OutputTest {
 
     @Test
     void output_파일이_있으면_PASS() throws IOException {
-        Output o = new Output();
+        Output output = new Output();
         boolean expected = true;
-        boolean act = o.existFileCheck();
+        boolean act = output.existFileCheck();
         assertEquals(expected, act);
     }
 
@@ -36,9 +36,9 @@ class OutputTest {
     @Test
     void output_파일이_있으면_마지막줄을_읽어서준다() throws IOException {
 
-        Output o = new Output();
+        Output output = new Output();
         boolean expected = true;
-        String act = o.readLine();
+        String act = output.readLine();
         assertNotNull(act);
     }
 
