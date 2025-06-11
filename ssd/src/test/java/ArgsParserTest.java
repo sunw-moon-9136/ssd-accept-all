@@ -27,6 +27,8 @@ class ArgsParserTest {
     private static final String INVALID_FIRST_ARG[] = {"Q", "12"};
     private static final String VALID_READ_ARGS[] = {"R", "56"};
     private static final String INVALID_READ_ARGS_CNT[] = {"R", "12", "77", "(!"};
+    private static final String VALID_WRITE_ARGS[] = {"W", "56", "0x12345678"};
+    private static final String INVALID_WRITE_ARGS_CNT[] = {"W"};
 
     @Test
     void ArgsParser에서_에러가나면_Driver_Write를_호출() {
@@ -63,15 +65,19 @@ class ArgsParserTest {
     }
 
     @Test
-    @Disabled
     void 쓰기요청의_인자는3개_입력값3개일때() {
+        parser.run(VALID_WRITE_ARGS);
 
+        verify(mockDriver, never()).write(anyString(), any());
     }
 
     @Test
-    @Disabled
     void 쓰기요청의_인자는3개_입력값1개일때_에러() {
+        doNothing().when(mockDriver).write(anyString(), any());
 
+        parser.run(INVALID_WRITE_ARGS_CNT);
+
+        verify(mockDriver, times(1)).write(anyString(), any());
     }
 
     @Test
