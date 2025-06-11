@@ -20,4 +20,10 @@ public class Output {
 
     }
 
+    public String readLine() {
+        String result;
+
+        return "T";
+
+    }
 }
