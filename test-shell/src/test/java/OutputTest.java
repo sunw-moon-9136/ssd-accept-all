@@ -51,7 +51,6 @@ class OutputTest {
     void 받은명령어가_READ이고_파일이_있으면_파일내용을_반환한다() {
 
         when(mockDataReader.exists()).thenReturn(true);
-
         when(mockDataReader.readLine()).thenReturn(OUTPUT_TEXT_READ_PASS);
         String result = output.checkResult("read");
         assertEquals(RESULT_STRING_READ_PASS, result);
