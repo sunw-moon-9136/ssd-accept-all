@@ -62,7 +62,8 @@ public class SsdController {
     }
 
     private void read(int lba) {
-        disk.read(lba);
+        String ret = disk.read(lba);
+        driver.write(SSD_OUTPUT_TXT, ret.getBytes());
     }
 
     public void run(String[] args) {

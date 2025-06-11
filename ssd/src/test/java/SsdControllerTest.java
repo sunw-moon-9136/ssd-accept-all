@@ -167,8 +167,8 @@ class SsdControllerTest {
 
         @Test
         void 읽기_호출_후_Driver를_호출하여_output에_기록() {
-            when(mockDisk.read(anyInt())).thenReturn(anyString());
             doNothing().when(mockDriver).write(anyString(), any());
+            when(mockDisk.read(anyInt())).thenReturn(anyString());
 
             controller.run(VALID_READ_ARGS);
 
