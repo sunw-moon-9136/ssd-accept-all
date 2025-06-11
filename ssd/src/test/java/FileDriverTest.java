@@ -116,11 +116,9 @@ class FileDriverTest {
             Path path = Paths.get(TEST_TARGET_FILE_NAME);
             Files.deleteIfExists(path);
 
-            String actual = fileDriver.read(TEST_TARGET_FILE_NAME);
-
-            assertThat(actual).isEqualTo(NAND_INIT_TEXT);
-            assertThat(Files.exists(path)).isTrue();
-            assertThat(Files.readString(path)).isEqualTo(NAND_INIT_TEXT);
+            assertThatThrownBy(() -> fileDriver.read(TEST_TARGET_FILE_NAME))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessageStartingWith("File Not Found: ");
         }
     }
 
