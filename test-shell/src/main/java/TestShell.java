@@ -21,6 +21,8 @@ public class TestShell {
         System.out.print(">> ");
         String command = input.nextLine().trim();
 
+        String result = "";
+
         if (isNullEmpty(command)) return INVALID_COMMAND;
 
         String[] parts = command.split("\\s+");
@@ -37,30 +39,25 @@ public class TestShell {
         if (parts[0].equals("fullread")) {
             for (int i = 0; i < 100; i++) {
                 changeCommand = parts[0].substring(4) + " " + i;
-                runProcess(changeCommand);
+                result = runProcess(changeCommand);
             }
         } else if (parts[0].equals("fullwrite")) {
             for (int i = 0; i < 100; i++) {
                 changeCommand = parts[0].substring(4) + " " + i + " " + parts[1];
-                runProcess(changeCommand);
+                result = runProcess(changeCommand);
             }
         } else {
             //read, write
-            runProcess(command);
+            result = runProcess(command);
         }
 
-        return parts[0];
+        return result;
     }
 
-    private void runProcess(String command) {
+    private String runProcess(String command) {
         String[] parts = command.split("\\s+");
-        if (runCommand.execute(command)) {
-            if (command.startsWith("full")) {
-                output.checkResult(parts[0].substring(4));
-            } else {
-                output.checkResult(parts[0]);
-            }
-        }
+        if (runCommand.execute(command)) return output.checkResult(parts[0]);
+        return "ERROR";
     }
 
     private boolean isNullEmpty(String command) {
