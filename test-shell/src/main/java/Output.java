@@ -38,6 +38,19 @@ public class Output {
     }
 
     public String checkResult(String commandLine) {
+        String checkResult;
+        if (commandLine.equals("read")) {
+            if (existFileCheck()) {
+                checkResult = readLine();
+            }
+        }
+
+        if (commandLine.equals("write")) {
+            if (existFileCheck()) {
+                checkResult = readLine();
+            }
+        }
+
         System.out.println("[" + commandLine + "]");
         return commandLine;
     }

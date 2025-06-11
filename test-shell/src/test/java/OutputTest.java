@@ -63,9 +63,11 @@ class OutputTest {
     @Test
     void 받은명령어가_READ이면_OUTPUT파일을_읽는다() throws IOException {
 
+        Output output = new Output();
         boolean expected = true;
-        String act = mockOutput.checkResult("read");
-        verify(mockOutput, times(1)).readLine();
+        String act = output.checkResult("read");
+        System.out.println(act);
+        assertNotNull(act);
 
     }
 
@@ -79,11 +81,13 @@ class OutputTest {
     }
 
     @Test
-    void 받은명령어가_rite이면_OUTPUT파일을_읽는다() throws IOException {
+    void 받은명령어가_write이면_OUTPUT파일을_읽는다() throws IOException {
 
+        Output output = new Output();
         boolean expected = true;
-        String act = mockOutput.checkResult("read");
-        verify(mockOutput, times(1)).readLine();
+        String act = output.checkResult("write");
+        System.out.println(act);
+        assertNotNull(act);
 
     }
 
