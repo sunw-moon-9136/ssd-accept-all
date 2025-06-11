@@ -1,18 +1,30 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class TestShellTest {
     public static final String INVALID_COMMAND = "INVALID COMMAND";
+    @Mock
+    RunCommand mockRunCommand;
+
+    @Mock
+    Output mockOutput;
+
     TestShell shell;
 
     @BeforeEach
     void setUp() {
-        shell = new TestShell();
+        shell = new TestShell(mockRunCommand, mockOutput);
     }
 
     private String getOutputResult(String input) {
@@ -144,4 +156,43 @@ class TestShellTest {
         }
     }
 
+    @Nested
+    class ChainingTest {
+
+        @Test
+        void read_실행_true() {
+            doReturn(true).when(mockRunCommand).execute(anyString());
+
+            String actual = getOutputResult("read 3\n");
+
+            verify(mockRunCommand, times(1)).execute(anyString());
+        }
+
+        @Test
+        void write_실행_true() {
+            doReturn(true).when(mockRunCommand).execute(anyString());
+
+            String actual = getOutputResult("write 3 0xAAAAFFFF\n");
+
+            verify(mockRunCommand, times(1)).execute(anyString());
+        }
+
+        @Test
+        void fullread_실행_true() {
+            doReturn(true).when(mockRunCommand).execute(anyString());
+
+            String actual = getOutputResult("fullread\n");
+
+            verify(mockRunCommand, times(100)).execute(anyString());
+        }
+
+        @Test
+        void fullwrite_실행_true() {
+            doReturn(true).when(mockRunCommand).execute(anyString());
+
+            String actual = getOutputResult("fullwrite 0xAAAAFFFF\n");
+
+            verify(mockRunCommand, times(100)).execute(anyString());
+        }
+    }
 }
