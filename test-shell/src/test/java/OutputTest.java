@@ -13,8 +13,15 @@ import static org.mockito.Mockito.*;
 class OutputTest {
 
 
-    final static String READ_OUPUT_PASS_STRING = "1 0xAAAABBBB";
-    final static String READ_OUPUT_ERROR_STRING = "ERROR";
+    final static String OUTPUT_TEXT_READ_PASS = "1 0xAAAABBBB";
+    final static String OUTPUT_TEXT_ERROR = "ERROR";
+    final static String OUTPUT_TEXT_WRITE_PASS = null;
+
+    final static String RESULT_STRING_READ_PASS = "[read] " + OUTPUT_TEXT_READ_PASS;
+    final static String RESULT_STRING_READ_ERROR = "[read] " + OUTPUT_TEXT_ERROR;
+    final static String RESULT_STRING_WRITE_PASS = "[write] DONE";
+    final static String RESULT_STRING_WRITE_ERROR = "[write] ERROR";
+
 
     @Mock
     private DataReader mockDataReader;
@@ -45,9 +52,9 @@ class OutputTest {
 
         when(mockDataReader.exists()).thenReturn(true);
 
-        when(mockDataReader.readLine()).thenReturn(READ_OUPUT_PASS_STRING);
+        when(mockDataReader.readLine()).thenReturn(OUTPUT_TEXT_READ_PASS);
         String result = output.checkResult("read");
-        assertEquals("[read] 1 0xAAAABBBB", result);
+        assertEquals(RESULT_STRING_READ_PASS, result);
         verify(mockDataReader, times(1)).readLine();
     }
 
@@ -55,18 +62,18 @@ class OutputTest {
     void 받은명령어가_WRITE이고_파일내용이_비어있으면_DONE을_반환한다() {
 
         when(mockDataReader.exists()).thenReturn(true);
-        when(mockDataReader.readLine()).thenReturn(null);
+        when(mockDataReader.readLine()).thenReturn(OUTPUT_TEXT_WRITE_PASS);
         String result = output.checkResult("write");
-        assertEquals("DONE", result);
+        assertEquals(RESULT_STRING_WRITE_PASS, result);
     }
 
     @Test
     void 받은명령어가_WRITE이고_파일내용이_있으면_FAIL을_반환한다() {
 
         when(mockDataReader.exists()).thenReturn(true);
-        when(mockDataReader.readLine()).thenReturn("ERROR");
+        when(mockDataReader.readLine()).thenReturn(OUTPUT_TEXT_ERROR);
         String result = output.checkResult("write");
-        assertEquals("FAIL", result);
+        assertEquals(RESULT_STRING_WRITE_ERROR, result);
     }
 
 
@@ -74,7 +81,7 @@ class OutputTest {
     void READ명령을_3번받으면_readLine도_3번_호출된다() {
 
         when(mockDataReader.exists()).thenReturn(true);
-        when(mockDataReader.readLine()).thenReturn("1 0xAAAABBBB");
+        when(mockDataReader.readLine()).thenReturn(OUTPUT_TEXT_READ_PASS);
         output.checkResult("read");
         output.checkResult("read");
         output.checkResult("read");
