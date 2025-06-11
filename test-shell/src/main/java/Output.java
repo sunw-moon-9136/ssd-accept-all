@@ -43,6 +43,7 @@ public class Output {
         if (commandLine.equals("read")) {
             if (existFileCheck()) {
                 checkResult = readLine();
+                System.out.println(checkResult);
                 return checkResult;
             }
         }

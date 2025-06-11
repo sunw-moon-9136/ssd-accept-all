@@ -16,6 +16,7 @@ class OutputTest {
     @Mock
     Output mockOutput;
 
+
     @Test
     void output_파일이_있으면_PASS() throws IOException {
         Output output = new Output();
@@ -81,6 +82,19 @@ class OutputTest {
         assertNotNull(act);
     }
 
+    //To-Do
+    @Test
+    void READ명령을_3번받으면_3번_출력() throws IOException {
+
+
+        mockOutput.checkResult("read");
+        mockOutput.checkResult("read");
+        mockOutput.checkResult("read");
+        verify(mockOutput, times(3)).checkResult("read");
+
+    }
+
+
     @Test
     void 받은명렁어가_Write이면_OUTPUT파일을_check한다() throws IOException {
 
@@ -99,5 +113,6 @@ class OutputTest {
         System.out.println(act);
         assertNotNull(act);
     }
+
 
 }
