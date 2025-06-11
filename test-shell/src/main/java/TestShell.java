@@ -34,11 +34,9 @@ public class TestShell {
     }
 
     private boolean isValidRead(String[] parts) {
+        // read 3
         if (parts.length != 2) return false;
-
-        if (!parts[1].matches("\\d+")) return false;
-        if (Integer.parseInt(parts[1]) > 99) return false;
-        if (Integer.parseInt(parts[1]) < 0) return false;
+        if (isValidLBAPositionArgument(parts[1])) return false;
 
         return true;
     }
@@ -46,10 +44,7 @@ public class TestShell {
     private boolean isValidFullwrite(String[] parts) {
         // fullwrite 0xSSSSSSSS
         if (parts.length != 2) return false;
-
-        if (!parts[1].startsWith("0x")) return false;
-        if (parts[1].length() != 10) return false;
-        if (!parts[1].substring(2).matches("[A-Z]+")) return false;
+        if (isValidDataArgument(parts[1])) return false;
 
         return true;
     }
@@ -57,16 +52,26 @@ public class TestShell {
     private boolean isValidWrite(String[] parts) {
         // write 3 0xSSSSSSSS
         if (parts.length != 3) return false;
-
-        if (!parts[1].matches("\\d+")) return false;
-        if (Integer.parseInt(parts[1]) > 99) return false;
-        if (Integer.parseInt(parts[1]) < 0) return false;
-
-        if (!parts[2].startsWith("0x")) return false;
-        if (parts[2].length() != 10) return false;
-        if (!parts[2].substring(2).matches("[A-Z]+")) return false;
+        if (isValidLBAPositionArgument(parts[1])) return false;
+        if (isValidDataArgument(parts[2])) return false;
 
         return true;
+    }
+
+    private boolean isValidLBAPositionArgument(String arg) {
+        if (!arg.matches("\\d+")) return true;
+        if (Integer.parseInt(arg) > 99) return true;
+        if (Integer.parseInt(arg) < 0) return true;
+
+        return false;
+    }
+
+    private boolean isValidDataArgument(String arg) {
+        if (!arg.startsWith("0x")) return true;
+        if (arg.length() != 10) return true;
+        if (!arg.substring(2).matches("[A-Z]+")) return true;
+
+        return false;
     }
 }
 

@@ -8,6 +8,7 @@ public class Main {
         while (true) {
             String ret = testShell.runTestShell(scanner);
             System.out.println("[" + ret + "]");
+
             if (ret.equals("exit")) break;
         }
         scanner.close();

@@ -15,7 +15,7 @@ class TestShellTest {
         shell = new TestShell();
     }
 
-    private String getString(String input) {
+    private String getOutputResult(String input) {
         Scanner scanner = new Scanner(input);
         return shell.runTestShell(scanner);
     }
@@ -25,7 +25,7 @@ class TestShellTest {
         @Test
         void read_Command_입력시_read_반환() {
             String expect = "read 3";
-            String actual = getString(expect + "\n");
+            String actual = getOutputResult(expect + "\n");
 
             assertEquals(expect, actual);
         }
@@ -33,7 +33,7 @@ class TestShellTest {
         @Test
         void write_Command_입력시_write_반환() {
             String expect = "write 3 0xAAAABBBB";
-            String actual = getString(expect + "\n");
+            String actual = getOutputResult(expect + "\n");
 
             assertEquals(expect, actual);
         }
@@ -41,7 +41,7 @@ class TestShellTest {
         @Test
         void fullread_Command_입력시_fullread_반환() {
             String expect = "fullread";
-            String actual = getString(expect + "\n");
+            String actual = getOutputResult(expect + "\n");
 
             assertEquals(expect, actual);
         }
@@ -49,7 +49,7 @@ class TestShellTest {
         @Test
         void fullwrite_Command_입력시_fullwrite_반환() {
             String expect = "fullwrite 0xAAAABBBB";
-            String actual = getString(expect + "\n");
+            String actual = getOutputResult(expect + "\n");
 
             assertEquals(expect, actual);
         }
@@ -57,7 +57,7 @@ class TestShellTest {
         @Test
         void help_Command_입력시_help_반환() {
             String expect = "help";
-            String actual = getString(expect + "\n");
+            String actual = getOutputResult(expect + "\n");
 
             assertEquals(expect, actual);
         }
@@ -65,21 +65,21 @@ class TestShellTest {
         @Test
         void exit_Command_입력시_exit_반환() {
             String expect = "exit";
-            String actual = getString(expect + "\n");
+            String actual = getOutputResult(expect + "\n");
 
             assertEquals(expect, actual);
         }
 
         @Test
         void null_Command_입력시_notCommand_반환() {
-            String actual = getString("\n");
+            String actual = getOutputResult("\n");
 
             assertEquals(INVALID_COMMAND, actual);
         }
 
         @Test
         void 없는_Command_입력시_notCommand_반환() {
-            String actual = getString("wrongCmd\n");
+            String actual = getOutputResult("wrongCmd\n");
 
             assertEquals(INVALID_COMMAND, actual);
         }
@@ -90,7 +90,7 @@ class TestShellTest {
         @Test
         void Command_포맷_검사_틀린_포맷_첫번째_항목_대문자() {
             String input = "READ 3";
-            String actual = getString(input);
+            String actual = getOutputResult(input);
 
             assertEquals(INVALID_COMMAND, actual);
         }
@@ -98,7 +98,7 @@ class TestShellTest {
         @Test
         void Command_포맷_검사_틀린_포맷_두번째_항목_숫자가_아님() {
             String input = "read ee";
-            String actual = getString(input);
+            String actual = getOutputResult(input);
 
             assertEquals(INVALID_COMMAND, actual);
         }
@@ -106,7 +106,7 @@ class TestShellTest {
         @Test
         void Command_포맷_검사_틀린_포맷_두번째_항목_숫자_범위_99() {
             String input = "READ 100";
-            String actual = getString(input);
+            String actual = getOutputResult(input);
 
             assertEquals(INVALID_COMMAND, actual);
         }
@@ -114,7 +114,7 @@ class TestShellTest {
         @Test
         void Command_포맷_검사_각_arg_갯수_확인() {
             String input = "help 3 0xAAAABBBB";
-            String actual = getString(input);
+            String actual = getOutputResult(input);
 
             assertEquals(INVALID_COMMAND, actual);
         }
@@ -122,7 +122,7 @@ class TestShellTest {
         @Test
         void write_Command_포맷_검사_세번째_항목_10글자() {
             String input = "write 3 0xAAAAB";
-            String actual = getString(input);
+            String actual = getOutputResult(input);
 
             assertEquals(INVALID_COMMAND, actual);
         }
@@ -130,7 +130,7 @@ class TestShellTest {
         @Test
         void write_Command_포맷_검사_세번째_항목_처음0x() {
             String input = "write 3 SSAAAABBBB";
-            String actual = getString(input);
+            String actual = getOutputResult(input);
 
             assertEquals(INVALID_COMMAND, actual);
         }
@@ -138,9 +138,10 @@ class TestShellTest {
         @Test
         void write_Command_포맷_검사_세번째_항목_소문자확인() {
             String input = "write 3 0xaaaabbbb";
-            String actual = getString(input);
+            String actual = getOutputResult(input);
 
             assertEquals(INVALID_COMMAND, actual);
         }
     }
+
 }
