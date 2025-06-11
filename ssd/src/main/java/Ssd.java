@@ -10,7 +10,6 @@ public class Ssd implements ReadWritable {
 
     private Driver driver;
 
-
     public Ssd() {
         this.driver = new FileDriver();
     }
@@ -22,7 +21,6 @@ public class Ssd implements ReadWritable {
     @Override
     public String read(int address) {
         if (!isFileExist(SSD_NAND_TXT)) initializeNand();
-        flushReadOutput();
         String readValue = getAddressValue(address);
         driver.write(SSD_OUTPUT_TXT, readValue.getBytes());
         return readValue;
@@ -46,9 +44,6 @@ public class Ssd implements ReadWritable {
         driver.write(SSD_NAND_TXT, sb.toString().getBytes());
     }
 
-    private void flushReadOutput() {
-        driver.write(SSD_OUTPUT_TXT, "".getBytes());
-    }
 
     private String getAddressValue(int readAddress) {
         String nandFullContents = driver.read(SSD_NAND_TXT);
@@ -63,7 +58,6 @@ public class Ssd implements ReadWritable {
     @Override
     public void write(int address, String value) {
         if (!isFileExist(SSD_NAND_TXT)) initializeNand();
-        flushReadOutput();
         driver.write(SSD_NAND_TXT, getWriteContent(address, value).getBytes());
     }
 
