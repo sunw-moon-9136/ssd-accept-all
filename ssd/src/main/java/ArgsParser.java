@@ -24,17 +24,28 @@ public class ArgsParser {
         driver.write("ssd_output.txt", "ERROR".getBytes());
     }
 
-    public static boolean isValidReadCommand(String[] args) {
+    private static boolean isValidLBA(String lba) {
+        try {
+            int number = Integer.parseInt(lba);
+            return number >= 0 && number <= 99;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private static boolean isValidReadCommand(String[] args) {
         return args.length == 2 &&
-                args[0].equals("R");
+                args[0].equals("R") &&
+                isValidLBA(args[1]);
     }
 
-    public static boolean isValidWriteCommand(String[] args) {
+    private static boolean isValidWriteCommand(String[] args) {
         return args.length == 3 &&
-                args[0].equals("W");
+                args[0].equals("W") &&
+                isValidLBA(args[1]);
     }
 
-    public static boolean isValidArgs(String[] args) {
+    private static boolean isValidArgs(String[] args) {
         return isValidReadCommand(args) ||
                 isValidWriteCommand(args);
     }
@@ -42,19 +53,6 @@ public class ArgsParser {
     public void run(String[] args) {
         try {
             if (!isValidArgs(args)) throw new IllegalArgumentException();
-            if (args[0].equals("R")) {
-                if (Integer.parseInt(args[1]) >= 0 && Integer.parseInt(args[1]) <= 99) {
-
-                } else {
-                    throw new IllegalArgumentException();
-                }
-            } else if (args[0].equals("W")) {
-                if (Integer.parseInt(args[1]) >= 0 && Integer.parseInt(args[1]) <= 99) {
-
-                } else {
-                    throw new IllegalArgumentException();
-                }
-            }
         } catch (Exception e) {
             error();
         }
