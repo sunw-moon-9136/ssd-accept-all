@@ -126,14 +126,19 @@ class SsdControllerTest {
     }
 
     @Test
-    @Disabled
     void 값의시작부분이_0x일때() {
+        parser.run(VALID_WRITE_ARGS);
 
+        verify(mockDriver, never()).write(anyString(), any());
     }
 
     @Test
-    @Disabled
-    void 값의시작부분이_0x가아니면_에러() {
+    void 값의시작부분이_0x가아니거나_이상한문자가오면에러() {
+        doNothing().when(mockDriver).write(anyString(), any());
+        String args[] = {"W", "12", "0*!(@&$*@("};
 
+        parser.run(args);
+
+        verify(mockDriver, times(1)).write(anyString(), any());
     }
 }
