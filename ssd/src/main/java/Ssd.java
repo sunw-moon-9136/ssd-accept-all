@@ -10,6 +10,11 @@ public class Ssd implements ReadWritable {
 
     private Driver driver;
 
+
+    public Ssd() {
+        this.driver = new FileDriver();
+    }
+
     public Ssd(Driver driver) {
         this.driver = driver;
     }
