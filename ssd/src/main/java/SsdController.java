@@ -58,6 +58,11 @@ public class SsdController {
     public void run(String[] args) {
         try {
             if (!isValidArgs(args)) throw new IllegalArgumentException();
+            if(args[0] == "R") {
+                int address = Integer.parseInt(args[1]);
+                disk.read(address);
+
+            }
         } catch (Exception e) {
             error();
         }
