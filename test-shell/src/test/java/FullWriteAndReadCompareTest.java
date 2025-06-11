@@ -31,10 +31,21 @@ class FullWriteAndReadCompareTest {
     }
 
     @Test
-    void 하나의_readCompare라도_실패한_경우_return_false()  {
+    void value가_달라서_readCompare_실패한_경우_return_false()  {
         ITestScenario testScenario = new FullWriteAndReadCompare(runCommand, output);
         doReturn(true).when(runCommand).execute(any());
         doReturn("LBA 00 : 0x12345678").when(output).checkResult(anyString());
+
+        boolean actual = testScenario.run();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void address가_달라서_readCompare_실패한_경우_return_false()  {
+        ITestScenario testScenario = new FullWriteAndReadCompare(runCommand, output);
+        doReturn(true).when(runCommand).execute(any());
+        doReturn("LBA 99 : 0x00000000").when(output).checkResult(anyString());
 
         boolean actual = testScenario.run();
 
