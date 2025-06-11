@@ -34,6 +34,8 @@ public class SsdController {
     }
 
     private boolean isValidValue(String value) {
+        if(!value.startsWith("0x")) return false;
+
         return value.length() == 10;
     }
 
