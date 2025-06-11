@@ -34,19 +34,10 @@ public class FileDriver implements Driver {
 
     private void requireValidFileName(String file) {
         if (isNullOrEmpty(file) || !(file.equals(OUTPUT_FILE_NAME) || file.equals(NAND_FILE_NAME)))
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Invalid Argument");
     }
 
     private boolean isNullOrEmpty(String file) {
         return file == null || file.isEmpty();
-    }
-
-    private String initNandFileAndRead(String file) {
-        try {
-            Files.copy(Path.of("ssd_nand_init.txt"), Path.of(NAND_FILE_NAME));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return read(file);
     }
 }
