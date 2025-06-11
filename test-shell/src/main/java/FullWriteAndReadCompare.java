@@ -16,24 +16,26 @@ public class FullWriteAndReadCompare extends DefaultTestScenario {
         return true;
     }
 
-    private boolean writeFiveValues(int i, String testValue) {
-        for (int j = 0; j <= 4; j++) {
-            if (!runCommand.execute(String.format("W %d %s", i + j, testValue)))
+    private boolean writeFiveValues(int baseAddress, String testValue) {
+        for (int additionalAddress = 0; additionalAddress <= 4; additionalAddress++) {
+            if (!runCommand.execute(String.format("W %d %s", baseAddress + additionalAddress, testValue)))
                 return false;
         }
         return true;
     }
 
-    private boolean readCompareFiveValues(int i, String testValue) {
-        for (int j = 0; j <= 4; j++) {
-            if (!runCommand.execute(String.format("R %d", i + j)))
+    private boolean readCompareFiveValues(int baseAddress, String testValue) {
+        for (int additionalAddress = 0; additionalAddress <= 4; additionalAddress++) {
+            if (!runCommand.execute(String.format("R %d", baseAddress + additionalAddress)))
                 return false;
 
             String result = output.checkResult("read");
-            String address = result.split(" : ")[0].substring(4);
+            int address = Integer.parseInt(result.split(" : ")[0].substring(4));
             String value = result.split(" : ")[1];
-            if (Integer.parseInt(address) != i + j)
+
+            if (address != baseAddress + additionalAddress)
                 return false;
+
             if (!value.equals(testValue))
                 return false;
         }
