@@ -68,6 +68,8 @@ class FileDriverTest {
     @Nested
     class WriteTest {
 
+        public static final String NOT_IMPORTANT_ALREADY_EXIST_OUTPUT_TEXT = "Bye Bye, World!";
+
         @Test
         void 대상_파일이_존재하지_않는_경우_파일_새로_생성하여_write() throws IOException {
             Path path = Paths.get(FileDriver.NAND_FILE_NAME);
@@ -82,7 +84,8 @@ class FileDriverTest {
         @Test
         void 대상_파일이_존재하는_경우_파일_덮어쓰기하여_write() throws IOException {
             Path path = Paths.get(FileDriver.NAND_FILE_NAME);
-            Files.write(path, "Bye Bye, World!".getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            Files.writeString(path, NOT_IMPORTANT_ALREADY_EXIST_OUTPUT_TEXT,
+                    StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
             fileDriver.write(FileDriver.NAND_FILE_NAME, TEST_BYTES);
 

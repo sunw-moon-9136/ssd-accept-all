@@ -11,28 +11,26 @@ public class FileDriver implements Driver {
 
     @Override
     public String read(String file) {
-        if (!isValidFileName(file))
-            throw new IllegalArgumentException();
+        requireValidFileName(file);
 
         return "";
     }
 
     @Override
     public void write(String file, byte[] bytes) {
-        if (!isValidFileName(file))
-            throw new IllegalArgumentException();
+        requireValidFileName(file);
 
-        Path path = Paths.get(file);
         try {
+            Path path = Paths.get(file);
             Files.write(path, bytes, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private boolean isValidFileName(String file) {
-        return !isNullOrEmpty(file) &&
-                (file.equals(OUTPUT_FILE_NAME) || file.equals(NAND_FILE_NAME));
+    private void requireValidFileName(String file) {
+        if (isNullOrEmpty(file) || !(file.equals(OUTPUT_FILE_NAME) || file.equals(NAND_FILE_NAME)))
+            throw new IllegalArgumentException();
     }
 
     private boolean isNullOrEmpty(String file) {
