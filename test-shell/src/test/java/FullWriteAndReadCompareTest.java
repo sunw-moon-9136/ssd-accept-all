@@ -3,7 +3,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,7 +20,6 @@ class FullWriteAndReadCompareTest {
 
     @Test
     void 정상적으로_모든_readCompare가_성공한_경우_return_true()  {
-        
         ITestScenario testScenario = new FullWriteAndReadCompare(runCommand, output);
         AtomicInteger atomicInteger = new AtomicInteger(0);
         doReturn(true).when(runCommand).execute(any());
@@ -38,6 +36,7 @@ class FullWriteAndReadCompareTest {
     void 하나의_readCompare라도_실패한_경우_return_false()  {
         ITestScenario testScenario = new FullWriteAndReadCompare(runCommand, output);
         doReturn(true).when(runCommand).execute(any());
+        doReturn("LBA 00 : 0x12345678").when(output).checkResult(anyString());
 
         boolean actual = testScenario.run();
 
@@ -47,7 +46,7 @@ class FullWriteAndReadCompareTest {
     @Test
     void runCommand에서_Exception이_발생한_경우_return_false()  {
         ITestScenario testScenario = new FullWriteAndReadCompare(runCommand, output);
-        doThrow(new IOException()).when(runCommand).execute(any());
+        doReturn(false).when(runCommand).execute(any());
 
         boolean actual = testScenario.run();
 
