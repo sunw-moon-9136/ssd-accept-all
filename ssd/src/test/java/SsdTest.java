@@ -65,7 +65,7 @@ class SsdTest {
         ssd.write(WRITE_TEST_ADDRESS, WRITE_TEST_VALUE);
 
         //Assert
-        verify(fileDriver, times(1)).write(anyString(), any());
+        verify(fileDriver, times(2)).write(anyString(), any());
         assertTrue(new File(SSD_NAND_TXT).exists(), "파일이 생성되지 않았습니다.");
     }
 
@@ -89,7 +89,7 @@ class SsdTest {
         ssd.write(WRITE_TEST_ADDRESS, WRITE_TEST_VALUE);
 
         //Assert
-        verify(fileDriver, times(1)).write(anyString(), any());
+        verify(fileDriver, times(2)).write(anyString(), any());
         assertTrue(expectFile.exists(), "파일이 생성되지 않았습니다.");
     }
 
