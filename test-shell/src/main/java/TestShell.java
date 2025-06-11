@@ -37,16 +37,17 @@ public class TestShell {
             for (int i = 0; i < 100; i++) {
                 runProcess(command);
             }
-            return parts[0];
+        } else {
+            //read, write
+            runProcess(command);
         }
 
-        // read, write
-        runProcess(command);
         return parts[0];
     }
 
     private void runProcess(String command) {
         if (runCommand.execute(command)) {
+            // TODO
             // output 접근
         }
     }
