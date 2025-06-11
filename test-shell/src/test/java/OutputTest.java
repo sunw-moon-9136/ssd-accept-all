@@ -13,6 +13,9 @@ import static org.mockito.Mockito.*;
 class OutputTest {
 
 
+    final static String READ_OUPUT_PASS_STRING = "1 0xAAAABBBB";
+    final static String READ_OUPUT_ERROR_STRING = "ERROR";
+
     @Mock
     private DataReader mockDataReader;
     private Output output;
@@ -41,7 +44,8 @@ class OutputTest {
     void 받은명령어가_READ이고_파일이_있으면_파일내용을_반환한다() {
 
         when(mockDataReader.exists()).thenReturn(true);
-        when(mockDataReader.readLine()).thenReturn("1 0xAAAABBBB");
+
+        when(mockDataReader.readLine()).thenReturn(READ_OUPUT_PASS_STRING);
         String result = output.checkResult("read");
         assertEquals("[read] 1 0xAAAABBBB", result);
         verify(mockDataReader, times(1)).readLine();
