@@ -82,7 +82,7 @@ class FileDriverTest {
         @Test
         void 대상_파일이_존재하는_경우_파일_덮어쓰기하여_write() throws IOException {
             Path path = Paths.get(FileDriver.NAND_FILE_NAME);
-            Files.write(path, "Bye, World!".getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE);
+            Files.write(path, "Bye Bye, World!".getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
             fileDriver.write(FileDriver.NAND_FILE_NAME, TEST_BYTES);
 
