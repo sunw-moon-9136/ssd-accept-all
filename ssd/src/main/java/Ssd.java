@@ -18,6 +18,22 @@ public class Ssd implements ReadWritable {
 
     @Override
     public void read(int address) {
+        if (!isFileExist(SSD_NAND_TXT)) {
+            initializeNAND();
+        }
+        String nandContents = driver.read(SSD_NAND_TXT);
+        driver.write(SSD_OUTPUT_TXT, getAddressValue(nandContents, address).getBytes());
+    }
+
+    private String getAddressValue(String nandContents, int readAddress) {
+        String[] contentLines = nandContents.split(NEW_LINE_CHAR);
+        String readValue = "";
+        for (String line : contentLines) {
+            String[] content = line.split(ADDRESS_VALUE_DELIMITER);
+            if (content[0].equals(String.valueOf(readAddress)))
+                return content[1];
+        }
+        return readValue;
     }
 
     private void flushReadOutput() {
