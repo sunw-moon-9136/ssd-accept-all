@@ -1,10 +1,10 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -12,6 +12,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 
+@ExtendWith(MockitoExtension.class)
 class WriteReadAgingTest {
 
     ITestScenario testScenario;
@@ -27,19 +28,19 @@ class WriteReadAgingTest {
 
     @BeforeEach
     void setUp() {
-        testScenario = new WriteReadAging(runCommand, output);
+        testScenario = new WriteReadAging(runCommand, output, randomFactory);
     }
 
     @Test
     void 정상적으로_모든_readCompare가_성공한_경우_return_true() {
-        AtomicBoolean atomicBoolean = new AtomicBoolean(true);
+        AtomicBoolean atomicBoolean = new AtomicBoolean(false);
         String randomValue = "0x00000000";
         doReturn(randomValue).when(randomFactory).getRandomHexValue();
         doReturn(true).when(runCommand).execute(any());
         doAnswer(invocation -> {
-            if(atomicBoolean.get())
+            atomicBoolean.set(!atomicBoolean.get());
+            if (atomicBoolean.get())
                 return "LBA 00 : " + randomValue;
-            atomicBoolean.set(false);
             return "LBA 99 : " + randomValue;
         }).when(output).checkResult(anyString());
 
