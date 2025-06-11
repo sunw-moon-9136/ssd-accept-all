@@ -6,7 +6,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -42,7 +41,7 @@ class RunCommandTest {
 
         runCommand.execute("write 3 0xAAAABBBB");
 
-        verify(mockOutput).run();
+        verify(mockOutput).checkResult("write 3 0xAAAABBBB");
     }
 
     @Test
@@ -72,6 +71,6 @@ class RunCommandTest {
 
         runCommand.execute("read 3");
 
-        verify(mockOutput).run();
+        verify(mockOutput).checkResult("read");
     }
 }

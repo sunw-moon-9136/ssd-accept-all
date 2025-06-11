@@ -6,6 +6,7 @@ import java.util.List;
 public class RunCommand {
     private final Output output;
 
+
     public RunCommand(Output output) {
         this.output = output;
     }
@@ -17,7 +18,10 @@ public class RunCommand {
         if (command.equals("write")) runSSDCommand("W", parts[1], parts[2]);
         if (command.equals("read")) runSSDCommand("R", parts[1]);
 
-        output.run();
+
+        Output output;
+        output = ReadOutputFactory.readOutput();
+        output.checkResult(command);
     }
 
     void runSSDCommand(String... args) throws IOException, InterruptedException {

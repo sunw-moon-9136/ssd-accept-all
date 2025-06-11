@@ -90,7 +90,6 @@ class ActualTest {
 
     @BeforeEach
     void setUp() {
-
         output = ReadOutputFactory.readOutput();
     }
 
