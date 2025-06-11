@@ -76,11 +76,15 @@ class RunCommandTest {
     }
 
     @Test
-    void 지원하지_않는_명령시_예외발생() {
-        RunCommand runCommand = new RunCommand(mockOutput);
+    void fullwrite_호출시_모든_LBA에_write호출되는지_확인() throws Exception {
+        RunCommand runCommand = spy(new RunCommand(mockOutput));
+        doNothing().when(runCommand).runSSDCommand(any(), any(), any());
 
-        assertThatThrownBy(() -> runCommand.execute("delete 1"))
-                .isInstanceOf(UnsupportedOperationException.class)
-                .hasMessageContaining("Unknown command");
+        runCommand.execute("fullwrite 0xABCDFFFF");
+
+        for (int i = 0; i < 100; i++) {
+            verify(runCommand).runSSDCommand("W", String.valueOf(i), "0xABCDFFFF");
+        }
+        verify(mockOutput).run("write");
     }
 }

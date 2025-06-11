@@ -16,7 +16,6 @@ public class RunCommand {
 
         if (command.equals("write")) runSSDCommand("W", parts[1], parts[2]);
         if (command.equals("read")) runSSDCommand("R", parts[1]);
-
         output.run(command);
     }
 
@@ -30,5 +29,7 @@ public class RunCommand {
         ProcessBuilder pb = new ProcessBuilder(command);
         pb.start().waitFor();
     }
+
+
 }
 
