@@ -34,4 +34,9 @@ public class Output {
             return null;
         }
     }
+
+    public String checkResult(String commandLine) {
+        return commandLine;
+    }
+
 }
