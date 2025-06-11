@@ -4,6 +4,8 @@ public class SsdController {
     private Driver driver;
     private ReadWritable disk;
 
+    public static final String SSD_OUTPUT_TXT = "ssd_output.txt";
+
     public SsdController() {
         this.driver = new FileDriver();
         this.disk = new Ssd();
@@ -74,10 +76,6 @@ public class SsdController {
             int lba = Integer.parseInt(args[1]);
 
             if (mode.equals("R")) read(lba);
-            if (mode.equals("W")) {
-                String value = args[2];
-                write(lba, value);
-            }
         } catch (Exception e) {
             error();
         }

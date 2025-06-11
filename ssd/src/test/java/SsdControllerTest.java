@@ -164,5 +164,14 @@ class SsdControllerTest {
 
             verify(mockDisk).read(anyInt()); // equals(anyString()) 제거
         }
+
+        @Test
+        void 쓰기_호출_시_ssd_write를_호출한다() {
+            doNothing().when(mockDisk).write(anyInt(), anyString());
+
+            controller.run(VALID_READ_ARGS);
+
+            verify(mockDisk).write(anyInt(),anyString()); // equals(anyString()) 제거
+        }
     }
 }
