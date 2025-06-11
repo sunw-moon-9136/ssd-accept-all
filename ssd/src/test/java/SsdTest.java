@@ -7,6 +7,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -67,32 +68,32 @@ class SsdTest {
         verify(fileDriver, times(1)).write(anyString(), any());
         assertTrue(new File(SSD_NAND_TXT).exists(), "파일이 생성되지 않았습니다.");
     }
-//
-//
-//    @Test
-//    void LBA_영역_값_쓰기_ssd_nand_txt_존재() throws IOException {
-//        //Arrange
-//        try (FileOutputStream fileOutputStream = new FileOutputStream(SSD_OUTPUT_TXT)) {
-//            fileOutputStream.write("test".getBytes());
-//        }
-//        File expectFile = new File(SSD_NAND_TXT);
-//
-//        doAnswer(invocation -> {
-//            try (FileOutputStream fileOutputStream = new FileOutputStream(SSD_NAND_TXT)) {
-//                fileOutputStream.write((WRITE_TEST_ADDRESS + DELIMITER + WRITE_TEST_VALUE).getBytes());
-//                return null;
-//            }
-//        }).when(fileDriver).write(anyString(), any());
-//
-//        //Act
-//        ssd.write(WRITE_TEST_ADDRESS, WRITE_TEST_VALUE);
-//
-//        //Assert
-//        verify(fileDriver, times(1)).write(anyString(), any());
-//        assertTrue(expectFile.exists(), "파일이 생성되지 않았습니다.");
-//    }
-//
-//
+
+
+    @Test
+    void LBA_영역_값_쓰기_ssd_nand_txt_존재() throws IOException {
+        //Arrange
+        try (FileOutputStream fileOutputStream = new FileOutputStream(SSD_OUTPUT_TXT)) {
+            fileOutputStream.write("test".getBytes());
+        }
+        File expectFile = new File(SSD_NAND_TXT);
+
+        doAnswer(invocation -> {
+            try (FileOutputStream fileOutputStream = new FileOutputStream(SSD_NAND_TXT)) {
+                fileOutputStream.write((WRITE_TEST_ADDRESS + DELIMITER + WRITE_TEST_VALUE).getBytes());
+                return null;
+            }
+        }).when(fileDriver).write(anyString(), any());
+
+        //Act
+        ssd.write(WRITE_TEST_ADDRESS, WRITE_TEST_VALUE);
+
+        //Assert
+        verify(fileDriver, times(1)).write(anyString(), any());
+        assertTrue(expectFile.exists(), "파일이 생성되지 않았습니다.");
+    }
+
+
 //    //Read Test
 //    @Test
 //    void 기록한적_있는_LBA영역_읽기() throws IOException {
