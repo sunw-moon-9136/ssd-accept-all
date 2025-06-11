@@ -23,11 +23,11 @@ class FullWriteAndReadCompareTest {
 
     @BeforeEach
     void setUp() {
-         testScenario = new FullWriteAndReadCompare(runCommand, output);
+        testScenario = new FullWriteAndReadCompare(runCommand, output);
     }
 
     @Test
-    void 정상적으로_모든_readCompare가_성공한_경우_return_true()  {
+    void 정상적으로_모든_readCompare가_성공한_경우_return_true() {
         AtomicInteger atomicInteger = new AtomicInteger(0);
         doReturn(true).when(runCommand).execute(any());
         doAnswer(invocation -> String.format("LBA %02d : %s", atomicInteger.get(), makeHex(atomicInteger.getAndIncrement() / 5)))
@@ -39,7 +39,7 @@ class FullWriteAndReadCompareTest {
     }
 
     @Test
-    void value가_달라서_readCompare_실패한_경우_return_false()  {
+    void value가_달라서_readCompare_실패한_경우_return_false() {
         doReturn(true).when(runCommand).execute(any());
         doReturn("LBA 00 : 0x12345678").when(output).checkResult(anyString());
 
@@ -49,7 +49,7 @@ class FullWriteAndReadCompareTest {
     }
 
     @Test
-    void address가_달라서_readCompare_실패한_경우_return_false()  {
+    void address가_달라서_readCompare_실패한_경우_return_false() {
         doReturn(true).when(runCommand).execute(any());
         doReturn("LBA 99 : 0x00000000").when(output).checkResult(anyString());
 
@@ -59,7 +59,7 @@ class FullWriteAndReadCompareTest {
     }
 
     @Test
-    void runCommand에서_Exception이_발생한_경우_return_false()  {
+    void runCommand에서_Exception이_발생한_경우_return_false() {
         doReturn(false).when(runCommand).execute(any());
 
         boolean actual = testScenario.run();
