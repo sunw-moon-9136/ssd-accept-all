@@ -4,8 +4,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -20,7 +18,7 @@ class RunCommandTest {
     RunCommand runCommand;
 
     @Test
-    void write_SSDjar파일없을때_IOException_발생() throws IOException, InterruptedException {
+    void write_SSDjar파일없을때_IOException_발생() {
         doReturn(false).when(runCommand).runSSDCommand(any(), any(), any());
 
         boolean result = runCommand.execute("write 3 0xAAAABBBB");
@@ -29,7 +27,7 @@ class RunCommandTest {
     }
 
     @Test
-    void write_호출시_SSDjar_실행되어_true반환_확인() throws Exception {
+    void write_호출시_SSDjar_실행되어_true반환_확인() {
         doReturn(true).when(runCommand).runSSDCommand(any(), any(), any());
 
         boolean result = runCommand.execute("write 3 0xAAAABBBB");
@@ -39,7 +37,7 @@ class RunCommandTest {
     }
 
     @Test
-    void write_호출시_SSDjar_실행안되어_false반환_확인() throws IOException, InterruptedException {
+    void write_호출시_SSDjar_실행안되어_false반환_확인() {
         doReturn(false).when(runCommand).runSSDCommand(any(), any(), any());
 
         boolean result = runCommand.execute("write 3 0xAAAABBBB");
@@ -48,7 +46,7 @@ class RunCommandTest {
     }
 
     @Test
-    void read_호출시_SSDjar_실행되어_true반환_확인() throws Exception {
+    void read_호출시_SSDjar_실행되어_true반환_확인() {
         doReturn(true).when(runCommand).runSSDCommand(any(), any());
 
         boolean result = runCommand.execute("read 3");
@@ -58,7 +56,7 @@ class RunCommandTest {
     }
 
     @Test
-    void 존재하지_않는_명령어_입력시_IllegalArgumentException_발생() throws Exception {
+    void 존재하지_않는_명령어_입력시_IllegalArgumentException_발생() {
         assertThatThrownBy(() -> runCommand.execute("abnormal 1 0xABCDFFFF"))
                 .isInstanceOf(IllegalArgumentException.class);
     }

@@ -9,7 +9,7 @@ public class RunCommand {
         public static final String READ = "read";
     }
 
-    public boolean  execute(String input) throws IOException, InterruptedException {
+    public boolean execute(String input) {
         String[] parts = input.trim().split("\\s+");
         String command = parts[0].toLowerCase();
 
