@@ -42,6 +42,7 @@ class RunCommandTest {
 
         boolean result = runCommand.execute("write 3 0xAAAABBBB");
 
+
         assertFalse(result);
     }
 
