@@ -1,13 +1,13 @@
-public class ArgsParser {
+public class SsdController {
     private Driver driver;
     private ReadWritable disk;
 
-    public ArgsParser() {
+    public SsdController() {
         this.driver = new FileDriver();
         this.disk = new Ssd();
     }
 
-    public ArgsParser(Driver driver, ReadWritable disk) {
+    public SsdController(Driver driver, ReadWritable disk) {
         this.driver = driver;
         this.disk = disk;
     }
@@ -24,17 +24,28 @@ public class ArgsParser {
         driver.write("ssd_output.txt", "ERROR".getBytes());
     }
 
-    public static boolean isValidReadCommand(String[] args) {
+    private boolean isValidLBA(String lba) {
+        try {
+            int number = Integer.parseInt(lba);
+            return number >= 0 && number <= 99;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private boolean isValidReadCommand(String[] args) {
         return args.length == 2 &&
-                args[0].equals("R");
+                args[0].equals("R") &&
+                isValidLBA(args[1]);
     }
 
-    public static boolean isValidWriteCommand(String[] args) {
+    private boolean isValidWriteCommand(String[] args) {
         return args.length == 3 &&
-                args[0].equals("W");
+                args[0].equals("W") &&
+                isValidLBA(args[1]);
     }
 
-    public static boolean isValidArgs(String[] args) {
+    private boolean isValidArgs(String[] args) {
         return isValidReadCommand(args) ||
                 isValidWriteCommand(args);
     }
