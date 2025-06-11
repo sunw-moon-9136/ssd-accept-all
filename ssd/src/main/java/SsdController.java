@@ -1,3 +1,5 @@
+import java.util.Objects;
+
 public class SsdController {
     private Driver driver;
     private ReadWritable disk;
@@ -55,13 +57,26 @@ public class SsdController {
                 isValidWriteCommand(args);
     }
 
+    private void write(int lba, String value) {
+
+    }
+
+    private void read(int lba) {
+        disk.read(lba);
+    }
+
     public void run(String[] args) {
         try {
             if (!isValidArgs(args)) throw new IllegalArgumentException();
-            if(args[0] == "R") {
-                int address = Integer.parseInt(args[1]);
-                disk.read(address);
 
+            // cmd: ssd mode lba [value]
+            String mode = args[0];
+            int lba = Integer.parseInt(args[1]);
+
+            if (mode.equals("R")) read(lba);
+            if (mode.equals("W")) {
+                String value = args[2];
+                write(lba, value);
             }
         } catch (Exception e) {
             error();

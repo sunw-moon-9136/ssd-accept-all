@@ -162,7 +162,7 @@ class SsdControllerTest {
 
             controller.run(VALID_READ_ARGS);
 
-            verify(mockDisk, times(1)).read(anyInt());
+            verify(mockDisk).read(anyInt()); // equals(anyString()) 제거
         }
     }
 }
