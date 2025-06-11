@@ -24,23 +24,25 @@ public class ArgsParser {
         driver.write("ssd_output.txt", "ERROR".getBytes());
     }
 
-    public static boolean isValidModeCommand(String arg) {
-        return (arg.equals("R") || arg.equals("W"));
+    public static boolean isValidReadCommand(String[] args) {
+        return args.length == 2 &&
+                args[0].equals("R");
+    }
+
+    public static boolean isValidWriteCommand(String[] args) {
+        return args.length == 3 &&
+                args[0].equals("W");
     }
 
     public static boolean isValidArgs(String[] args) {
-        return isValidModeCommand(args[0]);
+        return isValidReadCommand(args) ||
+                isValidWriteCommand(args);
     }
 
     public void run(String[] args) {
         try {
-            if(!isValidArgs(args)) throw new IllegalArgumentException();
-            if(args[0].equals("R")) {
-                if(args.length != 2) throw new IllegalArgumentException();
-            } else if(args[0].equals("W")) {
-                if(args.length != 3) throw new IllegalArgumentException();
-            }
-        } catch(Exception e) {
+            if (!isValidArgs(args)) throw new IllegalArgumentException();
+        } catch (Exception e) {
             error();
         }
     }
