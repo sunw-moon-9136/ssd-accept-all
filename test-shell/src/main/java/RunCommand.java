@@ -23,6 +23,12 @@ public class RunCommand {
             }
             command = "write";
         }
+        if (command.equals("fullread")) {
+            for (int lba = 0; lba < 100; lba++) {
+                runSSDCommand("R", String.valueOf(lba));
+            }
+            command = "read";
+        }
         output.run(command);
     }
 
