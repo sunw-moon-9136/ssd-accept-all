@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.StringReader;
 import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -198,6 +199,23 @@ class TestShellTest {
 
     @Nested
     class outputTest {
+        @Test
+        void write_정상입력시_output_checkResult_호출확인() {
+            doReturn(true).when(mockRunCommand).execute("write 3 0xABCDFFFF");
+            doReturn("[write] DONE").when(mockOutput).checkResult("write");
 
+            getOutputResult("write 3 0xABCDFFFF\n");
+
+            verify(mockOutput).checkResult("write");
+        }
+        @Test
+        void read_정상입력시_output_checkResult_호출확인() {
+            doReturn(true).when(mockRunCommand).execute("read 3");
+            doReturn("[read] LBA 3 0xABCDFFFF").when(mockOutput).checkResult("read");
+
+            getOutputResult("read 3\n");
+
+            verify(mockOutput).checkResult("read");
+        }
     }
 }

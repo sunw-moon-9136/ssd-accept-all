@@ -53,8 +53,13 @@ public class TestShell {
     }
 
     private void runProcess(String command) {
+        String[] parts = command.split("\\s+");
         if (runCommand.execute(command)) {
-            output.checkResult(command.substring(4));
+            if (command.startsWith("full")) {
+                output.checkResult(parts[0].substring(4));
+            } else {
+                output.checkResult(parts[0]);
+            }
         }
     }
 
