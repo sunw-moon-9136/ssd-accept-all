@@ -1,5 +1,3 @@
-import java.util.Objects;
-
 public class SsdController {
     private Driver driver;
     private ReadWritable disk;
@@ -60,7 +58,7 @@ public class SsdController {
     }
 
     private void write(int lba, String value) {
-
+        disk.write(lba, value);
     }
 
     private void read(int lba) {
@@ -76,6 +74,10 @@ public class SsdController {
             int lba = Integer.parseInt(args[1]);
 
             if (mode.equals("R")) read(lba);
+            if (mode.equals("W")) {
+                String value = args[2];
+                write(lba, value);
+            }
         } catch (Exception e) {
             error();
         }
