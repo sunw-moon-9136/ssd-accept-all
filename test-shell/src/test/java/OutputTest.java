@@ -6,6 +6,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
 
@@ -32,5 +33,13 @@ class OutputTest {
         assertEquals(expected, act);
     }
 
+    @Test
+    void output_파일이_있으면_마지막줄을읽어서준다() throws IOException {
+
+        Output o = new Output();
+        boolean expected = true;
+        String act = o.readLine();
+        assertNotNull(act);
+    }
 
 }
