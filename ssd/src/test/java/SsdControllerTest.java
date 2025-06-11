@@ -9,7 +9,6 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class SsdControllerTest {
-    // TODO RuntimeException -> output.txt.에 Error를 저장하는 것으로 변경
     private static final String[] INVALID_FIRST_ARG = {"Q", "12"};
     private static final String[] VALID_READ_ARGS = {"R", "56"};
     private static final String[] INVALID_READ_ARGS_CNT = {"R", "12", "77", "(!"};

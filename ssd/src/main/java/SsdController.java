@@ -3,6 +3,8 @@ public class SsdController {
     private ReadWritable disk;
 
     public static final String SSD_OUTPUT_TXT = "ssd_output.txt";
+    public static final byte[] ERROR_BYTES = "ERROR".getBytes();
+    public static final byte[] EMPTY_BYTES = "".getBytes();
 
     public SsdController() {
         this.driver = new FileDriver();
@@ -23,20 +25,16 @@ public class SsdController {
     }
 
     public void error() {
-        driver.write(SSD_OUTPUT_TXT, "ERROR".getBytes());
+        driver.write(SSD_OUTPUT_TXT, ERROR_BYTES);
     }
 
     public void flushOut() {
-        driver.write(SSD_OUTPUT_TXT, "".getBytes());
+        driver.write(SSD_OUTPUT_TXT, EMPTY_BYTES);
     }
 
     private boolean isValidLBA(String lba) {
-        try {
-            int number = Integer.parseInt(lba);
-            return number >= 0 && number <= 99;
-        } catch (Exception e) {
-            return false;
-        }
+        int number = Integer.parseInt(lba);
+        return number >= 0 && number <= 99;
     }
 
     private boolean isValidValue(String value) {
