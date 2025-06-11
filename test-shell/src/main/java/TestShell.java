@@ -39,20 +39,25 @@ public class TestShell {
         if (parts[0].equals("fullread")) {
             for (int i = 0; i < 100; i++) {
                 changeCommand = parts[0].substring(4) + " " + i;
-                result = runProcess(changeCommand);
+                printResult(runProcess(changeCommand));
             }
         } else if (parts[0].equals("fullwrite")) {
             for (int i = 0; i < 100; i++) {
                 changeCommand = parts[0].substring(4) + " " + i + " " + parts[1];
-                result = runProcess(changeCommand);
+                printResult(runProcess(changeCommand));
             }
         } else {
             //read, write
-            result = runProcess(command);
+            printResult(runProcess(command));
         }
 
-        return result;
+        return "\n";
     }
+
+    void printResult(String str) {
+        System.out.println(str);
+    }
+
 
     private String runProcess(String command) {
         String[] parts = command.split("\\s+");

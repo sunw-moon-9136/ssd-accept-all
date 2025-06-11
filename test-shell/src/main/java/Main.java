@@ -9,9 +9,7 @@ public class Main {
 
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            String result = testShell.runTestShell(scanner);
-            if (result.equals("exit")) break;
-            System.out.println(result);
+            if (testShell.runTestShell(scanner).equals("exit")) break;
         }
 
         scanner.close();
