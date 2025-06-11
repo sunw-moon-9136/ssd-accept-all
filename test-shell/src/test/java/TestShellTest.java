@@ -24,16 +24,16 @@ class TestShellTest {
     class CommandInputTest {
         @Test
         void read_Command_입력시_read_반환() {
-            String expect = "read 3";
-            String actual = getOutputResult(expect + "\n");
+            String expect = "read";
+            String actual = getOutputResult("read 3\n");
 
             assertEquals(expect, actual);
         }
 
         @Test
         void write_Command_입력시_write_반환() {
-            String expect = "write 3 0xAAAABBBB";
-            String actual = getOutputResult(expect + "\n");
+            String expect = "write";
+            String actual = getOutputResult("write 3 0xAAAABBBB\n");
 
             assertEquals(expect, actual);
         }
@@ -41,15 +41,15 @@ class TestShellTest {
         @Test
         void fullread_Command_입력시_fullread_반환() {
             String expect = "fullread";
-            String actual = getOutputResult(expect + "\n");
+            String actual = getOutputResult("fullread\n");
 
             assertEquals(expect, actual);
         }
 
         @Test
         void fullwrite_Command_입력시_fullwrite_반환() {
-            String expect = "fullwrite 0xAAAABBBB";
-            String actual = getOutputResult(expect + "\n");
+            String expect = "fullwrite";
+            String actual = getOutputResult("fullwrite 0xAAAABBBB\n");
 
             assertEquals(expect, actual);
         }
@@ -57,7 +57,7 @@ class TestShellTest {
         @Test
         void help_Command_입력시_help_반환() {
             String expect = "help";
-            String actual = getOutputResult(expect + "\n");
+            String actual = getOutputResult("help\n");
 
             assertEquals(expect, actual);
         }
@@ -65,7 +65,7 @@ class TestShellTest {
         @Test
         void exit_Command_입력시_exit_반환() {
             String expect = "exit";
-            String actual = getOutputResult(expect + "\n");
+            String actual = getOutputResult("exit\n");
 
             assertEquals(expect, actual);
         }
