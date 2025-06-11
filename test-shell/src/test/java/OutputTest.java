@@ -6,12 +6,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
+
 
 @ExtendWith(MockitoExtension.class)
 class OutputTest {
-
 
     final static String OUTPUT_TEXT_READ_PASS = "1 0xAAAABBBB";
     final static String OUTPUT_TEXT_ERROR = "ERROR";
@@ -64,14 +63,44 @@ class OutputTest {
 
     @Test
     void 받은명령어가_READ이고_파일이_없으면_ERROR반환() {
+        when(mockDataReader.exists()).thenReturn(false);
+        String result = output.checkResult("read");
+        System.out.println(result);
+        assertEquals(RESULT_STRING_READ_ERROR, result);
+        verify(mockDataReader, never()).readLine();
+    }
 
+    @Test
+    void 받은명령어가_READ이고_결과값이_ERROR일때() {
         when(mockDataReader.exists()).thenReturn(true);
-        when(mockDataReader.readLine()).thenReturn(OUTPUT_TEXT_ERROR);
         String result = output.checkResult("read");
         System.out.println(result);
         assertEquals(RESULT_STRING_READ_ERROR, result);
         verify(mockDataReader, times(1)).readLine();
     }
+
+    @Test
+    void 받은명령어가_READ이고_exception이_발생했을때() {
+
+        when(mockDataReader.exists()).thenReturn(true);
+        when(mockDataReader.readLine()).thenThrow(new RuntimeException("Simulated file read error"));
+        String result = output.checkResult("read");
+        System.out.println(result);
+        assertEquals(RESULT_STRING_READ_ERROR, result);
+        verify(mockDataReader, times(1)).readLine();
+    }
+
+    @Test
+    void 받은명령어가_READ이고_결과값에_형태가_맞지않을때() {
+
+        when(mockDataReader.exists()).thenReturn(true);
+        when(mockDataReader.readLine()).thenReturn(" 11111");
+        String result = output.checkResult("read");
+        System.out.println(result);
+        assertEquals(RESULT_STRING_READ_ERROR, result);
+        verify(mockDataReader, times(1)).readLine();
+    }
+
 
     @Test
     void READ명령을_3번받으면_readLine도_3번_호출된다() {
@@ -96,6 +125,17 @@ class OutputTest {
     }
 
     @Test
+    void 받은명령어가_WRITE이고_exception이_발생했을때() {
+
+        when(mockDataReader.exists()).thenReturn(true);
+        when(mockDataReader.readLine()).thenThrow(new RuntimeException("Simulated file read error"));
+        String result = output.checkResult("write");
+        System.out.println(result);
+        assertEquals(RESULT_STRING_WRITE_ERROR, result);
+        verify(mockDataReader, times(1)).readLine();
+    }
+
+    @Test
     void 받은명령어가_WRITE이고_파일내용이_있으면_ERROR를_반환한다() {
 
         when(mockDataReader.exists()).thenReturn(true);
@@ -104,7 +144,6 @@ class OutputTest {
         System.out.println(result);
         assertEquals(RESULT_STRING_WRITE_ERROR, result);
     }
-
 
 }
 
@@ -117,52 +156,66 @@ class ActualTest {
         output = new Output();
     }
 
-    @Test
-    void output_파일이_있으면_PASS() throws IOException {
+    @Nested
+    @DisplayName("파일읽을때 오류체크")
+    class fileTest {
 
-        boolean expected = true;
-        boolean act = output.existFileCheck();
-        assertEquals(expected, act);
+
+        @Test
+        void output_파일이_있으면_PASS() throws IOException {
+
+            boolean expected = true;
+            boolean act = output.existFileCheck();
+            assertEquals(expected, act);
+
+        }
+
+        @Disabled
+        @Test
+        void output_파일이_없으면_FAIL() throws IOException {
+
+            boolean expected = false;
+            boolean act = output.existFileCheck();
+            assertEquals(expected, act);
+
+        }
+
 
     }
-
-    @Test
-    void output_파일이_없으면_FAIL() throws IOException {
-
-        boolean expected = false;
-        boolean act = output.existFileCheck();
-        assertEquals(expected, act);
-
-    }
-
-    @Test
-    void output_파일이_없으면_FAIL2() throws IOException {
-
-        boolean expected = false;
-        String act = output.checkResult("read");
-        assertEquals(expected, act);
-
-    }
-
 
     @Nested
     @DisplayName("명령어가 'read'일 때")
-    @Disabled
     class ReadTest {
+
+        @Disabled
+        @Test
+        void output_파일이_없을때_checkResult_ERROR() throws IOException {
+
+            boolean expected = false;
+            String act = output.checkResult("read");
+            assertEquals("[read] ERROR", act);
+
+        }
+
+
         @Test
         void 받은명령어가_READ이면_OUTPUT파일을_읽는다() throws IOException {
 
-            boolean expected = true;
+            String expected = "[read] LBA 1 0xFFFFFFF";
             String act = output.checkResult("read");
-            assertNotNull(act);
+            System.out.println(act);
+
+            assertEquals(expected, act);
+
 
         }
     }
 
     @Nested
     @DisplayName("명령어가 'Write'일 때")
+    @Disabled
     class WriteTest {
-        @Disabled
+
         @Test
         void 받은명령어가_write일때_정상동작_확인() throws IOException {
 
@@ -172,11 +225,11 @@ class ActualTest {
         }
 
         @Test
-        void 받은명령어가_write일때_fail확인() throws IOException {
+        void 받은명령어가_write일때_ERROR() throws IOException {
 
-            boolean expected = true;
+            String expected = "[write] ERROR";
             String act = output.checkResult("write");
-            assertEquals("FAIL", act);
+            assertEquals(expected, act);
         }
     }
 }

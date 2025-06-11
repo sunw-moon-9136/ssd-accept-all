@@ -17,7 +17,6 @@ public class OutputFileReader implements DataReader {
         try {
             return Files.exists(path);
         } catch (Exception e) {
-            System.out.println("OUTPUT FILE CHECK ERROR");
             return false;
         }
     }
@@ -27,8 +26,8 @@ public class OutputFileReader implements DataReader {
         try (BufferedReader reader = Files.newBufferedReader(path)) {
             return reader.readLine();
         } catch (IOException e) {
-            System.out.println("파일 읽기 오류");
-            return null;
+            //  System.out.println("파일 읽기 오류");
+            return "ERROR";
         }
     }
 }

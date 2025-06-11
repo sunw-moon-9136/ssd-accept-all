@@ -26,28 +26,34 @@ public class Output {
 
     public String checkResult(String commandLine) {
         String checkResult = "[" + commandLine + "] ";
-
+        String readResult;
         try {
-            if (commandLine.equals("read")) {
-                if (existFileCheck()) {
-                    checkResult += "LBA ";
-                    checkResult += readLine();
-                    return checkResult;
-                }
-            }
+            if (!existFileCheck()) return checkResult += "ERROR";
+
+            readResult = readLine();
+
 
             if (commandLine.equals("write")) {
-                if (existFileCheck()) {
-
-                    String readResult = readLine();
-                    if (readResult == null || readResult.isEmpty()) {
-                        checkResult += "DONE";
-                        return checkResult;
-                    }
-                    return checkResult += "ERROR";
-
+                if (readResult == null || readResult.isEmpty()) {
+                    checkResult += "DONE";
+                    return checkResult;
                 }
+
+                if (readResult.contains("ERROR")) return checkResult += "ERROR";
+                return checkResult += "ERROR";
+
             }
+
+            if (commandLine.equals("read")) {
+                if (readResult == null || readResult.isEmpty()) return checkResult += "ERROR";
+                if (!readResult.contains("0x")) return checkResult += "ERROR";
+                if (readResult.contains("ERROR")) return checkResult += "ERROR";
+                checkResult += "LBA ";
+                checkResult += readResult;
+                return checkResult;
+            }
+
+
         } catch (Exception e) {
             return checkResult += "ERROR";
         }
