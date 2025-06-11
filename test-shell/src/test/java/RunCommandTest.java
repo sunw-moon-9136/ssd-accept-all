@@ -88,4 +88,16 @@ class RunCommandTest {
         verify(mockOutput).run("write");
     }
 
+    @Test
+    void fullread_호출시_모든_LBA에_read호출되는지_확인() throws Exception {
+        RunCommand runCommand = spy(new RunCommand(mockOutput));
+        doNothing().when(runCommand).runSSDCommand(any(), any());
+
+        runCommand.execute("fullread");
+
+        for (int i = 0; i < 100; i++) {
+            verify(runCommand).runSSDCommand("R", String.valueOf(i));
+        }
+        verify(mockOutput).run("read");
+    }
 }
