@@ -182,7 +182,17 @@ class SsdControllerTest {
 
             controller.run(VALID_WRITE_ARGS);
 
-            verify(mockDisk).write(anyInt(),anyString()); // equals(anyString()) 제거
+            verify(mockDisk).write(anyInt(), anyString()); // equals(anyString()) 제거
+        }
+
+        @Test
+        void 쓰기_호출_시_ssd_nand를_flush해야한다() {
+            doNothing().when(mockDisk).write(anyInt(), anyString());
+
+            controller.run(VALID_WRITE_ARGS);
+
+            verify(mockDisk).write(anyInt(), anyString());
+            verify(mockDriver).write(anyString(), any());
         }
     }
 }

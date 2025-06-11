@@ -23,7 +23,7 @@ public class SsdController {
     }
 
     public void error() {
-        driver.write("ssd_output.txt", "ERROR".getBytes());
+        driver.write(SSD_OUTPUT_TXT, "ERROR".getBytes());
     }
 
     private boolean isValidLBA(String lba) {
