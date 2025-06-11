@@ -7,6 +7,8 @@ import java.nio.file.Paths;
 
 public class Output {
 
+    //TODO
+    //final static String OUTPUT_FILE_PATH = "ssd_output.txt";
     final static String OUTPUT_FILE_PATH = "C:\\Users\\User\\Documents\\output.txt";
 
     public boolean existFileCheck() {
