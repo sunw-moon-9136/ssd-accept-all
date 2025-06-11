@@ -72,6 +72,16 @@ class OutputTest {
     }
 
     @Test
+    void 받은명령어가_READ이면_읽은_OUTPUT파일을_display() throws IOException {
+
+        Output output = new Output();
+        boolean expected = true;
+        String act = output.checkResult("read");
+
+        assertNotNull(act);
+    }
+
+    @Test
     void 받은명렁어가_Write이면_OUTPUT파일을_check한다() throws IOException {
 
         boolean expected = true;

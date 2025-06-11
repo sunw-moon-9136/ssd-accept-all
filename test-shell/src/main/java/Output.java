@@ -37,6 +37,7 @@ public class Output {
         }
     }
 
+
     public String checkResult(String commandLine) {
         String checkResult;
         if (commandLine.equals("read")) {
