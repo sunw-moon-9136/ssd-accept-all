@@ -8,7 +8,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -52,20 +55,25 @@ class SsdTest {
 
     //Write Test
     @Test
-    void LBA_영역_값_쓰기_ssd_nand_txt_미존재() {
+    void LBA_영역_값_쓰기_ssd_nand_txt_미존재() throws IOException {
         //Arrange
         doAnswer(invocation -> {
-            try (FileOutputStream fileOutputStream = new FileOutputStream(SSD_NAND_TXT)) {
-                fileOutputStream.write((WRITE_TEST_ADDRESS + DELIMITER + WRITE_TEST_VALUE).getBytes());
-            }
+            String path = invocation.getArgument(0);
+            byte[] data = invocation.getArgument(1);
+            Files.write(Paths.get(path), data);
             return null;
         }).when(fileDriver).write(anyString(), any());
+
+        when(fileDriver.read(anyString())).thenAnswer(invocation -> {
+            String path = invocation.getArgument(0);
+            return new String(Files.readAllBytes(Paths.get(path)));
+        });
 
         //Act
         ssd.write(WRITE_TEST_ADDRESS, WRITE_TEST_VALUE);
 
         //Assert
-        verify(fileDriver, times(2)).write(anyString(), any());
+        verify(fileDriver, times(3)).write(anyString(), any());
         assertTrue(new File(SSD_NAND_TXT).exists(), "파일이 생성되지 않았습니다.");
     }
 
@@ -73,68 +81,68 @@ class SsdTest {
     @Test
     void LBA_영역_값_쓰기_ssd_nand_txt_존재() throws IOException {
         //Arrange
-        try (FileOutputStream fileOutputStream = new FileOutputStream(SSD_OUTPUT_TXT)) {
-            fileOutputStream.write("test".getBytes());
-        }
-        File expectFile = new File(SSD_NAND_TXT);
-
         doAnswer(invocation -> {
-            try (FileOutputStream fileOutputStream = new FileOutputStream(SSD_NAND_TXT)) {
-                fileOutputStream.write((WRITE_TEST_ADDRESS + DELIMITER + WRITE_TEST_VALUE).getBytes());
-                return null;
-            }
+            String path = invocation.getArgument(0);
+            byte[] data = invocation.getArgument(1);
+            Files.write(Paths.get(path), data);
+            return null;
         }).when(fileDriver).write(anyString(), any());
+
+        when(fileDriver.read(anyString())).thenAnswer(invocation -> {
+            String path = invocation.getArgument(0);
+            return new String(Files.readAllBytes(Paths.get(path)));
+        });
 
         //Act
         ssd.write(WRITE_TEST_ADDRESS, WRITE_TEST_VALUE);
+        ssd.write(WRITE_TEST_ADDRESS, WRITE_TEST_VALUE);
 
         //Assert
-        verify(fileDriver, times(2)).write(anyString(), any());
-        assertTrue(expectFile.exists(), "파일이 생성되지 않았습니다.");
+        verify(fileDriver, times(5)).write(anyString(), any());
+        assertTrue(new File(SSD_NAND_TXT).exists(), "파일이 생성되지 않았습니다.");
     }
 
 
-//    //Read Test
-//    @Test
-//    void 기록한적_있는_LBA영역_읽기() throws IOException {
-//
-//        //Arrange
-//        doAnswer(invocation -> {
-//            try (FileOutputStream fileOutputStream = new FileOutputStream(SSD_OUTPUT_TXT)) {
-//                fileOutputStream.write((WRITE_TEST_ADDRESS + DELIMITER + WRITE_TEST_VALUE).getBytes());
-//                return null;
-//            }
-//        }).when(fileDriver).read(anyString());
-//
-//        //Act
-//        ssd.read(READ_TEST_ADDRESS);
-//
-//        //Assert
-//        verify(fileDriver, times(1)).read(anyString());
-//        assertThat(new String(Files.readAllBytes(Paths.get(SSD_OUTPUT_TXT)))).isEqualTo(WRITE_TEST_ADDRESS + DELIMITER + WRITE_TEST_VALUE);
-//    }
-//
-//    @Test
-//        //기록이 한적이 없는 LBA를 읽으면 0x00000000 으로 읽힌다.
-//    void 기록한적_없는_LBA영역_읽기() throws IOException {
-//
-//        //Arrange
-//        doAnswer(invocation -> {
-//            try (FileOutputStream fileOutputStream = new FileOutputStream(SSD_OUTPUT_TXT)) {
-//                fileOutputStream.write(NO_WRITE_VALUE.getBytes());
-//                return null;
-//            }
-//        }).when(fileDriver).read(anyString());
-//
-//        //Act
-//        ssd.read(READ_TEST_ADDRESS);
-//
-//        //Assert
-//        verify(fileDriver, times(1)).read(anyString());
-//        String content = new String(Files.readAllBytes(Paths.get(SSD_OUTPUT_TXT))); // 기본 UTF-8로 변환
-//        assertThat(content).isEqualTo(NO_WRITE_VALUE);
-//    }
-//
+    //Read Test
+    @Test
+    void 기록한적_있는_LBA영역_읽기() throws IOException {
+        //Arrange
+        doAnswer(invocation -> {
+            try (FileOutputStream fileOutputStream = new FileOutputStream(SSD_OUTPUT_TXT)) {
+                fileOutputStream.write((WRITE_TEST_ADDRESS + DELIMITER + WRITE_TEST_VALUE).getBytes());
+                return null;
+            }
+        }).when(fileDriver).read(anyString());
+
+        //Act
+        ssd.read(READ_TEST_ADDRESS);
+
+        //Assert
+        verify(fileDriver, times(1)).read(anyString());
+        assertThat(new String(Files.readAllBytes(Paths.get(SSD_OUTPUT_TXT)))).isEqualTo(WRITE_TEST_ADDRESS + DELIMITER + WRITE_TEST_VALUE);
+    }
+
+    @Test
+        //기록이 한적이 없는 LBA를 읽으면 0x00000000 으로 읽힌다.
+    void 기록한적_없는_LBA영역_읽기() throws IOException {
+
+        //Arrange
+        doAnswer(invocation -> {
+            try (FileOutputStream fileOutputStream = new FileOutputStream(SSD_OUTPUT_TXT)) {
+                fileOutputStream.write(NO_WRITE_VALUE.getBytes());
+                return null;
+            }
+        }).when(fileDriver).read(anyString());
+
+        //Act
+        ssd.read(READ_TEST_ADDRESS);
+
+        //Assert
+        verify(fileDriver, times(1)).read(anyString());
+        String content = new String(Files.readAllBytes(Paths.get(SSD_OUTPUT_TXT))); // 기본 UTF-8로 변환
+        assertThat(content).isEqualTo(NO_WRITE_VALUE);
+    }
+
 //    @Test
 //    void 같은_LBA영역_다른_값_쓰고_읽기_여러번() throws IOException {
 //
