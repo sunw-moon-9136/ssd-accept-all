@@ -30,9 +30,15 @@ public class TestShell {
             return result;
         }
 
-        if (isNullEmpty(command)) return INVALID_COMMAND;
+        if (isNullEmpty(command)) {
+            printResult(INVALID_COMMAND);
+            return INVALID_COMMAND;
+        }
 
-        if (isValidCommand(parts)) return INVALID_COMMAND;
+        if (isValidCommand(parts)) {
+            printResult(INVALID_COMMAND);
+            return INVALID_COMMAND;
+        }
 
         if (parts[0].equals("help")) {
             System.out.println(Common.HELP_TEXT);
