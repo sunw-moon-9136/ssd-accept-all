@@ -88,7 +88,6 @@ class OutputTest {
         String act = output.checkResult("write");
         System.out.println(act);
         assertNotNull(act);
-
     }
 
 }

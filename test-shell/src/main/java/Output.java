@@ -42,12 +42,14 @@ public class Output {
         if (commandLine.equals("read")) {
             if (existFileCheck()) {
                 checkResult = readLine();
+                return checkResult;
             }
         }
 
         if (commandLine.equals("write")) {
             if (existFileCheck()) {
                 checkResult = readLine();
+                return checkResult;
             }
         }
 
