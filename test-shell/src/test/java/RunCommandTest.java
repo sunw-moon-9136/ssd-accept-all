@@ -15,7 +15,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class RunCommandTest {
     @Spy
-    @InjectMocks  // 💡 이거 붙이면 mockOutput이 생성자에 주입됨
+    @InjectMocks
     RunCommand runCommand;
 
     @Test
