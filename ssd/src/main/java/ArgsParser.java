@@ -38,7 +38,7 @@ public class ArgsParser {
             if(args[0].equals("R")) {
                 if(args.length != 2) throw new IllegalArgumentException();
             } else if(args[0].equals("W")) {
-
+                if(args.length != 3) throw new IllegalArgumentException();
             }
         } catch(Exception e) {
             error();
