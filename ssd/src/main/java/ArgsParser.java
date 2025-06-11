@@ -42,6 +42,19 @@ public class ArgsParser {
     public void run(String[] args) {
         try {
             if (!isValidArgs(args)) throw new IllegalArgumentException();
+            if (args[0].equals("R")) {
+                if (Integer.parseInt(args[1]) >= 0 && Integer.parseInt(args[1]) <= 99) {
+
+                } else {
+                    throw new IllegalArgumentException();
+                }
+            } else if (args[0].equals("W")) {
+                if (Integer.parseInt(args[1]) >= 0 && Integer.parseInt(args[1]) <= 99) {
+
+                } else {
+                    throw new IllegalArgumentException();
+                }
+            }
         } catch (Exception e) {
             error();
         }
