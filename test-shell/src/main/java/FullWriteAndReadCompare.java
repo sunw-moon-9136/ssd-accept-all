@@ -29,8 +29,12 @@ public class FullWriteAndReadCompare extends DefaultTestScenario {
             if (!runCommand.execute(String.format("R %d", i + j)))
                 return false;
 
-            String result = output.checkResult("read").split(": ")[1];
-            if (!result.equals(testValue))
+            String result = output.checkResult("read");
+            String address = result.split(" : ")[0].substring(4);
+            String value = result.split(" : ")[1];
+            if (Integer.parseInt(address) != i + j)
+                return false;
+            if (!value.equals(testValue))
                 return false;
         }
         return true;
