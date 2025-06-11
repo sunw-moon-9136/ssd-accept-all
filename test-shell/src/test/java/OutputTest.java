@@ -52,12 +52,22 @@ class OutputTest {
     }
 
     @Test
-    void 받은명령어가_READ이면_OUTPUT파일을_읽어_diaplay한다() throws IOException {
+    void 받은명령어가_READ이면_OUTPUT파일을_읽어_diaplay() throws IOException {
 
         boolean expected = true;
         String act = mockOutput.checkResult("read");
         verify(mockOutput, times(1)).checkResult("read");
 
     }
+
+    @Test
+    void 받은명렁어가_Write이면_OUTPUT파일을_읽었는지_확인한다() throws IOException {
+
+        boolean expected = true;
+        String act = mockOutput.checkResult("write");
+        verify(mockOutput, times(1)).checkResult("write");
+
+    }
+
 
 }
