@@ -30,7 +30,7 @@ class PartialLBAWriteTest {
             int index = idx.getAndIncrement() % inputAddressList.length;
             int value = Integer.parseInt(inputAddressList[index]);
             return String.format("LBA %02d : 0xAAAABBBB", value);
-        }).when(output).checkResult(anyString());
+        }).when(output).checkResult(anyString(), anyString());
 
         boolean actual = testScenario.run();
         assertThat(actual).isTrue();

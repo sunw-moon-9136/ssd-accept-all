@@ -24,7 +24,7 @@ public class Output {
     }
 
 
-    public String checkResult(String commandLine) {
+    public String checkResult(String commandLine, String address) {
         String checkResult = "[" + commandLine + "] ";
         String readResult;
         try {
@@ -49,6 +49,12 @@ public class Output {
                 if (!readResult.contains("0x")) return checkResult += "ERROR";
                 if (readResult.contains("ERROR")) return checkResult += "ERROR";
                 checkResult += "LBA ";
+                if (address.length() == 1) {
+                    address = "0" + address + " : ";
+                } else {
+                    address = address + " : ";
+                }
+                checkResult += address;
                 checkResult += readResult;
                 return checkResult;
             }

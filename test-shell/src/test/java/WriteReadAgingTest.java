@@ -42,7 +42,7 @@ class WriteReadAgingTest {
             if (isAddress00.get())
                 return "LBA 00 : " + testValue;
             return "LBA 99 : " + testValue;
-        }).when(output).checkResult(anyString());
+        }).when(output).checkResult(anyString(), anyString());
 
         boolean actual = testScenario.run();
 
@@ -53,7 +53,7 @@ class WriteReadAgingTest {
     void value가_달라서_readCompare_실패한_경우_return_false() {
         doReturn("0x12488321").when(randomFactory).getRandomHexValue();
         doReturn(true).when(runCommand).execute(any());
-        doReturn("LBA 00 : 0x12345678").when(output).checkResult(anyString());
+        doReturn("LBA 00 : 0x12345678").when(output).checkResult(anyString(), anyString());
 
         boolean actual = testScenario.run();
 
@@ -64,7 +64,7 @@ class WriteReadAgingTest {
     void address가_달라서_readCompare_실패한_경우_return_false() {
         doReturn("0x00000000").when(randomFactory).getRandomHexValue();
         doReturn(true).when(runCommand).execute(any());
-        doReturn("LBA 50 : 0x00000000").when(output).checkResult(anyString());
+        doReturn("LBA 50 : 0x00000000").when(output).checkResult(anyString(), anyString());
 
         boolean actual = testScenario.run();
 

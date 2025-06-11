@@ -12,7 +12,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class OutputTest {
 
-    final static String OUTPUT_TEXT_READ_PASS = "1 0xAAAABBBB";
+    final static String OUTPUT_TEXT_READ_PASS = "0xAAAABBBB";
     final static String OUTPUT_TEXT_ERROR = "ERROR";
     final static String OUTPUT_TEXT_WRITE_PASS = null;
 
@@ -55,16 +55,16 @@ class OutputTest {
 
         when(mockDataReader.exists()).thenReturn(true);
         when(mockDataReader.readLine()).thenReturn(OUTPUT_TEXT_READ_PASS);
-        String result = output.checkResult("read");
+        String result = output.checkResult("read", "1");
         System.out.println(result);
-        assertEquals(RESULT_STRING_READ_PASS, result);
+        assertEquals("[read] LBA 01 : 0xAAAABBBB", result);
         verify(mockDataReader, times(1)).readLine();
     }
 
     @Test
     void 받은명령어가_READ이고_파일이_없으면_ERROR반환() {
         when(mockDataReader.exists()).thenReturn(false);
-        String result = output.checkResult("read");
+        String result = output.checkResult("read", "1");
         System.out.println(result);
         assertEquals(RESULT_STRING_READ_ERROR, result);
         verify(mockDataReader, never()).readLine();
@@ -73,7 +73,7 @@ class OutputTest {
     @Test
     void 받은명령어가_READ이고_결과값이_ERROR일때() {
         when(mockDataReader.exists()).thenReturn(true);
-        String result = output.checkResult("read");
+        String result = output.checkResult("read", "1");
         System.out.println(result);
         assertEquals(RESULT_STRING_READ_ERROR, result);
         verify(mockDataReader, times(1)).readLine();
@@ -84,7 +84,7 @@ class OutputTest {
 
         when(mockDataReader.exists()).thenReturn(true);
         when(mockDataReader.readLine()).thenThrow(new RuntimeException("Simulated file read error"));
-        String result = output.checkResult("read");
+        String result = output.checkResult("read", "1");
         System.out.println(result);
         assertEquals(RESULT_STRING_READ_ERROR, result);
         verify(mockDataReader, times(1)).readLine();
@@ -95,7 +95,7 @@ class OutputTest {
 
         when(mockDataReader.exists()).thenReturn(true);
         when(mockDataReader.readLine()).thenReturn(" 11111");
-        String result = output.checkResult("read");
+        String result = output.checkResult("read", "1");
         System.out.println(result);
         assertEquals(RESULT_STRING_READ_ERROR, result);
         verify(mockDataReader, times(1)).readLine();
@@ -107,9 +107,9 @@ class OutputTest {
 
         when(mockDataReader.exists()).thenReturn(true);
         when(mockDataReader.readLine()).thenReturn(OUTPUT_TEXT_READ_PASS);
-        output.checkResult("read");
-        output.checkResult("read");
-        output.checkResult("read");
+        output.checkResult("read", "1");
+        output.checkResult("read", "1");
+        output.checkResult("read", "1");
         verify(mockDataReader, times(3)).readLine();
     }
 
@@ -119,7 +119,7 @@ class OutputTest {
 
         when(mockDataReader.exists()).thenReturn(true);
         when(mockDataReader.readLine()).thenReturn(OUTPUT_TEXT_WRITE_PASS);
-        String result = output.checkResult("write");
+        String result = output.checkResult("write", "1");
         System.out.println(result);
         assertEquals(RESULT_STRING_WRITE_PASS, result);
     }
@@ -129,7 +129,7 @@ class OutputTest {
 
         when(mockDataReader.exists()).thenReturn(true);
         when(mockDataReader.readLine()).thenThrow(new RuntimeException("Simulated file read error"));
-        String result = output.checkResult("write");
+        String result = output.checkResult("write", "1");
         System.out.println(result);
         assertEquals(RESULT_STRING_WRITE_ERROR, result);
         verify(mockDataReader, times(1)).readLine();
@@ -140,7 +140,7 @@ class OutputTest {
 
         when(mockDataReader.exists()).thenReturn(true);
         when(mockDataReader.readLine()).thenReturn(OUTPUT_TEXT_ERROR);
-        String result = output.checkResult("write");
+        String result = output.checkResult("write", "1");
         System.out.println(result);
         assertEquals(RESULT_STRING_WRITE_ERROR, result);
     }
@@ -192,7 +192,7 @@ class ActualTest {
         void output_파일이_없을때_checkResult_ERROR() throws IOException {
 
             boolean expected = false;
-            String act = output.checkResult("read");
+            String act = output.checkResult("read", "1");
             assertEquals("[read] ERROR", act);
 
         }
@@ -201,8 +201,8 @@ class ActualTest {
         @Test
         void 받은명령어가_READ이면_OUTPUT파일을_읽는다() throws IOException {
 
-            String expected = "[read] LBA 1 0xFFFFFFF";
-            String act = output.checkResult("read");
+            String expected = "[read] LBA 01 : 0xFFFFFFF";
+            String act = output.checkResult("read", "1");
             System.out.println(act);
 
             assertEquals(expected, act);
@@ -220,7 +220,7 @@ class ActualTest {
         void 받은명령어가_write일때_정상동작_확인() throws IOException {
 
             boolean expected = true;
-            String act = output.checkResult("write");
+            String act = output.checkResult("write", "1");
             assertEquals("[write] DONE", act);
         }
 
@@ -228,7 +228,7 @@ class ActualTest {
         void 받은명령어가_write일때_ERROR() throws IOException {
 
             String expected = "[write] ERROR";
-            String act = output.checkResult("write");
+            String act = output.checkResult("write", "1");
             assertEquals(expected, act);
         }
     }
