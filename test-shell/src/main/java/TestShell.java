@@ -9,22 +9,54 @@ public class TestShell {
     public static final String[] COMMAND_DATA = new String[]{"fullwrite"};
     public static final String[] COMMAND_LBA_DATA = new String[]{"write"};
 
+    RunCommand runCommand;
+    Output output;
+
+    public TestShell(RunCommand runCommand, Output output) {
+        this.runCommand = runCommand;
+        this.output = output;
+    }
+
     public String runTestShell(Scanner input) {
         System.out.print(">> ");
         String command = input.nextLine().trim();
 
         if (isNullEmpty(command)) return INVALID_COMMAND;
-        if (isValidCommand(command)) return INVALID_COMMAND;
-        return command;
+
+        String[] parts = command.split("\\s+");
+        if (isValidCommand(parts)) return INVALID_COMMAND;
+
+        if (parts[0].equals("help")) {
+            System.out.println(Common.HELP_TEXT);
+            return "help";
+        }
+        if (parts[0].equals("exit")) return "exit";
+
+        // fullread, fullwrite
+        if (parts[0].startsWith("full")) {
+            for (int i = 0; i < 100; i++) {
+                runProcess(command);
+            }
+        } else {
+            //read, write
+            runProcess(command);
+        }
+
+        return parts[0];
+    }
+
+    private void runProcess(String command) {
+        if (runCommand.execute(command)) {
+            // TODO
+            // output 접근
+        }
     }
 
     private boolean isNullEmpty(String command) {
         return command == null || command.isEmpty();
     }
 
-    private boolean isValidCommand(String command) {
-        String[] parts = command.split("\\s+");
-
+    private boolean isValidCommand(String[] parts) {
         if (checkRegisteredCommand(parts[0])) return true;
         if (Arrays.asList(ONE_LENGTH_COMMAND).contains(parts[0])) return isValidOneLength(parts);
         if (Arrays.asList(COMMAND_LBA).contains(parts[0])) return isValidCmdLBA(parts);
