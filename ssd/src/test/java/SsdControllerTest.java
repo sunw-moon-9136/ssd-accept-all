@@ -19,6 +19,7 @@ class SsdControllerTest {
     private static final String INVALID_WRITE_LBA[] = {"W", "-1", "0x12345678"};
     private static final String INVALID_LBA_CHARACTER[] = {"W", "qvione", "0x12345678"};
     private static final String INVALID_VALUE_LENGTH[] = {"W", "12", "0x1234567194538"};
+    private static final String INVALID_VALUE_CHARACTER[] = {"W", "12", "0(!*@&$(@*#"};
 
     SsdController parser;
 
@@ -117,7 +118,7 @@ class SsdControllerTest {
     }
 
     @Test
-    void 값의자리수는10_입력값_자리수가_10이아닐때_에러() {
+    void 주소값의자리수는10_입력값_자리수가_10이아닐때_에러() {
         doNothing().when(mockDriver).write(anyString(), any());
 
         parser.run(INVALID_VALUE_LENGTH);
@@ -126,7 +127,7 @@ class SsdControllerTest {
     }
 
     @Test
-    void 값의시작부분이_0x일때() {
+    void 주소값의시작부분이_0x일때() {
         parser.run(VALID_WRITE_ARGS);
 
         verify(mockDriver, never()).write(anyString(), any());
@@ -135,9 +136,8 @@ class SsdControllerTest {
     @Test
     void 값의시작부분이_0x가아니거나_이상한문자가오면에러() {
         doNothing().when(mockDriver).write(anyString(), any());
-        String args[] = {"W", "12", "0*!(@&$*@("};
 
-        parser.run(args);
+        parser.run(INVALID_VALUE_CHARACTER);
 
         verify(mockDriver, times(1)).write(anyString(), any());
     }

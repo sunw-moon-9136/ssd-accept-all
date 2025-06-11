@@ -33,10 +33,8 @@ public class SsdController {
         }
     }
 
-    private boolean isValidValue(String value) {
-        if(!value.startsWith("0x")) return false;
-
-        return value.length() == 10;
+    private boolean isValidAddress(String value) {
+        return value.matches("0x[A-F0-9]{8}$");
     }
 
     private boolean isValidReadCommand(String[] args) {
@@ -49,7 +47,7 @@ public class SsdController {
         return args.length == 3 &&
                 args[0].equals("W") &&
                 isValidLBA(args[1]) &&
-                isValidValue(args[2]);
+                isValidAddress(args[2]);
     }
 
     private boolean isValidArgs(String[] args) {
