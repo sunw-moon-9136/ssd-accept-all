@@ -118,7 +118,7 @@ class SsdControllerTest {
     }
 
     @Test
-    void 주소값의자리수는10_입력값_자리수가_10이아닐때_에러() {
+    void 값의자리수는10_입력값_자리수가_10이아닐때_에러() {
         doNothing().when(mockDriver).write(anyString(), any());
 
         parser.run(INVALID_VALUE_LENGTH);
@@ -127,7 +127,7 @@ class SsdControllerTest {
     }
 
     @Test
-    void 주소값의시작부분이_0x일때() {
+    void 값의시작부분이_0x일때() {
         parser.run(VALID_WRITE_ARGS);
 
         verify(mockDriver, never()).write(anyString(), any());

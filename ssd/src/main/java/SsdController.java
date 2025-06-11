@@ -33,7 +33,7 @@ public class SsdController {
         }
     }
 
-    private boolean isValidAddress(String value) {
+    private boolean isValidValue(String value) {
         return value.matches("0x[A-F0-9]{8}$");
     }
 
@@ -47,7 +47,7 @@ public class SsdController {
         return args.length == 3 &&
                 args[0].equals("W") &&
                 isValidLBA(args[1]) &&
-                isValidAddress(args[2]);
+                isValidValue(args[2]);
     }
 
     private boolean isValidArgs(String[] args) {
