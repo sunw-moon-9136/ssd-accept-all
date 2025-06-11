@@ -10,9 +10,8 @@ public class FileDriver implements Driver {
     public String read(String file) {
         requireValidFileName(file);
 
-        Path path = Paths.get(file);
-        try {
-            return Files.readString(path);
+         try {
+            return Files.readString(Paths.get(file));
         } catch (NoSuchFileException e) {
             throw new RuntimeException("File Not Found: " + file);
         } catch (IOException e) {
@@ -25,8 +24,7 @@ public class FileDriver implements Driver {
         requireValidFileName(file);
 
         try {
-            Path path = Paths.get(file);
-            Files.write(path, bytes, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            Files.write(Paths.get(file), bytes, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException e) {
             e.printStackTrace();
         }

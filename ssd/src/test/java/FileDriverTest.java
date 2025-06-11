@@ -102,8 +102,8 @@ class FileDriverTest {
 
         @Test
         void 대상_파일이_존재하는_경우_파일_전체_read() throws IOException {
-            Path path = Paths.get(TEST_TARGET_FILE_NAME);
-            Files.writeString(path, TEST_TEXT, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            Files.writeString(Paths.get(TEST_TARGET_FILE_NAME),
+                    TEST_TEXT, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
             String actual = fileDriver.read(TEST_TARGET_FILE_NAME);
 
@@ -112,8 +112,7 @@ class FileDriverTest {
 
         @Test
         void 대상_파일이_존재하지_않는_경우_NAND_FILE_INIT하여_신규로_생성_후_return() throws IOException {
-            Path path = Paths.get(TEST_TARGET_FILE_NAME);
-            Files.deleteIfExists(path);
+            Files.deleteIfExists(Paths.get(TEST_TARGET_FILE_NAME));
 
             assertThatThrownBy(() -> fileDriver.read(TEST_TARGET_FILE_NAME))
                     .isInstanceOf(RuntimeException.class)
@@ -123,7 +122,6 @@ class FileDriverTest {
 
     @AfterEach
     void cleanUp() throws IOException {
-        Path path = Paths.get(TEST_TARGET_FILE_NAME);
-        Files.deleteIfExists(path);
+        Files.deleteIfExists(Paths.get(TEST_TARGET_FILE_NAME));
     }
 }
