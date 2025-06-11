@@ -8,7 +8,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -18,13 +21,14 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class SsdTest {
     public static final String DELIMITER = "\t";
-    public static final String WRITE_TEST_VALUE = "0xFFFFFFF0";
-    public static final int WRITE_TEST_ADDRESS = 88;
-    public static final String READ_TEST_VALUE = "0xFFFFFFF0";
-    public static final int READ_TEST_ADDRESS = 33;
-    public static final String NO_WRITE_VALUE = "0x00000000";
     public static final String SSD_OUTPUT_TXT = "ssd_output.txt";
     public static final String SSD_NAND_TXT = "ssd_nand.txt";
+
+    public static final int WRITE_TEST_ADDRESS = 88;
+    public static final int READ_TEST_ADDRESS = 33;
+    public static final String WRITE_TEST_VALUE = "0xFFFFFFF0";
+    public static final String READ_TEST_VALUE = "0xFFFFFFF0";
+    public static final String NO_WRITE_VALUE = "0x00000000";
 
 
     @Mock
@@ -51,7 +55,11 @@ class SsdTest {
 
         when(fileDriver.read(anyString())).thenAnswer(invocation -> {
             String path = invocation.getArgument(0);
-            return new String(Files.readAllBytes(Paths.get(path)));
+            try {
+                return new String(Files.readAllBytes(Paths.get(path)));
+            } catch (NoSuchFileException e) {
+                throw new RuntimeException("no file");
+            }
         });
     }
 
@@ -103,7 +111,7 @@ class SsdTest {
 
         //Assert
         content = new String(Files.readAllBytes(Paths.get(SSD_OUTPUT_TXT)));
-        verify(fileDriver, times(2)).read(anyString());
+        verify(fileDriver, times(4)).read(anyString());
         assertThat(content).isEqualTo(READ_TEST_VALUE);
     }
 
@@ -118,43 +126,30 @@ class SsdTest {
 
         //Assert
         content = new String(Files.readAllBytes(Paths.get(SSD_OUTPUT_TXT)));
-        verify(fileDriver, times(1)).read(anyString());
+        verify(fileDriver, times(2)).read(anyString());
         assertThat(content).isEqualTo(NO_WRITE_VALUE);
     }
 
-//    @Test
-//    void 같은_LBA영역_다른_값_쓰고_읽기_여러번() throws IOException {
-//
-//        //Arrange
-//        int retryCnt = 3;
-//        doAnswer(invocation -> {
-//            String path = invocation.getArgument(0);
-//            byte[] data = invocation.getArgument(1);
-//            Files.write(Paths.get(SSD_OUTPUT_TXT), data);
-//            return null;
-//        }).when(fileDriver).write(anyString(), any());
-//
-//        doAnswer(invocation -> {
-//            byte[] data = Files.readAllBytes(Paths.get(SSD_OUTPUT_TXT));
-//            try (FileOutputStream fos = new FileOutputStream(SSD_OUTPUT_TXT)) {
-//                fos.write(data);
-//                return null;
-//            }
-//        }).when(fileDriver).read(anyString());
-//
-//        //Act
-//        List<String> readStringList = new ArrayList<>();
-//        for (int i = 0; i < retryCnt; i++) {
-//            ssd.write(WRITE_TEST_ADDRESS, WRITE_TEST_VALUE + i);
-//            ssd.read(WRITE_TEST_ADDRESS);
-//            readStringList.add(Files.readString(Paths.get(SSD_OUTPUT_TXT)));
-//        }
-//
-//        //Assert
-//        for (int i = 0; i < readStringList.size(); i++) {
-//            assertThat(readStringList.get(i)).isEqualTo(String.valueOf(//                fileOutputStream.write((WRITE_TEST_ADDRESS + DELIMITER + (WRITE_TEST_VALUE+i)).getBytes());));
-//        }
-//        verify(fileDriver, times(retryCnt)).write(anyString(), any());
-//        verify(fileDriver, times(retryCnt)).read(anyString());
-//    }
+    @Test
+    void 같은_LBA영역_다른_값_쓰고_읽기_여러번() throws IOException {
+
+        //Arrange
+        int retryCnt = 3;
+
+        //Act
+        List<String> readStringList = new ArrayList<>();
+        for (int i = 0; i < retryCnt; i++) {
+            ssd.write(WRITE_TEST_ADDRESS, WRITE_TEST_VALUE + i);
+            ssd.read(WRITE_TEST_ADDRESS);
+            readStringList.add(Files.readString(Paths.get(SSD_OUTPUT_TXT)));
+        }
+
+        //Assert
+        for (int i = 0; i < readStringList.size(); i++) {
+            assertThat(readStringList.get(i)).isEqualTo(String.valueOf(WRITE_TEST_VALUE + i));
+        }
+
+        verify(fileDriver, times(13)).write(anyString(), any());
+        verify(fileDriver, times(12)).read(anyString());
+    }
 }

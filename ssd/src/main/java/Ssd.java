@@ -1,14 +1,12 @@
-import java.io.File;
-
 public class Ssd implements ReadWritable {
+    public static final int MAX_ADDRESS_LENGTH = 100;
+    public static final String INIT_VALUE = "0x00000000";
+
     public static final String SSD_OUTPUT_TXT = "ssd_output.txt";
     public static final String SSD_NAND_TXT = "ssd_nand.txt";
-    public static final int MAX_ADDRESS_LENGTH = 100;
 
     private final String ADDRESS_VALUE_DELIMITER = "\t";
     private final String NEW_LINE_CHAR = "\n";
-    private final String EMPTY_STRING = "";
-
 
     private Driver driver;
 
@@ -17,70 +15,69 @@ public class Ssd implements ReadWritable {
     }
 
     @Override
-    public void read(int address) {
-        if (!isFileExist(SSD_NAND_TXT)) {
-            initializeNAND();
-        }
-        String nandContents = driver.read(SSD_NAND_TXT);
-        driver.write(SSD_OUTPUT_TXT, getAddressValue(nandContents, address).getBytes());
+    public String read(int address) {
+        if (!isFileExist(SSD_NAND_TXT)) initializeNand();
+        flushReadOutput();
+        String readValue = getAddressValue(address);
+        driver.write(SSD_OUTPUT_TXT, readValue.getBytes());
+        return readValue;
     }
 
-    private String getAddressValue(String nandContents, int readAddress) {
-        String[] contentLines = nandContents.split(NEW_LINE_CHAR);
-        String readValue = "";
-        for (String line : contentLines) {
-            String[] content = line.split(ADDRESS_VALUE_DELIMITER);
-            if (content[0].equals(String.valueOf(readAddress)))
-                return content[1];
+    private boolean isFileExist(String fileName) {
+        try {
+            driver.read(fileName);
+            return true;
+        } catch (RuntimeException e) {
+            return false;
         }
-        return readValue;
+    }
+
+    private void initializeNand() {
+        StringBuilder sb = new StringBuilder();
+        for (int writeAddress = 0; writeAddress < MAX_ADDRESS_LENGTH; writeAddress++) {
+            String writeString = generateWriteString(writeAddress, INIT_VALUE);
+            sb.append(writeString);
+        }
+        driver.write(SSD_NAND_TXT, sb.toString().getBytes());
     }
 
     private void flushReadOutput() {
         driver.write(SSD_OUTPUT_TXT, "".getBytes());
     }
 
-    private boolean isFileExist(String fileName) {
-        return new File(fileName).exists();
+    private String getAddressValue(int readAddress) {
+        String nandFullContents = driver.read(SSD_NAND_TXT);
+
+        for (String line : nandFullContents.split(NEW_LINE_CHAR)) {
+            String[] content = line.split(ADDRESS_VALUE_DELIMITER);
+            if (content[0].equals(String.valueOf(readAddress))) return content[1];
+        }
+        return "";
     }
 
     @Override
     public void write(int address, String value) {
-        if (!isFileExist(SSD_NAND_TXT)) {
-            initializeNAND();
-        }
+        if (!isFileExist(SSD_NAND_TXT)) initializeNand();
         flushReadOutput();
-        String writeContent = getWriteContent(address, value);
-        driver.write(SSD_NAND_TXT, writeContent.getBytes());
+        driver.write(SSD_NAND_TXT, getWriteContent(address, value).getBytes());
     }
 
-    private String getWriteContent(int address, String value) {
+    private String getWriteContent(int writeAddress, String writeValue) {
         String fileContent = driver.read(SSD_NAND_TXT);
-        String[] contentLines = fileContent.split(NEW_LINE_CHAR);
 
         StringBuilder sb = new StringBuilder();
-        for (String line : contentLines) {
-            String writeString = "";
-            String[] content = line.split(ADDRESS_VALUE_DELIMITER);
-            String readAddress = content[0];
-            String readValue = content[1];
-            if (readAddress.equals(String.valueOf(address))) {
-                writeString = readAddress + ADDRESS_VALUE_DELIMITER + value + NEW_LINE_CHAR;
-            } else {
-                writeString = readAddress + ADDRESS_VALUE_DELIMITER + readValue + NEW_LINE_CHAR;
-            }
-            sb.append(writeString);
+        for (String line : fileContent.split(NEW_LINE_CHAR)) {
+            String[] readLineSplit = line.split(ADDRESS_VALUE_DELIMITER);
+            int readAddress = Integer.parseInt(readLineSplit[0]);
+            String readValue = readLineSplit[1];
+
+            if (readAddress == writeAddress) readValue = writeValue;
+            sb.append(generateWriteString(readAddress, readValue));
         }
         return sb.toString();
     }
 
-    private void initializeNAND() {
-        StringBuilder sb = new StringBuilder();
-        String initValue = "0x00000000";
-        for (int i = 0; i < MAX_ADDRESS_LENGTH; i++) {
-            String inputString = i + ADDRESS_VALUE_DELIMITER + initValue + NEW_LINE_CHAR;
-            sb.append(inputString);
-        }
-        driver.write(SSD_NAND_TXT, sb.toString().getBytes());
+    private String generateWriteString(int writeAddress, String writeValue) {
+        return writeAddress + ADDRESS_VALUE_DELIMITER + writeValue + NEW_LINE_CHAR;
     }
 }
