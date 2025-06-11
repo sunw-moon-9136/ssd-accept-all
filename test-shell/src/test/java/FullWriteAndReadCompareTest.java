@@ -23,9 +23,7 @@ class FullWriteAndReadCompareTest {
         ITestScenario testScenario = new FullWriteAndReadCompare(runCommand, output);
         AtomicInteger atomicInteger = new AtomicInteger(0);
         doReturn(true).when(runCommand).execute(any());
-        doAnswer(invocationOnMock -> {
-            return String.format("LBA %02d : %s", atomicInteger.get(), makeHex(atomicInteger.getAndIncrement() / 5));
-        }).when(output).checkResult(anyString());
+        doAnswer(invocation -> String.format("LBA %02d : %s", atomicInteger.get(), makeHex(atomicInteger.getAndIncrement() / 5))).when(output).checkResult(anyString());
 
         boolean actual = testScenario.run();
 

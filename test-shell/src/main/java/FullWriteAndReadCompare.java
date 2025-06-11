@@ -1,32 +1,37 @@
 public class FullWriteAndReadCompare extends DefaultTestScenario {
 
-    private final Output output;
-
     public FullWriteAndReadCompare(RunCommand runCommand, Output output) {
-        super(runCommand);
-        this.output = output;
+        super(runCommand, output);
     }
 
     @Override
     public boolean run() {
-        for (int i = 0; i <= 95; i += 5) {
-            String testValue = makeHex(i / 5);
+        for (int addressByFive = 0; addressByFive <= 95; addressByFive += 5) {
+            String testValue = makeHex(addressByFive / 5);
 
-            // write
-            for (int j = 0; j <= 4; j++) {
-                if (!runCommand.execute(String.format("W %d %s", i + j, testValue)))
-                    return false;
-            }
+            if (!writeFiveValues(addressByFive, testValue)) return false;
 
-            // read compare
-            for (int j = 0; j <= 4; j++) {
-                if (!runCommand.execute(String.format("R %d", i + j)))
-                    return false;
+            if (!readCompareFiveValues(addressByFive, testValue)) return false;
+        }
+        return true;
+    }
 
-                String result = output.checkResult("read").split(": ")[1];
-                if (!result.equals(testValue))
-                    return false;
-            }
+    private boolean writeFiveValues(int i, String testValue) {
+        for (int j = 0; j <= 4; j++) {
+            if (!runCommand.execute(String.format("W %d %s", i + j, testValue)))
+                return false;
+        }
+        return true;
+    }
+
+    private boolean readCompareFiveValues(int i, String testValue) {
+        for (int j = 0; j <= 4; j++) {
+            if (!runCommand.execute(String.format("R %d", i + j)))
+                return false;
+
+            String result = output.checkResult("read").split(": ")[1];
+            if (!result.equals(testValue))
+                return false;
         }
         return true;
     }
