@@ -24,7 +24,7 @@ public class SsdController {
         driver.write("ssd_output.txt", "ERROR".getBytes());
     }
 
-    private static boolean isValidLBA(String lba) {
+    private boolean isValidLBA(String lba) {
         try {
             int number = Integer.parseInt(lba);
             return number >= 0 && number <= 99;
@@ -33,19 +33,19 @@ public class SsdController {
         }
     }
 
-    private static boolean isValidReadCommand(String[] args) {
+    private boolean isValidReadCommand(String[] args) {
         return args.length == 2 &&
                 args[0].equals("R") &&
                 isValidLBA(args[1]);
     }
 
-    private static boolean isValidWriteCommand(String[] args) {
+    private boolean isValidWriteCommand(String[] args) {
         return args.length == 3 &&
                 args[0].equals("W") &&
                 isValidLBA(args[1]);
     }
 
-    private static boolean isValidArgs(String[] args) {
+    private boolean isValidArgs(String[] args) {
         return isValidReadCommand(args) ||
                 isValidWriteCommand(args);
     }
