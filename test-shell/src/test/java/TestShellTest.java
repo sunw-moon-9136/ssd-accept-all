@@ -24,7 +24,7 @@ class TestShellTest {
     class CommandInputTest {
         @Test
         void read_Command_입력시_read_반환() {
-            String expect = "read";
+            String expect = "read 3";
             String actual = getString(expect + "\n");
 
             assertEquals(expect, actual);
@@ -32,7 +32,7 @@ class TestShellTest {
 
         @Test
         void write_Command_입력시_write_반환() {
-            String expect = "write";
+            String expect = "write 3 0xAAAABBBB";
             String actual = getString(expect + "\n");
 
             assertEquals(expect, actual);
@@ -48,7 +48,7 @@ class TestShellTest {
 
         @Test
         void fullwrite_Command_입력시_fullwrite_반환() {
-            String expect = "fullwrite";
+            String expect = "fullwrite 0xAAAABBBB";
             String actual = getString(expect + "\n");
 
             assertEquals(expect, actual);
@@ -120,93 +120,27 @@ class TestShellTest {
         }
 
         @Test
-        void read_Command_포맷_검사_올바른_포맷() {
-            String expect = "read";
-
-            String input = "read 3";
-            String actual = getString(input);
-
-            assertEquals(expect, actual);
-        }
-
-        @Test
-        void write_Command_포맷_검사_올바른_포맷() {
-            String expect = "write";
-
-            String input = "write 3 0xAAAABBBB";
-            String actual = getString(input);
-
-            assertEquals(expect, actual);
-        }
-
-        @Test
         void write_Command_포맷_검사_세번째_항목_10글자() {
-            String expect = "write";
-
             String input = "write 3 0xAAAAB";
             String actual = getString(input);
 
-            assertEquals(expect, actual);
+            assertEquals(INVALID_COMMAND, actual);
         }
 
         @Test
         void write_Command_포맷_검사_세번째_항목_처음0x() {
-            String expect = "write";
-
             String input = "write 3 SSAAAABBBB";
             String actual = getString(input);
 
-            assertEquals(expect, actual);
+            assertEquals(INVALID_COMMAND, actual);
         }
 
         @Test
         void write_Command_포맷_검사_세번째_항목_소문자확인() {
-            String expect = "write";
-
             String input = "write 3 0xaaaabbbb";
             String actual = getString(input);
 
-            assertEquals(expect, actual);
-        }
-
-        @Test
-        void fullread_Command_포맷_검사_올바른_포맷() {
-            String expect = "fullread";
-
-            String input = "fullread";
-            String actual = getString(input);
-
-            assertEquals(expect, actual);
-        }
-
-        @Test
-        void fullwrite_Command_포맷_검사_올바른_포맷() {
-            String expect = "fullwrite";
-
-            String input = "fullwrite";
-            String actual = getString(input);
-
-            assertEquals(expect, actual);
-        }
-
-        @Test
-        void help_Command_포맷_검사_올바른_포맷() {
-            String expect = "help";
-
-            String input = "help";
-            String actual = getString(input);
-
-            assertEquals(expect, actual);
-        }
-
-        @Test
-        void exit_Command_포맷_검사_올바른_포맷() {
-            String expect = "exit";
-
-            String input = "exit";
-            String actual = getString(input);
-
-            assertEquals(expect, actual);
+            assertEquals(INVALID_COMMAND, actual);
         }
     }
 }
