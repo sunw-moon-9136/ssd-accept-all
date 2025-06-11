@@ -34,7 +34,7 @@ class OutputTest {
     }
 
     @Test
-    void output_파일이_있으면_마지막줄을읽어서준다() throws IOException {
+    void output_파일이_있으면_마지막줄을_읽어서준다() throws IOException {
 
         Output o = new Output();
         boolean expected = true;
