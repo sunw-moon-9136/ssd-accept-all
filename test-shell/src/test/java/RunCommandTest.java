@@ -42,7 +42,7 @@ class RunCommandTest {
 
         runCommand.execute("write 3 0xAAAABBBB");
 
-        verify(mockOutput).run();
+        verify(mockOutput).run("write");
     }
 
     @Test
@@ -72,6 +72,6 @@ class RunCommandTest {
 
         runCommand.execute("read 3");
 
-        verify(mockOutput).run();
+        verify(mockOutput).run("read");
     }
 }

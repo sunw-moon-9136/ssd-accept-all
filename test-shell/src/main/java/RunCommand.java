@@ -17,7 +17,7 @@ public class RunCommand {
         if (command.equals("write")) runSSDCommand("W", parts[1], parts[2]);
         if (command.equals("read")) runSSDCommand("R", parts[1]);
 
-        output.run();
+        output.run(command);
     }
 
     void runSSDCommand(String... args) throws IOException, InterruptedException {
