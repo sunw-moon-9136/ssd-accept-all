@@ -9,6 +9,14 @@ public class TestShell {
     public static final String[] COMMAND_DATA = new String[]{"fullwrite"};
     public static final String[] COMMAND_LBA_DATA = new String[]{"write"};
 
+    RunCommand runCommand;
+    Output output;
+
+    public TestShell(RunCommand runCommand, Output output) {
+        this.runCommand = runCommand;
+        this.output = output;
+    }
+
     public String runTestShell(Scanner input) {
         System.out.print(">> ");
         String command = input.nextLine().trim();
@@ -24,7 +32,23 @@ public class TestShell {
         }
         if (parts[0].equals("exit")) return "exit";
 
+        // fullread, fullwrite
+        if (parts[0].startsWith("full")) {
+            for (int i = 0; i < 100; i++) {
+                runProcess(command);
+            }
+            return parts[0];
+        }
+
+        // read, write
+        runProcess(command);
         return parts[0];
+    }
+
+    private void runProcess(String command) {
+        if (runCommand.execute(command)) {
+            // output 접근
+        }
     }
 
     private boolean isNullEmpty(String command) {
