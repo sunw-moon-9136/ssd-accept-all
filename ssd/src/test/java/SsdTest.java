@@ -102,10 +102,9 @@ class SsdTest {
 
         //Act
         ssd.write(READ_TEST_ADDRESS, READ_TEST_VALUE);
-        ssd.read(READ_TEST_ADDRESS);
+        content = ssd.read(READ_TEST_ADDRESS);
 
         //Assert
-        content = new String(Files.readAllBytes(Paths.get(SSD_OUTPUT_TXT)));
         assertThat(content).isEqualTo(READ_TEST_VALUE);
     }
 
@@ -116,10 +115,9 @@ class SsdTest {
         String content = "";
 
         //Act
-        ssd.read(READ_TEST_ADDRESS);
+        content=ssd.read(READ_TEST_ADDRESS);
 
-        //Assert
-        content = new String(Files.readAllBytes(Paths.get(SSD_OUTPUT_TXT)));
+        //Assert\
         assertThat(content).isEqualTo(NO_WRITE_VALUE);
     }
 
@@ -133,8 +131,8 @@ class SsdTest {
         List<String> readStringList = new ArrayList<>();
         for (int i = 0; i < retryCnt; i++) {
             ssd.write(WRITE_TEST_ADDRESS, WRITE_TEST_VALUE + i);
-            ssd.read(WRITE_TEST_ADDRESS);
-            readStringList.add(Files.readString(Paths.get(SSD_OUTPUT_TXT)));
+            String content = ssd.read(WRITE_TEST_ADDRESS);
+            readStringList.add(content);
         }
 
         //Assert

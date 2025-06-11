@@ -2,7 +2,6 @@ public class Ssd implements ReadWritable {
     public static final int MAX_ADDRESS_LENGTH = 100;
     public static final String INIT_VALUE = "0x00000000";
 
-    public static final String SSD_OUTPUT_TXT = "ssd_output.txt";
     public static final String SSD_NAND_TXT = "ssd_nand.txt";
 
     private final String ADDRESS_VALUE_DELIMITER = "\t";
@@ -22,7 +21,6 @@ public class Ssd implements ReadWritable {
     public String read(int address) {
         if (!isFileExist(SSD_NAND_TXT)) initializeNand();
         String readValue = getAddressValue(address);
-        driver.write(SSD_OUTPUT_TXT, readValue.getBytes());
         return readValue;
     }
 
