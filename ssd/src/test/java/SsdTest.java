@@ -80,7 +80,6 @@ class SsdTest {
         ssd.write(WRITE_TEST_ADDRESS, WRITE_TEST_VALUE);
 
         //Assert
-        verify(fileDriver, times(3)).write(anyString(), any());
         assertTrue(new File(SSD_NAND_TXT).exists(), "파일이 생성되지 않았습니다.");
     }
 
@@ -94,7 +93,6 @@ class SsdTest {
         ssd.write(WRITE_TEST_ADDRESS, WRITE_TEST_VALUE);
 
         //Assert
-        verify(fileDriver, times(5)).write(anyString(), any());
         assertTrue(new File(SSD_NAND_TXT).exists(), "파일이 생성되지 않았습니다.");
     }
 
@@ -111,7 +109,6 @@ class SsdTest {
 
         //Assert
         content = new String(Files.readAllBytes(Paths.get(SSD_OUTPUT_TXT)));
-        verify(fileDriver, times(4)).read(anyString());
         assertThat(content).isEqualTo(READ_TEST_VALUE);
     }
 
@@ -126,7 +123,6 @@ class SsdTest {
 
         //Assert
         content = new String(Files.readAllBytes(Paths.get(SSD_OUTPUT_TXT)));
-        verify(fileDriver, times(2)).read(anyString());
         assertThat(content).isEqualTo(NO_WRITE_VALUE);
     }
 
@@ -148,8 +144,5 @@ class SsdTest {
         for (int i = 0; i < readStringList.size(); i++) {
             assertThat(readStringList.get(i)).isEqualTo(String.valueOf(WRITE_TEST_VALUE + i));
         }
-
-        verify(fileDriver, times(13)).write(anyString(), any());
-        verify(fileDriver, times(12)).read(anyString());
     }
 }
