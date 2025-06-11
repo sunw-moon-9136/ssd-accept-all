@@ -195,4 +195,9 @@ class TestShellTest {
             verify(mockRunCommand, times(100)).execute(anyString());
         }
     }
+
+    @Nested
+    class outputTest {
+
+    }
 }

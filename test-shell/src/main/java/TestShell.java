@@ -33,9 +33,16 @@ public class TestShell {
         if (parts[0].equals("exit")) return "exit";
 
         // fullread, fullwrite
-        if (parts[0].startsWith("full")) {
+        String changeCommand = "";
+        if (parts[0].equals("fullread")) {
             for (int i = 0; i < 100; i++) {
-                runProcess(command);
+                changeCommand = parts[0].substring(4) + " " + i;
+                runProcess(changeCommand);
+            }
+        } else if (parts[0].equals("fullwrite")) {
+            for (int i = 0; i < 100; i++) {
+                changeCommand = parts[0].substring(4) + " " + i + " " + parts[1];
+                runProcess(changeCommand);
             }
         } else {
             //read, write
@@ -47,8 +54,7 @@ public class TestShell {
 
     private void runProcess(String command) {
         if (runCommand.execute(command)) {
-            // TODO
-            // output 접근
+            output.checkResult(command.substring(4));
         }
     }
 
