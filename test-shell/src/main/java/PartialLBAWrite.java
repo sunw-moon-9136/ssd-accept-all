@@ -21,7 +21,7 @@ public class PartialLBAWrite extends DefaultTestScenario {
                 doWriteCmd(inputAddress);
             }
             for (String inputAddress : inputAddressList) {
-                if (!readCompare(inputAddress, WRITE_EXPECT_VALUE)) return false;
+                if (!readCompare(Integer.parseInt(inputAddress), WRITE_EXPECT_VALUE)) return false;
             }
             return true;
         } catch (Exception e) {
@@ -36,19 +36,5 @@ public class PartialLBAWrite extends DefaultTestScenario {
 
     private String generateWriteCommand(String writeAddress, String writeValue) {
         return "write".toLowerCase() + " " + writeAddress + " " + writeValue;
-    }
-
-    private boolean readCompare(String adress, String expect) {
-        return doReadCmdResult(adress).equals(expect);
-    }
-
-    private String doReadCmdResult(String inputAddress) {
-        runCommand.execute(generateReadCommand(inputAddress));
-        String[] splitConsoleString = output.checkResult("read").split(":");
-        return splitConsoleString[splitConsoleString.length - 1].trim();
-    }
-
-    private String generateReadCommand(String addr) {
-        return "read".toLowerCase() + " " + addr;
     }
 }
