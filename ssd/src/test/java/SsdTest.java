@@ -37,14 +37,11 @@ class SsdTest {
     Ssd ssd;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
         ssd = new Ssd(fileDriver);
 
-        File file = new File(SSD_OUTPUT_TXT);
-        if (file.exists()) file.delete();
-
-        File nand_file = new File(SSD_NAND_TXT);
-        if (nand_file.exists()) nand_file.delete();
+        Files.deleteIfExists(Paths.get(SSD_OUTPUT_TXT));
+        Files.deleteIfExists(Paths.get(SSD_NAND_TXT));
 
         doAnswer(invocation -> {
             String path = invocation.getArgument(0);
