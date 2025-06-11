@@ -1,8 +1,5 @@
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
 
 public class FileDriver implements Driver {
 
@@ -13,7 +10,13 @@ public class FileDriver implements Driver {
     public String read(String file) {
         requireValidFileName(file);
 
-        return "";
+         try {
+            return Files.readString(Paths.get(file));
+        } catch (NoSuchFileException e) {
+            throw new RuntimeException("File Not Found: " + file);
+        } catch (IOException e) {
+            throw new RuntimeException("Not Expected Error");
+        }
     }
 
     @Override
@@ -21,8 +24,7 @@ public class FileDriver implements Driver {
         requireValidFileName(file);
 
         try {
-            Path path = Paths.get(file);
-            Files.write(path, bytes, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            Files.write(Paths.get(file), bytes, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -30,7 +32,7 @@ public class FileDriver implements Driver {
 
     private void requireValidFileName(String file) {
         if (isNullOrEmpty(file) || !(file.equals(OUTPUT_FILE_NAME) || file.equals(NAND_FILE_NAME)))
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Invalid Argument");
     }
 
     private boolean isNullOrEmpty(String file) {
