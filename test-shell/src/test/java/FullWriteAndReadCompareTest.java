@@ -23,6 +23,11 @@ class FullWriteAndReadCompareTest {
 
     @BeforeEach
     void setUp() {
+        testScenario = new FullWriteAndReadCompare(runCommand, output);
+    }
+
+    @Test
+    void 정상적으로_모든_readCompare가_성공한_경우_return_true() {
          testScenario = new FullWriteAndReadCompare(runCommand, output);
     }
 

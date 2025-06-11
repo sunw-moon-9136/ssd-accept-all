@@ -1,0 +1,54 @@
+public class PartialLBAWrite extends DefaultTestScenario {
+    public final int repeatCnt = 30;
+    public final String[] inputAddressList = {"4", "0", "3", "1", "2"};
+    public static final String WRITE_EXPECT_VALUE = "0xAAAABBBB";
+    
+    public PartialLBAWrite(RunCommand runCommand, Output output) {
+        super(runCommand, output);
+    }
+
+    @Override
+    public boolean run() {
+        for (int i = 0; i < repeatCnt; i++) {
+            if (!isSuccessTestScenarioOnce()) return false;
+        }
+        return true;
+    }
+
+    private boolean isSuccessTestScenarioOnce() {
+        try {
+            for (String inputAddress : inputAddressList) {
+                doWriteCmd(inputAddress);
+            }
+            for (String inputAddress : inputAddressList) {
+                if (!readCompare(inputAddress, WRITE_EXPECT_VALUE)) return false;
+            }
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private void doWriteCmd(String Address) {
+        String cmd = generateWriteCommand(Address, WRITE_EXPECT_VALUE);
+        runCommand.execute(cmd);
+    }
+
+    private String generateWriteCommand(String writeAddress, String writeValue) {
+        return "write".toLowerCase() + " " + writeAddress + " " + writeValue;
+    }
+
+    private boolean readCompare(String adress, String expect) {
+        return doReadCmdResult(adress).equals(expect);
+    }
+
+    private String doReadCmdResult(String inputAddress) {
+        runCommand.execute(generateReadCommand(inputAddress));
+        String[] splitConsoleString = output.checkResult("read").split(":");
+        return splitConsoleString[splitConsoleString.length - 1].trim();
+    }
+
+    private String generateReadCommand(String addr) {
+        return "read".toLowerCase() + " " + addr;
+    }
+}
