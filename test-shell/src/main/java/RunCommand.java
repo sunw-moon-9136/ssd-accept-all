@@ -16,6 +16,13 @@ public class RunCommand {
 
         if (command.equals("write")) runSSDCommand("W", parts[1], parts[2]);
         if (command.equals("read")) runSSDCommand("R", parts[1]);
+        if (command.equals("fullwrite")) {
+            String value = parts[1];
+            for (int lba = 0; lba < 100; lba++) {
+                runSSDCommand("W", String.valueOf(lba), value);
+            }
+            command = "write";
+        }
         output.run(command);
     }
 

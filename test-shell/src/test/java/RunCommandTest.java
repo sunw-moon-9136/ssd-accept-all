@@ -87,4 +87,5 @@ class RunCommandTest {
         }
         verify(mockOutput).run("write");
     }
+
 }
