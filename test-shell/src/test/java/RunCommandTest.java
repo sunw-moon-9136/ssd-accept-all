@@ -74,4 +74,13 @@ class RunCommandTest {
 
         verify(mockOutput).run("read");
     }
+
+    @Test
+    void 지원하지_않는_명령시_예외발생() {
+        RunCommand runCommand = new RunCommand(mockOutput);
+
+        assertThatThrownBy(() -> runCommand.execute("delete 1"))
+                .isInstanceOf(UnsupportedOperationException.class)
+                .hasMessageContaining("Unknown command");
+    }
 }
