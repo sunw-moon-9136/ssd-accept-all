@@ -51,7 +51,8 @@ public class Output {
         if (commandLine.equals("write")) {
             if (existFileCheck()) {
                 checkResult = readLine();
-                return checkResult;
+                return null;
+
             }
         }
 
