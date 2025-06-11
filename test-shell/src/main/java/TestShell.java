@@ -69,7 +69,7 @@ public class TestShell {
     private boolean isValidDataArgument(String arg) {
         if (!arg.startsWith("0x")) return true;
         if (arg.length() != 10) return true;
-        if (!arg.substring(2).matches("[A-Z]+")) return true;
+        if (!arg.substring(2).matches("[A-Z0-9]+")) return true;
 
         return false;
     }
