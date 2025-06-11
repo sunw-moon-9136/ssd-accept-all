@@ -3,9 +3,9 @@ import java.util.Scanner;
 public class TestShell {
     public String runTestShell(Scanner input) {
         System.out.print(">> ");
-        String line = input.nextLine().trim();
+        String command = input.nextLine().trim();
 
-        switch (line) {
+        switch (command) {
             case "read" -> {
                 return "read";
             }
