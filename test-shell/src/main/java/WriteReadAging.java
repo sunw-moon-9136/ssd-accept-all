@@ -16,12 +16,12 @@ public class WriteReadAging extends DefaultTestScenario {
     public boolean run() {
         for (int i = 0; i < 200; i++) {
             String value = randomFactory.getRandomHexValue();
-            runCommand.execute("W 00 " + value);
+            runCommand.execute("write 0 " + value);
             if (!readCompare(0, value))
                 return false;
 
             value = randomFactory.getRandomHexValue();
-            runCommand.execute("W 99 " + value);
+            runCommand.execute("write 99 " + value);
             if (!readCompare(99, value))
                 return false;
         }

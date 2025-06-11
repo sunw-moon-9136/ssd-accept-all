@@ -17,7 +17,7 @@ public class FullWriteAndReadCompare extends DefaultTestScenario {
 
     private boolean writeFiveValues(int baseAddress, String testValue) {
         for (int additionalAddress = 0; additionalAddress <= 4; additionalAddress++) {
-            if (!runCommand.execute(String.format("W %d %s", baseAddress + additionalAddress, testValue)))
+            if (!runCommand.execute(String.format("write %d %s", baseAddress + additionalAddress, testValue)))
                 return false;
         }
         return true;

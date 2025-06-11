@@ -20,12 +20,18 @@ public class TestShell {
     public String runTestShell(Scanner input) {
         System.out.print("Shell> ");
         String command = input.nextLine().trim();
+        String[] parts = command.split("\\s+");
 
-        String result = "";
+        // Test Scenario
+        ITestScenario testScenario = TestScenarioFactory.getTestScenario(parts[0], runCommand, output);
+        if (testScenario != null) {
+            String result = testScenario.run() ? "PASS" : "FAIL";
+            System.out.println(result);
+            return result;
+        }
 
         if (isNullEmpty(command)) return INVALID_COMMAND;
 
-        String[] parts = command.split("\\s+");
         if (isValidCommand(parts)) return INVALID_COMMAND;
 
         if (parts[0].equals("help")) {
@@ -33,12 +39,6 @@ public class TestShell {
             return "help";
         }
         if (parts[0].equals("exit")) return "exit";
-
-        // Test Scenario
-        ITestScenario testScenario = TestScenarioFactory.getTestScenario(parts[0], runCommand, output);
-        if (testScenario != null) {
-            return testScenario.run() ? "PASS" : "FAIL";
-        }
 
         // fullread, fullwrite
         String changeCommand = "";

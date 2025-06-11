@@ -8,16 +8,10 @@ public abstract class DefaultTestScenario implements ITestScenario {
     }
 
     protected boolean readCompare(int testAddress, String testValue) {
-        if (!runCommand.execute(String.format("R %d", testAddress)))
+        if (!runCommand.execute(String.format("read %d", testAddress)))
             return false;
 
-        String result = output.checkResult("read", "1");
-        int address = Integer.parseInt(result.split(" : ")[0].substring(4));
-        String value = result.split(" : ")[1];
-
-        if (address != testAddress)
-            return false;
-
+        String value = "0x" + output.checkResult("read").split("0x")[1].trim();
         return value.equals(testValue);
     }
 }
