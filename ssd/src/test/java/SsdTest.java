@@ -115,9 +115,9 @@ class SsdTest {
         String content = "";
 
         //Act
-        content=ssd.read(READ_TEST_ADDRESS);
+        content = ssd.read(READ_TEST_ADDRESS);
 
-        //Assert\
+        //Assert
         assertThat(content).isEqualTo(NO_WRITE_VALUE);
     }
 

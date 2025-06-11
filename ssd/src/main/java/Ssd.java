@@ -2,6 +2,7 @@ public class Ssd implements ReadWritable {
     public static final int MAX_ADDRESS_LENGTH = 100;
     public static final String INIT_VALUE = "0x00000000";
 
+    public static final String SSD_OUTPUT_TXT = "ssd_output.txt";
     public static final String SSD_NAND_TXT = "ssd_nand.txt";
 
     private final String ADDRESS_VALUE_DELIMITER = "\t";
