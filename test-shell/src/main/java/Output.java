@@ -1,8 +1,8 @@
 public class Output {
 
     //TODO
-    final static String OUTPUT_FILE_PATH = "ssd_output.txt";
-    // final static String OUTPUT_FILE_PATH = "C:\\Users\\User\\Documents\\output.txt";
+    // final static String OUTPUT_FILE_PATH = "ssd_output.txt";
+    final static String OUTPUT_FILE_PATH = "C:\\Users\\User\\Documents\\output.txt";
 
     private final DataReader dataReader;
 
@@ -26,20 +26,31 @@ public class Output {
 
     public String checkResult(String commandLine) {
         String checkResult = "[" + commandLine + "] ";
-
+        String readResult;
         try {
             if (commandLine.equals("read")) {
                 if (existFileCheck()) {
+                    readResult = readLine();
+                    if (readResult.contains("ERROR")) {
+                        return checkResult += "ERROR";
+                    }
+
+                    if (!readResult.contains("0x")) {
+                        return checkResult += "ERROR";
+                    }
+
+
                     checkResult += "LBA ";
-                    checkResult += readLine();
+                    checkResult += readResult;
                     return checkResult;
                 }
+                return checkResult += "ERROR";
             }
 
             if (commandLine.equals("write")) {
                 if (existFileCheck()) {
 
-                    String readResult = readLine();
+                    readResult = readLine();
                     if (readResult == null || readResult.isEmpty()) {
                         checkResult += "DONE";
                         return checkResult;
