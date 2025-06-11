@@ -33,15 +33,15 @@ class WriteReadAgingTest {
 
     @Test
     void 정상적으로_모든_readCompare가_성공한_경우_return_true() {
-        AtomicBoolean atomicBoolean = new AtomicBoolean(false);
-        String randomValue = "0x00000000";
-        doReturn(randomValue).when(randomFactory).getRandomHexValue();
+        AtomicBoolean isAddress00 = new AtomicBoolean(false);
+        String testValue = "0x00000000";
+        doReturn(testValue).when(randomFactory).getRandomHexValue();
         doReturn(true).when(runCommand).execute(any());
         doAnswer(invocation -> {
-            atomicBoolean.set(!atomicBoolean.get());
-            if (atomicBoolean.get())
-                return "LBA 00 : " + randomValue;
-            return "LBA 99 : " + randomValue;
+            isAddress00.set(!isAddress00.get());
+            if (isAddress00.get())
+                return "LBA 00 : " + testValue;
+            return "LBA 99 : " + testValue;
         }).when(output).checkResult(anyString());
 
         boolean actual = testScenario.run();
