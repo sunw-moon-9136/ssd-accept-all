@@ -27,7 +27,7 @@ public class Output {
         if (commandLine.equals("read")) {
             if (existFileCheck()) {
                 checkResult = readLine();
-                return checkResult;
+                return "[read] " + checkResult;
             }
         }
 
@@ -36,14 +36,14 @@ public class Output {
 
                 checkResult = readLine();
                 if (checkResult == null || checkResult.isEmpty()) {
-                    return "DONE";
+                    return "[write] DONE";
                 }
-                return "FAIL";
+                return "[write] ERROR";
 
             }
         }
 
-        return "FAIL";
+        return "ERROR";
     }
 
 }
