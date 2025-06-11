@@ -4,13 +4,12 @@ import java.util.Collections;
 import java.util.List;
 
 public class RunCommand {
+    public void execute(String input) throws IOException, InterruptedException {
+        String[] parts = input.trim().split("\\s+");
+        String command = parts[0].toLowerCase();
 
-    public void write(String s) throws IOException, InterruptedException {
-        String[] str = s.split("\\s+");
-        String lba = str[1];
-        String value = str[2];
-
-        runSSDCommand("W", lba, value);
+        if (command.equals("write")) runSSDCommand("W", parts[1], parts[2]);
+        if (command.equals("read")) runSSDCommand("R", parts[1]);
     }
 
     void runSSDCommand(String... args) throws IOException, InterruptedException {
@@ -22,13 +21,6 @@ public class RunCommand {
 
         ProcessBuilder pb = new ProcessBuilder(command);
         pb.start().waitFor();
-    }
-
-    public void read(String s) throws IOException, InterruptedException {
-        String[] str = s.split("\\s+");
-        String lba = str[1];
-
-        runSSDCommand("R", lba);
     }
 }
 

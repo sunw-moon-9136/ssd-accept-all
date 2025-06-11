@@ -14,7 +14,7 @@ class RunCommandTest {
         RunCommand runCommand = spy(new RunCommand());
         doNothing().when(runCommand).runSSDCommand(any(), any(), any());
 
-        runCommand.write("write 3 0xAAAABBBB");
+        runCommand.execute("write 3 0xAAAABBBB");
 
         verify(runCommand).runSSDCommand("W", "3", "0xAAAABBBB");
     }
@@ -24,7 +24,7 @@ class RunCommandTest {
         RunCommand runCommand = spy(new RunCommand());
         doThrow(new IOException("테스트")).when(runCommand).runSSDCommand(any(), any(), any());
 
-        assertThatThrownBy(() -> runCommand.write("write 3 0xAAAABBBB"))
+        assertThatThrownBy(() -> runCommand.execute("write 3 0xAAAABBBB"))
                 .isInstanceOf(IOException.class)
                 .hasMessageContaining("테스트");
     }
@@ -34,8 +34,18 @@ class RunCommandTest {
         RunCommand runCommand = spy(new RunCommand());
         doNothing().when(runCommand).runSSDCommand(any(), any());
 
-        runCommand.read("read 3");
+        runCommand.execute("read 3");
 
         verify(runCommand).runSSDCommand("R", "3");
+    }
+
+    @Test
+    void read_SSDjar파일없을때_IOException_발생() throws IOException, InterruptedException {
+        RunCommand runCommand = spy(new RunCommand());
+        doThrow(new IOException("테스트")).when(runCommand).runSSDCommand(any(), any());
+
+        assertThatThrownBy(() -> runCommand.execute("read 3"))
+                .isInstanceOf(IOException.class)
+                .hasMessageContaining("테스트");
     }
 }
