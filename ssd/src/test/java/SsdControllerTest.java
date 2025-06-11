@@ -8,7 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class ArgsParserTest {
+class SsdControllerTest {
     // TODO RuntimeException -> output.txt.에 Error를 저장하는 것으로 변경
     private static final String INVALID_FIRST_ARG[] = {"Q", "12"};
     private static final String VALID_READ_ARGS[] = {"R", "56"};
@@ -19,7 +19,7 @@ class ArgsParserTest {
     private static final String INVALID_WRITE_LBA[] = {"W", "-1", "0x12345678"};
     private static final String INVALID_LBA_CHARACTER[] = {"W", "qvione", "0x12345678"};
 
-    ArgsParser parser;
+    SsdController parser;
 
     @Mock
     Driver mockDriver;
@@ -27,7 +27,7 @@ class ArgsParserTest {
 
     @BeforeEach
     void setUp() {
-        parser = new ArgsParser();
+        parser = new SsdController();
         parser.setDriver(mockDriver);
     }
 

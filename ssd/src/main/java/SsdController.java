@@ -1,13 +1,13 @@
-public class ArgsParser {
+public class SsdController {
     private Driver driver;
     private ReadWritable disk;
 
-    public ArgsParser() {
+    public SsdController() {
         this.driver = new FileDriver();
         this.disk = new Ssd();
     }
 
-    public ArgsParser(Driver driver, ReadWritable disk) {
+    public SsdController(Driver driver, ReadWritable disk) {
         this.driver = driver;
         this.disk = disk;
     }
