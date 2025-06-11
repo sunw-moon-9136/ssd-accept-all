@@ -61,7 +61,7 @@ public class TestShell {
 
     private String runProcess(String command) {
         String[] parts = command.split("\\s+");
-        if (runCommand.execute(command)) return output.checkResult(parts[0]);
+        if (runCommand.execute(command)) return output.checkResult(parts[0], parts[1]);
         return "ERROR";
     }
 

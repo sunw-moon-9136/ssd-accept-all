@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.StringReader;
 import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -210,22 +209,22 @@ class TestShellTest {
         @Test
         void write_정상입력시_output_checkResult_호출확인() {
             doReturn(true).when(mockRunCommand).execute("write 3 0xABCDFFFF");
-            doReturn("[write] DONE").when(mockOutput).checkResult("write");
+            doReturn("[write] DONE").when(mockOutput).checkResult("write", "3");
 
-            getOutputResult("write 3 0xABCDFFFF\n");
+            getOutputResult("write 03 0xABCDFFFF\n");
 
-            verify(mockOutput).checkResult("write");
+            verify(mockOutput).checkResult("write", "3");
         }
 
         @Test
         void read_정상입력시_output_checkResult_호출확인() {
             doReturn(true).when(mockRunCommand).execute("read 3");
-            doReturn("[read] LBA 3 0xABCDFFFF").when(mockOutput).checkResult("read");
+            doReturn("[read] LBA 03 : 0xABCDFFFF").when(mockOutput).checkResult("read", "3");
 
             String actual = getOutputResult("read 3\n");
 
-            verify(mockOutput).checkResult("read");
-            assertEquals("[read] LBA 3 0xABCDFFFF", actual);
+            verify(mockOutput).checkResult("read", "3");
+            assertEquals("[read] LBA 03 : 0xABCDFFFF", actual);
 
         }
     }

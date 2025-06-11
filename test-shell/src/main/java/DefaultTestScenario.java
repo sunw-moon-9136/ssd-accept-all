@@ -11,7 +11,7 @@ public abstract class DefaultTestScenario implements ITestScenario {
         if (!runCommand.execute(String.format("R %d", testAddress)))
             return false;
 
-        String result = output.checkResult("read");
+        String result = output.checkResult("read", "1");
         int address = Integer.parseInt(result.split(" : ")[0].substring(4));
         String value = result.split(" : ")[1];
 

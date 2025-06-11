@@ -31,7 +31,7 @@ class FullWriteAndReadCompareTest {
         AtomicInteger atomicInteger = new AtomicInteger(0);
         doReturn(true).when(runCommand).execute(any());
         doAnswer(invocation -> String.format("LBA %02d : %s", atomicInteger.get(), makeHex(atomicInteger.getAndIncrement() / 5)))
-                .when(output).checkResult(anyString());
+                .when(output).checkResult(anyString(), anyString());
 
         boolean actual = testScenario.run();
 
@@ -41,7 +41,7 @@ class FullWriteAndReadCompareTest {
     @Test
     void value가_달라서_readCompare_실패한_경우_return_false() {
         doReturn(true).when(runCommand).execute(any());
-        doReturn("LBA 00 : 0x12345678").when(output).checkResult(anyString());
+        doReturn("LBA 00 : 0x12345678").when(output).checkResult(anyString(), anyString());
 
         boolean actual = testScenario.run();
 
@@ -51,7 +51,7 @@ class FullWriteAndReadCompareTest {
     @Test
     void address가_달라서_readCompare_실패한_경우_return_false() {
         doReturn(true).when(runCommand).execute(any());
-        doReturn("LBA 99 : 0x00000000").when(output).checkResult(anyString());
+        doReturn("LBA 99 : 0x00000000").when(output).checkResult(anyString(), anyString());
 
         boolean actual = testScenario.run();
 
