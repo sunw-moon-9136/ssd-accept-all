@@ -7,7 +7,7 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -40,6 +40,16 @@ class OutputTest {
         boolean expected = true;
         String act = o.readLine();
         assertNotNull(act);
+    }
+
+    @Test
+    void 수행한_명령어를_받고_display한다() throws IOException {
+
+
+        boolean expected = true;
+        String act = f.checkResult("READ");
+        verify(f, times(1)).checkResult("READ");
+
     }
 
 }
