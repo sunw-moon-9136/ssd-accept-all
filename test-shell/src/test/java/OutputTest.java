@@ -25,6 +25,7 @@ class OutputTest {
 
     @Test
     void output_파일이_없으면_FAIL() throws IOException {
+
         when(f.existFileCheck()).thenReturn(false);
         boolean expected = false;
         boolean act = f.existFileCheck();
