@@ -4,7 +4,7 @@ import java.util.Scanner;
 public class TestShell {
     public static final String INVALID_COMMAND = "INVALID COMMAND";
     public static final String[] REGISTERED_COMMAND = new String[]{"read", "write", "fullread", "fullwrite", "help", "exit"};
-    public static final String[] ONE_LENGTH_COMMAND = new String[]{"fullread", "help", "exit"};
+    public static final String[] ONE_LENGTH_COMMAND = new String[]{"fullread", "help", "exit", "1_FullWriteAndReadCompare", "2_PartialLBAWrite", "3_WriteReadAging", "1_", "2_", "3_"};
     public static final String[] COMMAND_LBA = new String[]{"read"};
     public static final String[] COMMAND_DATA = new String[]{"fullwrite"};
     public static final String[] COMMAND_LBA_DATA = new String[]{"write"};
@@ -18,7 +18,7 @@ public class TestShell {
     }
 
     public String runTestShell(Scanner input) {
-        System.out.print(">> ");
+        System.out.print("Shell> ");
         String command = input.nextLine().trim();
 
         String result = "";
@@ -33,6 +33,12 @@ public class TestShell {
             return "help";
         }
         if (parts[0].equals("exit")) return "exit";
+
+        // Test Scenario
+        ITestScenario testScenario = TestScenarioFactory.getTestScenario(parts[0], runCommand, output);
+        if (testScenario != null) {
+            return testScenario.run() ? "PASS" : "FAIL";
+        }
 
         // fullread, fullwrite
         String changeCommand = "";
