@@ -79,16 +79,31 @@ class ArgsParserTest {
     }
 
     @Test
-    @Disabled
-    void LBA의_범위는_0_100사이_입력값이_범위안일때() {
-
+    void LBA의_범위는_0_99사이_입력값이_범위안일때() {
+        parser.run(VALID_READ_ARGS);
+        verify(mockDriver, never()).write(anyString(), any());
     }
 
     @Test
-    @Disabled
-    void LBA의_범위는_0_100사이_입력값이_범위밖일때_에러() {
+    void LBA의_범위는_0_99사이_읽기_입력값이_범위밖일때_에러() {
+        String[] args = {"R", "100"};
+        doNothing().when(mockDriver).write(anyString(), any());
 
+        parser.run(args);
+
+        verify(mockDriver, times(1)).write(anyString(), any());
     }
+
+    @Test
+    void LBA의_범위는_0_99사이_쓰기_입력값이_범위밖일때_에러() {
+        String[] args = {"W", "-1","0x12345678"};
+        doNothing().when(mockDriver).write(anyString(), any());
+
+        parser.run(args);
+
+        verify(mockDriver, times(1)).write(anyString(), any());
+    }
+
 
     @Test
     @Disabled
