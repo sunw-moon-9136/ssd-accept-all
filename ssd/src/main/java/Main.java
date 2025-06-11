@@ -3,5 +3,6 @@ public class Main {
         Driver driver = new FileDriver();
         ReadWritable ssd = new Ssd();
         SsdController parser = new SsdController(driver, ssd);
+        parser.run(args);
     }
 }
