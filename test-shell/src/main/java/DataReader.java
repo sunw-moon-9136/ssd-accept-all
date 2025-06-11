@@ -1,0 +1,5 @@
+public interface DataReader {
+    boolean exists();
+
+    String readLine();
+}
