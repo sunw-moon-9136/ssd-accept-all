@@ -53,6 +53,7 @@ public class SsdController {
     public void run(String[] args) {
         try {
             if (!isValidArgs(args)) throw new IllegalArgumentException();
+            if(args[0].equals("W") && args[2].length() != 10) throw new IllegalArgumentException();
         } catch (Exception e) {
             error();
         }
