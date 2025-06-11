@@ -23,10 +23,10 @@ public class Output {
 
     public String checkResult(String commandLine) {
         String checkResult;
+
         if (commandLine.equals("read")) {
             if (existFileCheck()) {
                 checkResult = readLine();
-                System.out.println(checkResult);
                 return checkResult;
             }
         }
@@ -35,7 +35,7 @@ public class Output {
             if (existFileCheck()) {
 
                 checkResult = readLine();
-                if (checkResult == null || checkResult.isEmpty() || checkResult.isBlank()) {
+                if (checkResult == null || checkResult.isEmpty()) {
                     return "DONE";
                 }
                 return "FAIL";
@@ -43,8 +43,7 @@ public class Output {
             }
         }
 
-        System.out.println("[" + commandLine + "]");
-        return commandLine;
+        return "FAIL";
     }
 
 }

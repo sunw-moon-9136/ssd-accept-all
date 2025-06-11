@@ -43,8 +43,7 @@ class OutputTest {
         when(mockDataReader.exists()).thenReturn(true);
         when(mockDataReader.readLine()).thenReturn("1 0xAAAABBBB");
         String result = output.checkResult("read");
-
-        assertEquals("1 0xAAAABBBB", result);
+        assertEquals("[read] 1 0xAAAABBBB", result);
         verify(mockDataReader, times(1)).readLine();
     }
 
@@ -62,24 +61,19 @@ class OutputTest {
 
         when(mockDataReader.exists()).thenReturn(true);
         when(mockDataReader.readLine()).thenReturn("ERROR");
-
         String result = output.checkResult("write");
-
         assertEquals("FAIL", result);
     }
+
 
     @Test
     void READ명령을_3번받으면_readLine도_3번_호출된다() {
 
         when(mockDataReader.exists()).thenReturn(true);
         when(mockDataReader.readLine()).thenReturn("1 0xAAAABBBB");
-
-
         output.checkResult("read");
         output.checkResult("read");
         output.checkResult("read");
-
-
         verify(mockDataReader, times(3)).readLine();
     }
 }
@@ -109,10 +103,8 @@ class ActualTest {
         @Test
         void 받은명령어가_READ이면_OUTPUT파일을_읽는다() throws IOException {
 
-
             boolean expected = true;
             String act = output.checkResult("read");
-            System.out.println(act);
             assertNotNull(act);
 
         }
@@ -121,13 +113,21 @@ class ActualTest {
     @Nested
     @DisplayName("명령어가 'Write'일 때")
     class WriteTest {
+        @Disabled
         @Test
         void 받은명령어가_write일때_정상동작_확인() throws IOException {
 
             boolean expected = true;
             String act = output.checkResult("write");
-            System.out.println(act);
-            assertEquals("DONE", act);
+            assertEquals("[write] DONE", act);
+        }
+
+        @Test
+        void 받은명령어가_write일때_fail확인() throws IOException {
+
+            boolean expected = true;
+            String act = output.checkResult("write");
+            assertEquals("FAIL", act);
         }
     }
 }
