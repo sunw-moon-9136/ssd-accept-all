@@ -20,11 +20,11 @@ class RunCommandTest {
 
     @Test
     void write_SSDjar파일없을때_IOException_발생() throws IOException, InterruptedException {
-        doThrow(new IOException("테스트")).when(runCommand).runSSDCommand(any(), any(), any());
+        doReturn(false).when(runCommand).runSSDCommand(any(), any(), any());
 
-        assertThatThrownBy(() -> runCommand.execute("write 3 0xAAAABBBB"))
-                .isInstanceOf(IOException.class)
-                .hasMessageContaining("테스트");
+        boolean result = runCommand.execute("write 3 0xAAAABBBB");
+
+        assertFalse(result);
     }
 
     @Test
