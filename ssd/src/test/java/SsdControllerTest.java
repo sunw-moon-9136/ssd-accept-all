@@ -29,15 +29,15 @@ class SsdControllerTest {
     @Mock
     ReadWritable mockDisk;
 
+    @BeforeEach
+    void setUp() {
+        controller = new SsdController(mockDriver, mockDisk);
+    }
+
+
     @Nested
     @DisplayName("인자 값 유효성 검사 테스트")
     class ArgumentValidation {
-        @BeforeEach
-        void setUp() {
-            controller = new SsdController();
-            controller.setDriver(mockDriver);
-        }
-
         @Test
         void SsdController에서_에러가나면_Driver_Write를_호출() {
             doNothing().when(mockDriver).write(anyString(), any());
@@ -58,9 +58,13 @@ class SsdControllerTest {
 
         @Test
         void 읽기요청의_인자는2개_입력값2개일때() {
+            doNothing().when(mockDriver).write(anyString(), any());
+            when(mockDisk.read(anyInt())).thenReturn(anyString());
+
             controller.run(VALID_READ_ARGS);
 
-            verify(mockDriver, never()).write(anyString(), any());
+            verify(mockDriver, times(1)).write(anyString(), any());
+            verify(mockDisk, times(1)).read(anyInt());
         }
 
         @Test
@@ -74,9 +78,13 @@ class SsdControllerTest {
 
         @Test
         void 쓰기요청의_인자는3개_입력값3개일때() {
+            doNothing().when(mockDriver).write(anyString(), any());
+            doNothing().when(mockDisk).write(anyInt(), anyString());
+
             controller.run(VALID_WRITE_ARGS);
 
-            verify(mockDriver, never()).write(anyString(), any());
+            verify(mockDriver, times(1)).write(anyString(), any());
+            verify(mockDisk, times(1)).write(anyInt(), anyString());
         }
 
         @Test
@@ -90,9 +98,13 @@ class SsdControllerTest {
 
         @Test
         void LBA의_범위는_0_99사이_입력값이_범위안일때() {
+            doNothing().when(mockDriver).write(anyString(), any());
+            when(mockDisk.read(anyInt())).thenReturn(anyString());
+
             controller.run(VALID_READ_ARGS);
 
-            verify(mockDriver, never()).write(anyString(), any());
+            verify(mockDriver, times(1)).write(anyString(), any());
+            verify(mockDisk, times(1)).read(anyInt());
         }
 
         @Test
@@ -133,9 +145,13 @@ class SsdControllerTest {
 
         @Test
         void 값의시작부분이_0x일때() {
+            doNothing().when(mockDriver).write(anyString(), any());
+            doNothing().when(mockDisk).write(anyInt(), anyString());
+
             controller.run(VALID_WRITE_ARGS);
 
-            verify(mockDriver, never()).write(anyString(), any());
+            verify(mockDriver, times(1)).write(anyString(), any());
+            verify(mockDisk, times(1)).write(anyInt(), anyString());
         }
 
         @Test
@@ -151,18 +167,13 @@ class SsdControllerTest {
     @Nested
     @DisplayName("읽기 테스트")
     class ReadTest {
-        @BeforeEach
-        void setUp() {
-            controller = new SsdController(mockDriver, mockDisk);
-        }
-
         @Test
         void 읽기_호출_시_ssd_read를_호출한다() {
             when(mockDisk.read(anyInt())).thenReturn(anyString());
 
             controller.run(VALID_READ_ARGS);
 
-            verify(mockDisk).read(anyInt()); // equals(anyString()) 제거
+            verify(mockDisk, times(1)).read(anyInt()); // equals(anyString()) 제거
         }
 
         @Test
@@ -172,8 +183,8 @@ class SsdControllerTest {
 
             controller.run(VALID_READ_ARGS);
 
-            verify(mockDisk).read(anyInt());
-            verify(mockDriver).write(anyString(), any());
+            verify(mockDisk, times(1)).read(anyInt());
+            verify(mockDriver, times(1)).write(anyString(), any());
         }
 
         @Test
@@ -182,7 +193,7 @@ class SsdControllerTest {
 
             controller.run(VALID_WRITE_ARGS);
 
-            verify(mockDisk).write(anyInt(), anyString()); // equals(anyString()) 제거
+            verify(mockDisk, times(1)).write(anyInt(), anyString()); // equals(anyString()) 제거
         }
 
         @Test
@@ -191,8 +202,8 @@ class SsdControllerTest {
 
             controller.run(VALID_WRITE_ARGS);
 
-            verify(mockDisk).write(anyInt(), anyString());
-            verify(mockDriver).write(anyString(), any());
+            verify(mockDisk, times(1)).write(anyInt(), anyString());
+            verify(mockDriver, times(1)).write(anyString(), any());
         }
     }
 }

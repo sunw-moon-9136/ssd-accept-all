@@ -63,6 +63,7 @@ public class SsdController {
 
     private void write(int lba, String value) {
         flushOut();
+
         disk.write(lba, value);
     }
 
