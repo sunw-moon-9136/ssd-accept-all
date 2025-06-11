@@ -10,16 +10,16 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class SsdControllerTest {
     // TODO RuntimeException -> output.txt.에 Error를 저장하는 것으로 변경
-    private static final String INVALID_FIRST_ARG[] = {"Q", "12"};
-    private static final String VALID_READ_ARGS[] = {"R", "56"};
-    private static final String INVALID_READ_ARGS_CNT[] = {"R", "12", "77", "(!"};
-    private static final String VALID_WRITE_ARGS[] = {"W", "56", "0x12345678"};
-    private static final String INVALID_WRITE_ARGS_CNT[] = {"W", "15"};
-    private static final String INVALID_READ_LBA[] = {"R", "100"};
-    private static final String INVALID_WRITE_LBA[] = {"W", "-1", "0x12345678"};
-    private static final String INVALID_LBA_CHARACTER[] = {"W", "qvione", "0x12345678"};
-    private static final String INVALID_VALUE_LENGTH[] = {"W", "12", "0x1234567194538"};
-    private static final String INVALID_VALUE_CHARACTER[] = {"W", "12", "0(!*@&$(@*#"};
+    private static final String[] INVALID_FIRST_ARG = {"Q", "12"};
+    private static final String[] VALID_READ_ARGS = {"R", "56"};
+    private static final String[] INVALID_READ_ARGS_CNT = {"R", "12", "77", "(!"};
+    private static final String[] VALID_WRITE_ARGS = {"W", "56", "0x12345678"};
+    private static final String[] INVALID_WRITE_ARGS_CNT = {"W", "15"};
+    private static final String[] INVALID_READ_LBA = {"R", "100"};
+    private static final String[] INVALID_WRITE_LBA = {"W", "-1", "0x12345678"};
+    private static final String[] INVALID_LBA_CHARACTER = {"W", "qvione", "0x12345678"};
+    private static final String[] INVALID_VALUE_LENGTH = {"W", "12", "0x1234567194538"};
+    private static final String[] INVALID_VALUE_CHARACTER = {"W", "12", "0(!*@&$(@*#"};
 
     SsdController parser;
 
