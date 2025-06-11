@@ -115,4 +115,14 @@ class OutputTest {
     }
 
 
+    @Test
+    void 받은명령어가_write이면_OUTPUT파일이_EMPTY() throws IOException {
+
+        Output output = new Output();
+        boolean expected = true;
+        String act = output.checkResult("write");
+        System.out.println(act);
+        assertEquals("", act);
+    }
+
 }
