@@ -1,18 +1,30 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class TestShellTest {
     public static final String INVALID_COMMAND = "INVALID COMMAND";
+    @Mock
+    RunCommand mockRunCommand;
+
+    @Mock
+    Output mockOutput;
+
     TestShell shell;
 
     @BeforeEach
     void setUp() {
-        shell = new TestShell();
+        shell = new TestShell(mockRunCommand, mockOutput);
     }
 
     private String getOutputResult(String input) {
@@ -24,16 +36,16 @@ class TestShellTest {
     class CommandInputTest {
         @Test
         void read_Command_입력시_read_반환() {
-            String expect = "read 3";
-            String actual = getOutputResult(expect + "\n");
+            String expect = "read";
+            String actual = getOutputResult("read 3\n");
 
             assertEquals(expect, actual);
         }
 
         @Test
         void write_Command_입력시_write_반환() {
-            String expect = "write 3 0xAAAABBBB";
-            String actual = getOutputResult(expect + "\n");
+            String expect = "write";
+            String actual = getOutputResult("write 3 0xAAAABBBB\n");
 
             assertEquals(expect, actual);
         }
@@ -41,15 +53,15 @@ class TestShellTest {
         @Test
         void fullread_Command_입력시_fullread_반환() {
             String expect = "fullread";
-            String actual = getOutputResult(expect + "\n");
+            String actual = getOutputResult("fullread\n");
 
             assertEquals(expect, actual);
         }
 
         @Test
         void fullwrite_Command_입력시_fullwrite_반환() {
-            String expect = "fullwrite 0xAAAABBBB";
-            String actual = getOutputResult(expect + "\n");
+            String expect = "fullwrite";
+            String actual = getOutputResult("fullwrite 0xAAAABBBB\n");
 
             assertEquals(expect, actual);
         }
@@ -57,7 +69,7 @@ class TestShellTest {
         @Test
         void help_Command_입력시_help_반환() {
             String expect = "help";
-            String actual = getOutputResult(expect + "\n");
+            String actual = getOutputResult("help\n");
 
             assertEquals(expect, actual);
         }
@@ -65,7 +77,7 @@ class TestShellTest {
         @Test
         void exit_Command_입력시_exit_반환() {
             String expect = "exit";
-            String actual = getOutputResult(expect + "\n");
+            String actual = getOutputResult("exit\n");
 
             assertEquals(expect, actual);
         }
@@ -144,4 +156,43 @@ class TestShellTest {
         }
     }
 
+    @Nested
+    class ChainingTest {
+
+        @Test
+        void read_실행_true() {
+            doReturn(true).when(mockRunCommand).execute(anyString());
+
+            String actual = getOutputResult("read 3\n");
+
+            verify(mockRunCommand, times(1)).execute(anyString());
+        }
+
+        @Test
+        void write_실행_true() {
+            doReturn(true).when(mockRunCommand).execute(anyString());
+
+            String actual = getOutputResult("write 3 0xAAAAFFFF\n");
+
+            verify(mockRunCommand, times(1)).execute(anyString());
+        }
+
+        @Test
+        void fullread_실행_true() {
+            doReturn(true).when(mockRunCommand).execute(anyString());
+
+            String actual = getOutputResult("fullread\n");
+
+            verify(mockRunCommand, times(100)).execute(anyString());
+        }
+
+        @Test
+        void fullwrite_실행_true() {
+            doReturn(true).when(mockRunCommand).execute(anyString());
+
+            String actual = getOutputResult("fullwrite 0xAAAAFFFF\n");
+
+            verify(mockRunCommand, times(100)).execute(anyString());
+        }
+    }
 }
