@@ -18,6 +18,7 @@ class SsdControllerTest {
     private static final String INVALID_READ_LBA[] = {"R", "100"};
     private static final String INVALID_WRITE_LBA[] = {"W", "-1", "0x12345678"};
     private static final String INVALID_LBA_CHARACTER[] = {"W", "qvione", "0x12345678"};
+    private static final String INVALID_VALUE_LENGTH[] = {"W", "12", "0x1234567194538"};
 
     SsdController parser;
 
@@ -32,7 +33,7 @@ class SsdControllerTest {
     }
 
     @Test
-    void ArgsParser에서_에러가나면_Driver_Write를_호출() {
+    void SsdController에서_에러가나면_Driver_Write를_호출() {
         doNothing().when(mockDriver).write(anyString(), any());
 
         parser.error();
@@ -115,11 +116,13 @@ class SsdControllerTest {
         verify(mockDriver, times(1)).write(anyString(), any());
     }
 
-
     @Test
-    @Disabled
     void 값의자리수는10_입력값_자리수가_10이아닐때_에러() {
+        doNothing().when(mockDriver).write(anyString(), any());
 
+        parser.run(INVALID_VALUE_LENGTH);
+
+        verify(mockDriver, times(1)).write(anyString(), any());
     }
 
     @Test
