@@ -45,6 +45,14 @@ class OutputTest {
     @Test
     void 수행한_명령어를_받고_display한다() throws IOException {
 
+        boolean expected = true;
+        String act = f.checkResult("READ");
+        verify(f, times(1)).checkResult("READ");
+
+    }
+
+    @Test
+    void 받은명령어가_READ이면_OUTPUT파일을_읽어_diaplay한다() throws IOException {
 
         boolean expected = true;
         String act = f.checkResult("READ");

@@ -36,6 +36,7 @@ public class Output {
     }
 
     public String checkResult(String commandLine) {
+        System.out.println("[" + commandLine + "]");
         return commandLine;
     }
 
