@@ -1,6 +1,8 @@
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
@@ -15,9 +17,12 @@ class RunCommandTest {
     @Mock
     Output mockOutput;
 
+    @Spy
+    @InjectMocks  // 💡 이거 붙이면 mockOutput이 생성자에 주입됨
+    RunCommand runCommand;
+
     @Test
     void write_SSDjar파일없을때_IOException_발생() throws IOException, InterruptedException {
-        RunCommand runCommand = spy(new RunCommand(mockOutput));
         doThrow(new IOException("테스트")).when(runCommand).runSSDCommand(any(), any(), any());
 
         assertThatThrownBy(() -> runCommand.execute("write 3 0xAAAABBBB"))
@@ -27,7 +32,6 @@ class RunCommandTest {
 
     @Test
     void write_호출시_SSDjar_호출되는지_확인() throws Exception {
-        RunCommand runCommand = spy(new RunCommand(mockOutput));
         doNothing().when(runCommand).runSSDCommand(any(), any(), any());
 
         runCommand.execute("write 3 0xAAAABBBB");
@@ -37,17 +41,15 @@ class RunCommandTest {
 
     @Test
     void write_호출시_Output_호출되는지_확인() throws Exception {
-        RunCommand runCommand = spy(new RunCommand(mockOutput));
         doNothing().when(runCommand).runSSDCommand(any(), any(), any());
 
         runCommand.execute("write 3 0xAAAABBBB");
 
-        verify(mockOutput).run("write");
+        verify(mockOutput).checkResult("write");
     }
 
     @Test
     void read_SSDjar파일없을때_IOException_발생() throws IOException, InterruptedException {
-        RunCommand runCommand = spy(new RunCommand(mockOutput));
         doThrow(new IOException("테스트")).when(runCommand).runSSDCommand(any(), any());
 
         assertThatThrownBy(() -> runCommand.execute("read 3"))
@@ -57,7 +59,6 @@ class RunCommandTest {
 
     @Test
     void read_호출시_SSDjar_호출되는지_확인() throws Exception {
-        RunCommand runCommand = spy(new RunCommand(mockOutput));
         doNothing().when(runCommand).runSSDCommand(any(), any());
 
         runCommand.execute("read 3");
@@ -67,30 +68,15 @@ class RunCommandTest {
 
     @Test
     void read_호출시_Output_호출되는지_확인() throws Exception {
-        RunCommand runCommand = spy(new RunCommand(mockOutput));
         doNothing().when(runCommand).runSSDCommand(any(), any());
 
         runCommand.execute("read 3");
 
-        verify(mockOutput).run("read");
-    }
-
-    @Test
-    void fullwrite_호출시_모든_LBA에_write호출되는지_확인() throws Exception {
-        RunCommand runCommand = spy(new RunCommand(mockOutput));
-        doNothing().when(runCommand).runSSDCommand(any(), any(), any());
-
-        runCommand.execute("fullwrite 0xABCDFFFF");
-
-        for (int i = 0; i < 100; i++) {
-            verify(runCommand).runSSDCommand("W", String.valueOf(i), "0xABCDFFFF");
-        }
-        verify(mockOutput).run("write");
+        verify(mockOutput).checkResult("read");
     }
 
     @Test
     void fullread_호출시_모든_LBA에_read호출되는지_확인() throws Exception {
-        RunCommand runCommand = spy(new RunCommand(mockOutput));
         doNothing().when(runCommand).runSSDCommand(any(), any());
 
         runCommand.execute("fullread");
@@ -98,6 +84,44 @@ class RunCommandTest {
         for (int i = 0; i < 100; i++) {
             verify(runCommand).runSSDCommand("R", String.valueOf(i));
         }
-        verify(mockOutput).run("read");
+    }
+
+    @Test
+    void fullread_호출시_write_100번_호출되는지_확인() throws Exception {
+        doNothing().when(runCommand).runSSDCommand(any(), any());
+
+        runCommand.execute("fullread");
+
+        verify(runCommand, times(100)).runSSDCommand(eq("R"), any());
+        verify(mockOutput, times(100)).checkResult("read");
+    }
+
+    @Test
+    void fullwrite_호출시_모든_LBA에_write호출되는지_확인() throws Exception {
+        doNothing().when(runCommand).runSSDCommand(any(), any(), any());
+
+        runCommand.execute("fullwrite 0xABCDFFFF");
+
+        for (int i = 0; i < 100; i++) {
+            verify(runCommand).runSSDCommand("W", String.valueOf(i),"0xABCDFFFF");
+        }
+    }
+
+    @Test
+    void fullwrite_호출시_write_100번_호출되는지_확인() throws Exception {
+        doNothing().when(runCommand).runSSDCommand(any(), any(), any());
+
+        runCommand.execute("fullwrite 0xABCDFFFF");
+
+        verify(runCommand, times(100)).runSSDCommand(eq("W"), any(), eq("0xABCDFFFF"));
+        verify(mockOutput, times(100)).checkResult("write");
+    }
+
+    @Test
+    void 존재하지_않는_명령어_입력시_IllegalArgumentException_발생() throws Exception {
+        RunCommand runCommand = new RunCommand(mockOutput);
+
+        assertThatThrownBy(() -> runCommand.execute("abnormal 1 0xABCDFFFF"))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }
