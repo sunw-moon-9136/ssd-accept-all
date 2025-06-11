@@ -1,4 +1,7 @@
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
 
@@ -7,21 +10,14 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class RunCommandTest {
-
-    @Test
-    void write_호출시_SSDjar_호출되는지_확인() throws Exception {
-        RunCommand runCommand = spy(new RunCommand());
-        doNothing().when(runCommand).runSSDCommand(any(), any(), any());
-
-        runCommand.execute("write 3 0xAAAABBBB");
-
-        verify(runCommand).runSSDCommand("W", "3", "0xAAAABBBB");
-    }
+    @Mock
+    Output mockOutput;
 
     @Test
     void write_SSDjar파일없을때_IOException_발생() throws IOException, InterruptedException {
-        RunCommand runCommand = spy(new RunCommand());
+        RunCommand runCommand = spy(new RunCommand(mockOutput));
         doThrow(new IOException("테스트")).when(runCommand).runSSDCommand(any(), any(), any());
 
         assertThatThrownBy(() -> runCommand.execute("write 3 0xAAAABBBB"))
@@ -30,8 +26,38 @@ class RunCommandTest {
     }
 
     @Test
+    void write_호출시_SSDjar_호출되는지_확인() throws Exception {
+        RunCommand runCommand = spy(new RunCommand(mockOutput));
+        doNothing().when(runCommand).runSSDCommand(any(), any(), any());
+
+        runCommand.execute("write 3 0xAAAABBBB");
+
+        verify(runCommand).runSSDCommand("W", "3", "0xAAAABBBB");
+    }
+
+    @Test
+    void write_호출시_Output_호출되는지_확인() throws Exception {
+        RunCommand runCommand = spy(new RunCommand(mockOutput));
+        doNothing().when(runCommand).runSSDCommand(any(), any(), any());
+
+        runCommand.execute("write 3 0xAAAABBBB");
+
+        verify(mockOutput).run();
+    }
+
+    @Test
+    void read_SSDjar파일없을때_IOException_발생() throws IOException, InterruptedException {
+        RunCommand runCommand = spy(new RunCommand(mockOutput));
+        doThrow(new IOException("테스트")).when(runCommand).runSSDCommand(any(), any());
+
+        assertThatThrownBy(() -> runCommand.execute("read 3"))
+                .isInstanceOf(IOException.class)
+                .hasMessageContaining("테스트");
+    }
+
+    @Test
     void read_호출시_SSDjar_호출되는지_확인() throws Exception {
-        RunCommand runCommand = spy(new RunCommand());
+        RunCommand runCommand = spy(new RunCommand(mockOutput));
         doNothing().when(runCommand).runSSDCommand(any(), any());
 
         runCommand.execute("read 3");
@@ -40,12 +66,12 @@ class RunCommandTest {
     }
 
     @Test
-    void read_SSDjar파일없을때_IOException_발생() throws IOException, InterruptedException {
-        RunCommand runCommand = spy(new RunCommand());
-        doThrow(new IOException("테스트")).when(runCommand).runSSDCommand(any(), any());
+    void read_호출시_Output_호출되는지_확인() throws Exception {
+        RunCommand runCommand = spy(new RunCommand(mockOutput));
+        doNothing().when(runCommand).runSSDCommand(any(), any());
 
-        assertThatThrownBy(() -> runCommand.execute("read 3"))
-                .isInstanceOf(IOException.class)
-                .hasMessageContaining("테스트");
+        runCommand.execute("read 3");
+
+        verify(mockOutput).run();
     }
 }
