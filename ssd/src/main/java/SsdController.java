@@ -26,6 +26,10 @@ public class SsdController {
         driver.write(SSD_OUTPUT_TXT, "ERROR".getBytes());
     }
 
+    public void flushOut() {
+        driver.write(SSD_OUTPUT_TXT, "".getBytes());
+    }
+
     private boolean isValidLBA(String lba) {
         try {
             int number = Integer.parseInt(lba);
@@ -58,7 +62,7 @@ public class SsdController {
     }
 
     private void write(int lba, String value) {
-        driver.write(SSD_OUTPUT_TXT, "".getBytes());
+        flushOut();
         disk.write(lba, value);
     }
 
