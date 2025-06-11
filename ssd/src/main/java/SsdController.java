@@ -58,6 +58,7 @@ public class SsdController {
     }
 
     private void write(int lba, String value) {
+        driver.write(SSD_OUTPUT_TXT, "".getBytes());
         disk.write(lba, value);
     }
 
