@@ -1,15 +1,18 @@
 public class Output {
 
     //TODO
-    //final static String OUTPUT_FILE_PATH = "ssd_output.txt";
-    final static String OUTPUT_FILE_PATH = "C:\\Users\\User\\Documents\\output.txt";
+    final static String OUTPUT_FILE_PATH = "ssd_output.txt";
+    // final static String OUTPUT_FILE_PATH = "C:\\Users\\User\\Documents\\output.txt";
 
     private final DataReader dataReader;
+
+    public Output() {
+        this.dataReader = new OutputFileReader(OUTPUT_FILE_PATH);
+    }
 
     public Output(DataReader dataReader) {
         this.dataReader = dataReader;
     }
-
 
     public boolean existFileCheck() {
         return dataReader.exists();
@@ -27,6 +30,7 @@ public class Output {
         try {
             if (commandLine.equals("read")) {
                 if (existFileCheck()) {
+                    checkResult += "LBA ";
                     checkResult += readLine();
                     return checkResult;
                 }
@@ -45,9 +49,9 @@ public class Output {
                 }
             }
         } catch (Exception e) {
-            return "ERROR";
+            return checkResult += "ERROR";
         }
 
-        return "ERROR";
+        return checkResult += "ERROR";
     }
 }
