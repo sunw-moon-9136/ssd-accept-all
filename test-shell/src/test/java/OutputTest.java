@@ -17,7 +17,7 @@ class OutputTest {
     final static String OUTPUT_TEXT_ERROR = "ERROR";
     final static String OUTPUT_TEXT_WRITE_PASS = null;
 
-    final static String RESULT_STRING_READ_PASS = "[read] " + OUTPUT_TEXT_READ_PASS;
+    final static String RESULT_STRING_READ_PASS = "[read] LBA " + OUTPUT_TEXT_READ_PASS;
     final static String RESULT_STRING_READ_ERROR = "[read] " + OUTPUT_TEXT_ERROR;
     final static String RESULT_STRING_WRITE_PASS = "[write] DONE";
     final static String RESULT_STRING_WRITE_ERROR = "[write] ERROR";
@@ -27,11 +27,14 @@ class OutputTest {
     private DataReader mockDataReader;
     private Output output;
 
+
     @BeforeEach
     void setUp() {
         output = new Output(mockDataReader);
     }
 
+
+    //outputfile 있는지 여부 체크
     @Test
     void output_파일이_있으면_true를_반환한다() {
 
@@ -47,34 +50,28 @@ class OutputTest {
         assertEquals(false, actual);
     }
 
+    //outputfile 있을 경우 READ TEST
     @Test
-    void 받은명령어가_READ이고_파일이_있으면_파일내용을_반환한다() {
+    void 받은명령어가_READ이고_파일이_있으면_파일내용을_반환() {
 
         when(mockDataReader.exists()).thenReturn(true);
         when(mockDataReader.readLine()).thenReturn(OUTPUT_TEXT_READ_PASS);
         String result = output.checkResult("read");
+        System.out.println(result);
         assertEquals(RESULT_STRING_READ_PASS, result);
         verify(mockDataReader, times(1)).readLine();
     }
 
     @Test
-    void 받은명령어가_WRITE이고_파일내용이_비어있으면_DONE을_반환한다() {
-
-        when(mockDataReader.exists()).thenReturn(true);
-        when(mockDataReader.readLine()).thenReturn(OUTPUT_TEXT_WRITE_PASS);
-        String result = output.checkResult("write");
-        assertEquals(RESULT_STRING_WRITE_PASS, result);
-    }
-
-    @Test
-    void 받은명령어가_WRITE이고_파일내용이_있으면_FAIL을_반환한다() {
+    void 받은명령어가_READ이고_파일이_없으면_ERROR반환() {
 
         when(mockDataReader.exists()).thenReturn(true);
         when(mockDataReader.readLine()).thenReturn(OUTPUT_TEXT_ERROR);
-        String result = output.checkResult("write");
-        assertEquals(RESULT_STRING_WRITE_ERROR, result);
+        String result = output.checkResult("read");
+        System.out.println(result);
+        assertEquals(RESULT_STRING_READ_ERROR, result);
+        verify(mockDataReader, times(1)).readLine();
     }
-
 
     @Test
     void READ명령을_3번받으면_readLine도_3번_호출된다() {
@@ -86,6 +83,29 @@ class OutputTest {
         output.checkResult("read");
         verify(mockDataReader, times(3)).readLine();
     }
+
+
+    @Test
+    void 받은명령어가_WRITE이고_파일내용이_비어있으면_DONE을_반환한다() {
+
+        when(mockDataReader.exists()).thenReturn(true);
+        when(mockDataReader.readLine()).thenReturn(OUTPUT_TEXT_WRITE_PASS);
+        String result = output.checkResult("write");
+        System.out.println(result);
+        assertEquals(RESULT_STRING_WRITE_PASS, result);
+    }
+
+    @Test
+    void 받은명령어가_WRITE이고_파일내용이_있으면_ERROR를_반환한다() {
+
+        when(mockDataReader.exists()).thenReturn(true);
+        when(mockDataReader.readLine()).thenReturn(OUTPUT_TEXT_ERROR);
+        String result = output.checkResult("write");
+        System.out.println(result);
+        assertEquals(RESULT_STRING_WRITE_ERROR, result);
+    }
+
+
 }
 
 
@@ -94,9 +114,8 @@ class ActualTest {
 
     @BeforeEach
     void setUp() {
-        output = ReadOutputFactory.readOutput();
+        output = new Output();
     }
-
 
     @Test
     void output_파일이_있으면_PASS() throws IOException {
@@ -104,7 +123,27 @@ class ActualTest {
         boolean expected = true;
         boolean act = output.existFileCheck();
         assertEquals(expected, act);
+
     }
+
+    @Test
+    void output_파일이_없으면_FAIL() throws IOException {
+
+        boolean expected = false;
+        boolean act = output.existFileCheck();
+        assertEquals(expected, act);
+
+    }
+
+    @Test
+    void output_파일이_없으면_FAIL2() throws IOException {
+
+        boolean expected = false;
+        String act = output.checkResult("read");
+        assertEquals(expected, act);
+
+    }
+
 
     @Nested
     @DisplayName("명령어가 'read'일 때")
