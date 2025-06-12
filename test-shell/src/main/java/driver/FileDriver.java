@@ -39,6 +39,7 @@ public class FileDriver implements Driver {
     @Override
     public void changeOldLogFileName(String latestLogFileName) {
         List<String> logFileNames = getLogFileNames().stream()
+                .filter(name -> !name.endsWith(".zip"))
                 .filter(name -> !name.equals(latestLogFileName))
                 .sorted()
                 .collect(Collectors.toList());
