@@ -49,7 +49,9 @@ public class Buffer {
     private void deleteMarkedCommand() {
         // 삭제되어야 할 명령을 뺀다
         List<Command> tmp = new ArrayList<>();
-
+        for (Command command : buffer) {
+            System.out.println(command);
+        }
         for (Command command : buffer) {
             if (command.order != -1) {
                 command.order = tmp.size() + 1;
@@ -57,17 +59,22 @@ public class Buffer {
             }
         }
         buffer = tmp;
+        for (Command command : buffer) {
+            System.out.println(command);
+        }
     }
 
-    private void ignoreWriteCommand(Command command) {
+    private void ignoreWriteCommand() {
+        Command command = buffer.get(buffer.size() - 1);
+        if (!command.mode.equals("W")) return;
         for (int i = buffer.size() - 2; i >= 0; i--) {
             Command prev = buffer.get(i);
-            // W W 에 같은 주소면 최신 W 만 남겨둔다.
+            // W W :에 같은 주소면 최신 W 만 남겨둔다.
             if (prev.mode.equals("W") && prev.lba == command.lba) {
                 System.out.printf("Ignoring command: %d, %d\n", prev.order, prev.lba);
                 prev.order = -1;
             }
-            // W E 의 경우 E가 단 한 곳만 지우는 경우 빼는 의미가 있다 (개수가 줄어듬)
+            // W E :의 경우 E가 단 한 곳만 지우는 경우 빼는 의미가 있다 (개수가 줄어듬)
             // 가령 W 를 E 2개로 나눠버리면 명령 개수가 늘어난다.
             // 만약 범위 양 끝쪽에서 짜르면 명령 개수는 그대로다
             // ignoreCommand의 목적은 명령을 줄이는 것이므로, 개수가 그대로일때도 패스한다.
@@ -79,25 +86,72 @@ public class Buffer {
         deleteMarkedCommand();
     }
 
-    private void ignoreEraseCommand(Command command) {
+    boolean isWriteCommandInEraseCommand(int wLBA, int eLBA, int size) {
+        int maxLBA = eLBA + size - 1;
+        return wLBA >= eLBA && wLBA <= maxLBA;
+    }
+
+    boolean isEraseCommandInEraseCommand(Command prev, Command next) {
+        int pL = prev.lba;
+        int pR = prev.lba + Integer.parseInt(prev.value) - 1;
+        int nL = next.lba;
+        int nR = next.lba + Integer.parseInt(next.value) - 1;
+
+        if ((pR >= nL && pR <= nR) || (nR >= pL && nR <= pR)) {
+            return true;
+        }
+        return false;
+    }
+
+    private List<Command> mergeErase(Command prev, Command next) {
+        List<Command> commands = new ArrayList<>();
+        int maxPLBA = prev.lba + Integer.parseInt(prev.value) - 1;
+        int maxNRBA = next.lba + Integer.parseInt(next.value) - 1;
+        int minX = Math.min(prev.lba, next.lba);
+        int maxX = Math.max(maxPLBA, maxNRBA);
+        while (minX <= maxX) {
+            Command newCommand = new Command(buffer.size() + 1, "E", minX, String.valueOf(Math.min(maxX - minX + 1, 10)));
+            commands.add(newCommand);
+            minX += 10;
+        }
+        return commands;
+    }
+
+    private void ignoreEraseCommand() {
+        Command command = buffer.get(buffer.size() - 1);
+        if (!command.mode.equals("E")) return;
+        for (int i = buffer.size() - 2; i >= 0; i--) {
+            Command prev = buffer.get(i);
+            // E W :W가 E 범위에 속하면 삭제한다.
+            if (prev.mode.equals("W") && isWriteCommandInEraseCommand(prev.lba, command.lba, Integer.parseInt(command.value))) {
+                prev.order = -1;
+            }
+            // E E : E와 E의 범위가 서로 겹치면 합친다(10을 넘으면 나눈다)
+            if (i == buffer.size() - 2 && prev.mode.equals("E") && isEraseCommandInEraseCommand(prev, command)) {
+                List<Command> newCommand = mergeErase(prev, command);
+                prev.order = -1;
+                command.order = -1;
+                buffer.addAll(newCommand);
+                break;
+            }
+        }
         deleteMarkedCommand();
     }
 
-    private void ignoreCommand(Command command) {
-        if (command.mode.equals("W")) {
-            ignoreWriteCommand(command);
-        } else if (command.mode.equals("E")) {
-            ignoreEraseCommand(command);
-        }
+    private void ignoreCommand() {
+        ignoreWriteCommand();
+        ignoreEraseCommand();
     }
 
     public void addCommand(Command command) {
         buffer.add(command);
-        ignoreCommand(command);
+        ignoreCommand();
         initFilesWithBuffer();
     }
 
     private void initFilesWithBuffer() {
+        deleteBufferFiles();
+        initEmptyTextFile();
         for (Command command : buffer) {
             if (folder.exists() && folder.isDirectory()) {
                 File[] files = folder.listFiles(new FilenameFilter() {
@@ -226,11 +280,7 @@ public class Buffer {
         return null;
     }
 
-    private void createFolderAndFilesIfNotExist() {
-        if (!folder.exists()) {
-            folder.mkdir();
-        }
-
+    private void initEmptyTextFile() {
         for (int i = 1; i <= 5; i++) {
             // index_ 로 시작하는 파일을 탐색
             int index = i;
@@ -254,6 +304,14 @@ public class Buffer {
                 }
             }
         }
+    }
+
+    private void createFolderAndFilesIfNotExist() {
+        if (!folder.exists()) {
+            folder.mkdir();
+        }
+
+        initEmptyTextFile();
     }
 
 }

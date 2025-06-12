@@ -101,6 +101,7 @@ public class SsdController {
 
     private void erase(int lba, int size) {
         // TODO: BUFFER에 쓰기, SIZE check랑 full이면 flush
+        if(size == 0) return;
         if (buffer.isFull()) {
             handleBufferFlush();
         }
@@ -141,6 +142,7 @@ public class SsdController {
                 default -> throw new IllegalArgumentException();
             }
         } catch (Exception e) {
+            e.printStackTrace();
             error();
         }
     }
