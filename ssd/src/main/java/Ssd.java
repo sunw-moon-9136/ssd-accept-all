@@ -62,6 +62,9 @@ public class Ssd implements ReadWritable {
 
     @Override
     public void erase(int address, int size) {
+        for (int i = 0; i < size; i++) {
+            write(address + i, INIT_VALUE);
+        }
     }
 
     private String getWriteContent(int writeAddress, String writeValue) {
