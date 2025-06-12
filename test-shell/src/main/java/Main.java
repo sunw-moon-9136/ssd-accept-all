@@ -1,3 +1,4 @@
+import scenario.TestRunner;
 import shell.Processor;
 import shell.manager.Manager;
 import shell.output.Output;
@@ -14,6 +15,14 @@ public class Main {
     public static Manager manager = new Manager(processor, output);
 
     public static void main(String[] args) {
+
+        if (args[0].length() > 0) {
+            TestRunner testRunner = new TestRunner(args[0]);
+            testRunner.process(manager);
+            return;
+        }
+
+        Manager manager = new Manager(processor, output);
         Scanner scanner = new Scanner(System.in);
         run(scanner);
         scanner.close();
