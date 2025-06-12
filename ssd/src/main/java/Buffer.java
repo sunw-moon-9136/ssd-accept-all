@@ -1,4 +1,6 @@
+import javax.annotation.processing.FilerException;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,36 +38,85 @@ public class Buffer {
 
     public static final String DEFAULT_ZERO_VALUE = "0x00000000";
     private static final int MAX_BUFFER_SIZE = 5;
-    private static final int RAW_SIZE = 100;
 
     File folder = new File("buffer");
-    private final List<Command> buffer = new ArrayList<>();
-    private final int[] raw = new int[100];
+    private List<Command> buffer = new ArrayList<>();
 
     public Buffer() {
         this.init();
     }
 
+    private void deleteMarkedCommand() {
+        // 삭제되어야 할 명령을 뺀다
+        List<Command> tmp = new ArrayList<>();
+
+        for (Command command : buffer) {
+            if (command.order != -1) {
+                command.order = tmp.size() + 1;
+                tmp.add(command);
+            }
+        }
+        buffer = tmp;
+    }
+
+    private void ignoreWriteCommand(Command command) {
+        for (int i = buffer.size() - 2; i >= 0; i--) {
+            Command prev = buffer.get(i);
+            // W W 에 같은 주소면 최신 W 만 남겨둔다.
+            if (prev.mode.equals("W") && prev.lba == command.lba) {
+                System.out.printf("Ignoring command: %d, %d\n", prev.order, prev.lba);
+                prev.order = -1;
+            }
+            // W E 의 경우 E가 단 한 곳만 지우는 경우 빼는 의미가 있다 (개수가 줄어듬)
+            // 가령 W 를 E 2개로 나눠버리면 명령 개수가 늘어난다.
+            // 만약 범위 양 끝쪽에서 짜르면 명령 개수는 그대로다
+            // ignoreCommand의 목적은 명령을 줄이는 것이므로, 개수가 그대로일때도 패스한다.
+            if (prev.mode.equals("E") && prev.lba == command.lba && Integer.parseInt(prev.value) == 1) {
+                System.out.printf("Ignoring command: %d, %d\n", prev.order, prev.lba);
+                prev.order = -1;
+            }
+        }
+        deleteMarkedCommand();
+    }
+
+    private void ignoreEraseCommand(Command command) {
+        deleteMarkedCommand();
+    }
+
+    private void ignoreCommand(Command command) {
+        if (command.mode.equals("W")) {
+            ignoreWriteCommand(command);
+        } else if (command.mode.equals("E")) {
+            ignoreEraseCommand(command);
+        }
+    }
+
     public void addCommand(Command command) {
-        if (folder.exists() && folder.isDirectory()) {
-            File[] files = folder.listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    return name.startsWith(String.valueOf(command.order) + "_");
-                }
-            });
-            if (files != null && files.length == 1 && files[0].getName().equals(String.valueOf(command.order) + "_empty.txt")) {
-                File newFile = new File("buffer/" + command.toString() + ".txt");
-                boolean succcess = files[0].renameTo(newFile);
-                if (succcess) {
-                    buffer.add(command);
+        buffer.add(command);
+        ignoreCommand(command);
+        initFilesWithBuffer();
+    }
+
+    private void initFilesWithBuffer() {
+        for (Command command : buffer) {
+            if (folder.exists() && folder.isDirectory()) {
+                File[] files = folder.listFiles(new FilenameFilter() {
+                    @Override
+                    public boolean accept(File dir, String name) {
+                        return name.startsWith(command.order + "_");
+                    }
+                });
+                if (files != null && files.length == 1) {
+                    File newFile = new File("buffer/" + command + ".txt");
+                    boolean success = files[0].renameTo(newFile);
+                    if (!success) throw new RuntimeException();
                 }
             }
         }
     }
 
-    public void erase(int lba,int size){
-        if(buffer.size() < MAX_BUFFER_SIZE) {
+    public void erase(int lba, int size) {
+        if (buffer.size() < MAX_BUFFER_SIZE) {
             Command command = new Command(buffer.size() + 1, "E", lba, String.valueOf(size));
             addCommand(command);
         }
@@ -78,18 +129,31 @@ public class Buffer {
         }
     }
 
+    private String fastRead(int lba) {
+        String ret = null;
+        // 가장 최신순부터 확인하면서, 해당 주소에 적용된 명령 값을 확인한다.
+        // E -> 지워짐 -> 0x00000000
+        // W -> 덮어쓰기 -> 해당 값
+        // 없으면 buffer miss -> ssd_nand.txt
+        for (int i = buffer.size() - 1; i >= 0; i--) {
+            Command command = buffer.get(i);
+            if (command.lba == lba) {
+                if (command.mode.equals("E")) {
+                    ret = "0x00000000";
+                } else if (command.mode.equals("W")) {
+                    ret = command.value;
+                }
+                break;
+            }
+        }
+        return ret;
+    }
+
+    // Fast-Read Algorithm
     public String read(int lba) {
         init();
 
-        int value = raw[lba];
-        String ret = null;
-        if (value >= 0) {
-            ret = String.format("0x%08X", value);
-        } else if (value == -1) {
-            ret = DEFAULT_ZERO_VALUE;
-        }
-
-        return ret;
+        return fastRead(lba);
     }
 
     public List<Command> flush() {
@@ -120,33 +184,6 @@ public class Buffer {
     public void init() {
         createFolderAndFilesIfNotExist();
         initBufferWithFiles();
-        initRawData();
-    }
-
-    private void initRawData() {
-        for (int i = 0; i < RAW_SIZE; i++) {
-            raw[i] = -2;
-        }
-
-        for (int i = 0; i < buffer.size(); i++) {
-            Command c = buffer.get(i);
-
-            int index = c.lba;
-
-            // W는 실제 값을 10진수로 기록
-            if (c.mode.equals("W")) {
-                int value = Integer.decode(c.value);
-                raw[index] = value;
-                System.out.println(value);
-            }
-            // E는 -1로 기록
-            else if (c.mode.equals("E")) {
-                int size = Integer.parseInt(c.value);
-                for (int j = index; j <= index + size - 1; j++) {
-                    raw[j] = -1;
-                }
-            }
-        }
     }
 
     private void initBufferWithFiles() {
@@ -200,7 +237,7 @@ public class Buffer {
             File[] files = folder.listFiles(new FilenameFilter() {
                 @Override
                 public boolean accept(File dir, String name) {
-                    return name.startsWith(String.valueOf(index) + "_");
+                    return name.startsWith(index + "_");
                 }
             });
 
