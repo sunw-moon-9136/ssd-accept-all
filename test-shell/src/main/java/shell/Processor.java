@@ -11,6 +11,7 @@ public class Processor {
         public static final String READ = "read";
         public static final String ERASE = "erase";
         public static final String ERASE_RANGE = "erase_range";
+        public static final String FLUSH = "flush";
     }
 
     public boolean execute(String input) {
@@ -33,6 +34,7 @@ public class Processor {
             case CommandNames.READ -> read(arg1);
             case CommandNames.ERASE -> erase(arg1, arg2);
             case CommandNames.ERASE_RANGE -> erase_range(arg1, arg2);
+            case CommandNames.FLUSH -> flush();
             default -> throw new IllegalArgumentException("Unknown command");
         };
     }
@@ -81,6 +83,10 @@ public class Processor {
             }
         }
         return true;
+    }
+
+    private boolean flush() {
+        return runSSDCommand("F");
     }
 
     boolean runSSDCommand(String... args) {

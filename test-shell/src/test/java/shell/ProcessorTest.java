@@ -199,6 +199,27 @@ class ProcessorTest {
 
     }
 
+    @Nested
+    class FlushCommandTests {
+        @Test
+        void flush_IOException발생시_false반환_발생확인() {
+            doReturn(false).when(processor).runSSDCommand(any());
+
+            boolean result = processor.execute("flush");
+
+            assertFalse(result);
+        }
+
+        @Test
+        void flush_정상처리되어_true반환_확인() {
+            doReturn(true).when(processor).runSSDCommand(any());
+
+            boolean result = processor.execute("flush");
+
+            assertTrue(result);
+            verify(processor).runSSDCommand("F");
+        }
+    }
 
     @Test
     void 존재하지_않는_명령어_입력시_IllegalArgumentException_발생() {
