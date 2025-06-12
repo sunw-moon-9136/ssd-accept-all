@@ -1,23 +1,27 @@
 package scenario;
 
-import shell.Processor;
-import shell.output.Output;
+import shell.manager.IManager;
+import utils.RandomFactory;
 
 public abstract class DefaultTestScenario implements ITestScenario {
-    protected final Processor processor;
-    protected final Output output;
+    protected final IManager manager;
+    protected final RandomFactory randomFactory;
 
-    public DefaultTestScenario(Processor processor, Output output) {
-        this.processor = processor;
-        this.output = output;
+    public DefaultTestScenario(IManager manager) {
+        this.manager = manager;
+        this.randomFactory = new RandomFactory();
+    }
+
+    public DefaultTestScenario(IManager manager, RandomFactory randomFactory) {
+        this.manager = manager;
+        this.randomFactory = randomFactory;
     }
 
     protected boolean readCompare(int testAddress, String testValue) {
-        if (!processor.execute(String.format("read %d", testAddress)))
-            return false;
+        return getValueFromTestShell(testAddress).equals(testValue);
+    }
 
-        String value = "0x" + output.checkResult("read", String.valueOf(testAddress))
-                .split("0x")[1].trim();
-        return value.equals(testValue);
+    private String getValueFromTestShell(int testAddress) {
+        return "0x" + manager.read(testAddress).split("0x")[1].trim();
     }
 }
