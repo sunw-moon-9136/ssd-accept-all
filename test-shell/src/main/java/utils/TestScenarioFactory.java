@@ -1,20 +1,20 @@
 package utils;
 
-import scenario.FullWriteAndReadCompare;
-import scenario.ITestScenario;
-import scenario.PartialLBAWrite;
-import scenario.WriteReadAging;
+import scenario.*;
 import shell.Processor;
+import shell.manager.IManager;
 import shell.output.Output;
 
 public class TestScenarioFactory {
-    public static ITestScenario getTestScenario(String command, Processor processor, Output output) {
+    public static ITestScenario getTestScenario(String command, IManager manager) {
         if (command.equals("1_FullWriteAndReadCompare") || command.equals("1_")) {
-            return new FullWriteAndReadCompare(processor, output);
+            return new FullWriteAndReadCompare(manager);
         } else if (command.equals("2_PartialLBAWrite") || command.equals("2_")) {
-            return new PartialLBAWrite(processor, output);
+            return new PartialLBAWrite(manager);
         } else if (command.equals("3_WriteReadAging") || command.equals("3_")) {
-            return new WriteReadAging(processor, output);
+            return new WriteReadAging(manager);
+        } else if (command.equals("4_EraseAndWriteAging") || command.equals("4_")) {
+            return new EraseAndWriteAging(manager);
         }
         return null;
     }
