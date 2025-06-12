@@ -1,6 +1,6 @@
 package scenario;
 
-import shell.Processor;
+import shell.processor.Processor;
 import shell.output.Output;
 import utils.RandomFactory;
 

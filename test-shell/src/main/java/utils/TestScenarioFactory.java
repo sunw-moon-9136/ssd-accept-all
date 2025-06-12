@@ -4,7 +4,7 @@ import scenario.FullWriteAndReadCompare;
 import scenario.ITestScenario;
 import scenario.PartialLBAWrite;
 import scenario.WriteReadAging;
-import shell.Processor;
+import shell.processor.Processor;
 import shell.output.Output;
 
 public class TestScenarioFactory {

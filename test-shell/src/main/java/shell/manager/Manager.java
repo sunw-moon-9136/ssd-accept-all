@@ -1,7 +1,7 @@
 package shell.manager;
 
 import scenario.ITestScenario;
-import shell.Processor;
+import shell.processor.Processor;
 import shell.output.Output;
 import utils.Common;
 import utils.TestScenarioFactory;
