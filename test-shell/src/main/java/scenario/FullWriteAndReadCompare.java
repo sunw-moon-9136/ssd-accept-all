@@ -1,7 +1,12 @@
+package scenario;
+
+import shell.Processor;
+import shell.output.Output;
+
 public class FullWriteAndReadCompare extends DefaultTestScenario {
 
-    public FullWriteAndReadCompare(RunCommand runCommand, Output output) {
-        super(runCommand, output);
+    public FullWriteAndReadCompare(Processor processor, Output output) {
+        super(processor, output);
     }
 
     @Override
@@ -17,7 +22,7 @@ public class FullWriteAndReadCompare extends DefaultTestScenario {
 
     private boolean writeFiveValues(int baseAddress, String testValue) {
         for (int additionalAddress = 0; additionalAddress <= 4; additionalAddress++) {
-            if (!runCommand.execute(String.format("write %d %s", baseAddress + additionalAddress, testValue)))
+            if (!processor.execute(String.format("write %d %s", baseAddress + additionalAddress, testValue)))
                 return false;
         }
         return true;

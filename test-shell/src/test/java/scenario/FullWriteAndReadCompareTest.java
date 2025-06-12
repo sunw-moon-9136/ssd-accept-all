@@ -1,8 +1,12 @@
+package scenario;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import shell.Processor;
+import shell.output.Output;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -16,20 +20,20 @@ class FullWriteAndReadCompareTest {
     ITestScenario testScenario;
 
     @Mock
-    RunCommand runCommand;
+    Processor processor;
 
     @Mock
     Output output;
 
     @BeforeEach
     void setUp() {
-        testScenario = new FullWriteAndReadCompare(runCommand, output);
+        testScenario = new FullWriteAndReadCompare(processor, output);
     }
 
     @Test
     void 정상적으로_모든_readCompare가_성공한_경우_return_true() {
         AtomicInteger atomicInteger = new AtomicInteger(0);
-        doReturn(true).when(runCommand).execute(any());
+        doReturn(true).when(processor).execute(any());
         doAnswer(invocation -> String.format("LBA %02d : %s", atomicInteger.get(), makeHex(atomicInteger.getAndIncrement() / 5)))
                 .when(output).checkResult(anyString(), anyString());
 
@@ -40,7 +44,7 @@ class FullWriteAndReadCompareTest {
 
     @Test
     void value가_달라서_readCompare_실패한_경우_return_false() {
-        doReturn(true).when(runCommand).execute(any());
+        doReturn(true).when(processor).execute(any());
         doReturn("LBA 00 : 0x12345678").when(output).checkResult(anyString(), anyString());
 
         boolean actual = testScenario.run();
@@ -50,7 +54,7 @@ class FullWriteAndReadCompareTest {
 
     @Test
     void address가_달라서_readCompare_실패한_경우_return_false() {
-        doReturn(true).when(runCommand).execute(any());
+        doReturn(true).when(processor).execute(any());
         doReturn("LBA 99 : 0x00000000").when(output).checkResult(anyString(), anyString());
 
         boolean actual = testScenario.run();
@@ -60,7 +64,7 @@ class FullWriteAndReadCompareTest {
 
     @Test
     void runCommand에서_Exception이_발생한_경우_return_false() {
-        doReturn(false).when(runCommand).execute(any());
+        doReturn(false).when(processor).execute(any());
 
         boolean actual = testScenario.run();
 

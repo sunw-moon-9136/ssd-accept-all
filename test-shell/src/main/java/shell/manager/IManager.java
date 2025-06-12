@@ -1,3 +1,5 @@
+package shell.manager;
+
 public interface IManager {
     String read(int address);
 

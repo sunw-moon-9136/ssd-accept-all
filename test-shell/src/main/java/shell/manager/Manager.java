@@ -1,11 +1,19 @@
+package shell.manager;
+
+import scenario.ITestScenario;
+import shell.Processor;
+import shell.output.Output;
+import utils.Common;
+import utils.TestScenarioFactory;
+
 import java.util.Scanner;
 
 public class Manager implements IManager {
-    RunCommand runCommand;
+    Processor processor;
     Output output;
 
-    public Manager(RunCommand runCommand, Output output) {
-        this.runCommand = runCommand;
+    public Manager(Processor processor, Output output) {
+        this.processor = processor;
         this.output = output;
     }
 
@@ -45,7 +53,7 @@ public class Manager implements IManager {
         String[] parts = command.split("\\s+");
 
         // Test Scenario
-        ITestScenario testScenario = TestScenarioFactory.getTestScenario(parts[0], runCommand, output);
+        ITestScenario testScenario = TestScenarioFactory.getTestScenario(parts[0], processor, output);
         if (testScenario != null) {
             String result = testScenario.run() ? "PASS" : "FAIL";
             System.out.println(result);
@@ -85,7 +93,7 @@ public class Manager implements IManager {
 
     private String runProcess(String command) {
         String[] parts = command.split("\\s+");
-        if (runCommand.execute(command)) return output.checkResult(parts[0], parts[1]);
+        if (processor.execute(command)) return output.checkResult(parts[0], parts[1]);
         return "ERROR";
     }
 }
