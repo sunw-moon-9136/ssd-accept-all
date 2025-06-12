@@ -5,10 +5,6 @@ public interface IManager {
 
     boolean write(int address, String value);
 
-    boolean fullread();
-
-    boolean fullwrite(String value);
-
     boolean erase(int address, int size);
 
     boolean erase_range(int startLBA, int endLBA);
