@@ -18,10 +18,10 @@ class OutputTest {
     final static String OUTPUT_TEXT_ERROR = "ERROR";
     final static String OUTPUT_TEXT_WRITE_PASS = null;
 
-    final static String RESULT_STRING_READ_PASS = "[read] LBA " + OUTPUT_TEXT_READ_PASS;
-    final static String RESULT_STRING_READ_ERROR = "[read] " + OUTPUT_TEXT_ERROR;
-    final static String RESULT_STRING_WRITE_PASS = "[write] DONE";
-    final static String RESULT_STRING_WRITE_ERROR = "[write] ERROR";
+    final static String RESULT_STRING_READ_PASS = OUTPUT_TEXT_READ_PASS;
+    final static String RESULT_STRING_READ_ERROR = OUTPUT_TEXT_ERROR;
+    final static String RESULT_STRING_WRITE_PASS = "DONE";
+    final static String RESULT_STRING_WRITE_ERROR = OUTPUT_TEXT_ERROR;
 
 
     @Mock
@@ -59,7 +59,7 @@ class OutputTest {
         when(mockDataReader.readLine()).thenReturn(OUTPUT_TEXT_READ_PASS);
         String result = output.checkResult("read", "1");
         System.out.println(result);
-        assertEquals("[read] LBA 01 : 0xAAAABBBB", result);
+        assertEquals(OUTPUT_TEXT_READ_PASS, result);
         verify(mockDataReader, times(1)).readLine();
     }
 
@@ -195,7 +195,7 @@ class ActualTest {
 
             boolean expected = false;
             String act = output.checkResult("read", "1");
-            assertEquals("[read] ERROR", act);
+            assertEquals("ERROR", act);
 
         }
 
@@ -203,7 +203,7 @@ class ActualTest {
         @Test
         void 받은명령어가_READ이면_OUTPUT파일을_읽는다() throws IOException {
 
-            String expected = "[read] LBA 01 : 0xFFFFFFF";
+            String expected = "0xFFFFFFF";
             String act = output.checkResult("read", "1");
             System.out.println(act);
 
@@ -223,13 +223,13 @@ class ActualTest {
 
             boolean expected = true;
             String act = output.checkResult("write", "1");
-            assertEquals("[write] DONE", act);
+            assertEquals("DONE", act);
         }
 
         @Test
         void 받은명령어가_write일때_ERROR() throws IOException {
 
-            String expected = "[write] ERROR";
+            String expected = "ERROR";
             String act = output.checkResult("write", "1");
             assertEquals(expected, act);
         }

@@ -1,18 +1,22 @@
 package scenario;
 
-import shell.Processor;
-import shell.output.Output;
+import shell.manager.IManager;
+import utils.RandomFactory;
 
 public class FullWriteAndReadCompare extends DefaultTestScenario {
 
-    public FullWriteAndReadCompare(Processor processor, Output output) {
-        super(processor, output);
+    public FullWriteAndReadCompare(IManager manager) {
+        super(manager);
+    }
+
+    public FullWriteAndReadCompare(IManager manager, RandomFactory randomFactory) {
+        super(manager, randomFactory);
     }
 
     @Override
     public boolean run() {
         for (int addressByFive = 0; addressByFive <= 95; addressByFive += 5) {
-            String testValue = makeHex(addressByFive / 5);
+            String testValue = randomFactory.getRandomHexValue();
 
             if (!writeFiveValues(addressByFive, testValue)) return false;
             if (!readCompareFiveValues(addressByFive, testValue)) return false;
@@ -22,7 +26,7 @@ public class FullWriteAndReadCompare extends DefaultTestScenario {
 
     private boolean writeFiveValues(int baseAddress, String testValue) {
         for (int additionalAddress = 0; additionalAddress <= 4; additionalAddress++) {
-            if (!processor.execute(String.format("write %d %s", baseAddress + additionalAddress, testValue)))
+            if (!manager.write(baseAddress + additionalAddress, testValue))
                 return false;
         }
         return true;
@@ -35,9 +39,5 @@ public class FullWriteAndReadCompare extends DefaultTestScenario {
             }
         }
         return true;
-    }
-
-    private String makeHex(int num) {
-        return String.format("0x%02d%02d%02d%02d", num, num, num, num);
     }
 }
