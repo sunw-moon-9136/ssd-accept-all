@@ -34,14 +34,12 @@ public class TestRunner {
         } catch (Exception e) {
             //To-do
             System.out.println("오류");
-
         }
     }
 
     public void process(IManager manager) {
 
         readTestScriptFile();
-
 
         for (String scnario : testScenarios) {
             // Test Scenario
@@ -52,10 +50,6 @@ public class TestRunner {
                 System.out.println(result);
 
             }
-
         }
-
-
     }
-
 }
