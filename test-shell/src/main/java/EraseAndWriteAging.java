@@ -1,15 +1,11 @@
 public class EraseAndWriteAging extends DefaultTestScenario {
 
-    RandomFactory randomFactory;
-
     public EraseAndWriteAging(RunCommand runCommand, Output output) {
         super(runCommand, output);
-        randomFactory = new RandomFactory();
     }
 
     public EraseAndWriteAging(RunCommand runCommand, Output output, RandomFactory randomFactory) {
-        super(runCommand, output);
-        this.randomFactory = randomFactory;
+        super(runCommand, output, randomFactory);
     }
 
     @Override

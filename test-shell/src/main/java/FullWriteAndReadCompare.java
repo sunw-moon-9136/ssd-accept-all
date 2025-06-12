@@ -4,10 +4,14 @@ public class FullWriteAndReadCompare extends DefaultTestScenario {
         super(runCommand, output);
     }
 
+    public FullWriteAndReadCompare(RunCommand runCommand, Output output, RandomFactory randomFactory) {
+        super(runCommand, output, randomFactory);
+    }
+
     @Override
     public boolean run() {
         for (int addressByFive = 0; addressByFive <= 95; addressByFive += 5) {
-            String testValue = makeHex(addressByFive / 5);
+            String testValue = randomFactory.getRandomHexValue();
 
             if (!writeFiveValues(addressByFive, testValue)) return false;
             if (!readCompareFiveValues(addressByFive, testValue)) return false;
@@ -30,9 +34,5 @@ public class FullWriteAndReadCompare extends DefaultTestScenario {
             }
         }
         return true;
-    }
-
-    private String makeHex(int num) {
-        return String.format("0x%02d%02d%02d%02d", num, num, num, num);
     }
 }

@@ -4,8 +4,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -21,17 +19,19 @@ class FullWriteAndReadCompareTest {
     @Mock
     Output output;
 
+    @Mock
+    RandomFactory randomFactory;
+
     @BeforeEach
     void setUp() {
-        testScenario = new FullWriteAndReadCompare(runCommand, output);
+        testScenario = new FullWriteAndReadCompare(runCommand, output, randomFactory);
     }
 
     @Test
     void 정상적으로_모든_readCompare가_성공한_경우_return_true() {
-        AtomicInteger atomicInteger = new AtomicInteger(0);
+        doReturn("0x12345678").when(randomFactory).getRandomHexValue();
         doReturn(true).when(runCommand).execute(any());
-        doAnswer(invocation -> String.format("LBA %02d : %s", atomicInteger.get(), makeHex(atomicInteger.getAndIncrement() / 5)))
-                .when(output).checkResult(anyString(), anyString());
+        doReturn("LBA XX : 0x12345678").when(output).checkResult(anyString(), anyString());
 
         boolean actual = testScenario.run();
 
@@ -55,9 +55,5 @@ class FullWriteAndReadCompareTest {
         boolean actual = testScenario.run();
 
         assertThat(actual).isFalse();
-    }
-
-    private String makeHex(int num) {
-        return String.format("0x%02d%02d%02d%02d", num, num, num, num);
     }
 }

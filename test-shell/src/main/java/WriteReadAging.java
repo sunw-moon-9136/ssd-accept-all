@@ -1,15 +1,11 @@
 public class WriteReadAging extends DefaultTestScenario {
 
-    RandomFactory randomFactory;
-
     public WriteReadAging(RunCommand runCommand, Output output) {
         super(runCommand, output);
-        randomFactory = new RandomFactory();
     }
 
     public WriteReadAging(RunCommand runCommand, Output output, RandomFactory randomFactory) {
-        super(runCommand, output);
-        this.randomFactory = randomFactory;
+        super(runCommand, output, randomFactory);
     }
 
     @Override
