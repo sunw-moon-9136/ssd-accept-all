@@ -1,5 +1,4 @@
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,11 +20,11 @@ class TestShellTest {
     @Mock
     Output mockOutput;
 
-    TestShell shell;
+    Manager shell;
 
     @BeforeEach
     void setUp() {
-        shell = new TestShell(mockRunCommand, mockOutput);
+        shell = new Manager(mockRunCommand, mockOutput);
     }
 
     private String getOutputResult(String input) {
@@ -36,7 +35,6 @@ class TestShellTest {
     @Nested
     class CommandInputTest {
         @Test
-        @Disabled
         void read_Command_입력시_read_반환() {
             String expect = "read";
             String actual = getOutputResult("read 3\n");
@@ -45,7 +43,6 @@ class TestShellTest {
         }
 
         @Test
-        @Disabled
         void write_Command_입력시_write_반환() {
             String expect = "write";
             String actual = getOutputResult("write 3 0xAAAABBBB\n");
@@ -54,7 +51,6 @@ class TestShellTest {
         }
 
         @Test
-        @Disabled
         void fullread_Command_입력시_fullread_반환() {
             String expect = "fullread";
             String actual = getOutputResult("fullread\n");
@@ -63,7 +59,6 @@ class TestShellTest {
         }
 
         @Test
-        @Disabled
         void fullwrite_Command_입력시_fullwrite_반환() {
             String expect = "fullwrite";
             String actual = getOutputResult("fullwrite 0xAAAABBBB\n");
@@ -72,7 +67,6 @@ class TestShellTest {
         }
 
         @Test
-        @Disabled
         void help_Command_입력시_help_반환() {
             String expect = "help";
             String actual = getOutputResult("help\n");
@@ -81,7 +75,6 @@ class TestShellTest {
         }
 
         @Test
-        @Disabled
         void exit_Command_입력시_exit_반환() {
             String expect = "exit";
             String actual = getOutputResult("exit\n");
@@ -90,7 +83,6 @@ class TestShellTest {
         }
 
         @Test
-        @Disabled
         void null_Command_입력시_notCommand_반환() {
             String actual = getOutputResult("\n");
 
