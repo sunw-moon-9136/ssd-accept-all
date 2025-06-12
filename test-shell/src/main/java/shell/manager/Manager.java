@@ -53,7 +53,7 @@ public class Manager implements IManager {
         String[] parts = command.split("\\s+");
 
         // Test Scenario
-        ITestScenario testScenario = TestScenarioFactory.getTestScenario(parts[0], processor, output);
+        ITestScenario testScenario = TestScenarioFactory.getTestScenario(parts[0], this);
         if (testScenario != null) {
             String result = testScenario.run() ? "PASS" : "FAIL";
             System.out.println(result);

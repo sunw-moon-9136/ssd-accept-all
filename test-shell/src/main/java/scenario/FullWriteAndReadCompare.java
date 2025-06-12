@@ -1,17 +1,16 @@
 package scenario;
 
-import shell.Processor;
-import shell.output.Output;
+import shell.manager.IManager;
 import utils.RandomFactory;
 
 public class FullWriteAndReadCompare extends DefaultTestScenario {
 
-    public FullWriteAndReadCompare(Processor processor, Output output) {
-        super(processor, output);
+    public FullWriteAndReadCompare(IManager manager) {
+        super(manager);
     }
 
-    public FullWriteAndReadCompare(Processor processor, Output output, RandomFactory randomFactory) {
-        super(processor, output, randomFactory);
+    public FullWriteAndReadCompare(IManager manager, RandomFactory randomFactory) {
+        super(manager, randomFactory);
     }
 
     @Override
@@ -27,7 +26,7 @@ public class FullWriteAndReadCompare extends DefaultTestScenario {
 
     private boolean writeFiveValues(int baseAddress, String testValue) {
         for (int additionalAddress = 0; additionalAddress <= 4; additionalAddress++) {
-            if (!processor.execute(String.format("write %d %s", baseAddress + additionalAddress, testValue)))
+            if (!manager.write(baseAddress + additionalAddress, testValue))
                 return false;
         }
         return true;
