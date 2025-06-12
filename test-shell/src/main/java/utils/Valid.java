@@ -10,7 +10,7 @@ public class Valid {
             "1_", "2_", "3_", "4_");
 
     public static final List<String> ONE_LENGTH_COMMAND = Arrays.asList(
-            "fullread", "help", "exit",
+            "fullread", "help", "exit", "flush",
             "1_FullWriteAndReadCompare", "2_PartialLBAWrite", "3_WriteReadAging", "4_EraseAndWriteAging",
             "1_", "2_", "3_", "4_");
     public static final List<String> COMMAND_LBA = List.of("read");

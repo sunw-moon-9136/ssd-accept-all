@@ -92,6 +92,7 @@ public class Main {
 
             case "erase" -> manager.erase(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
             case "erase_range" -> manager.erase_range(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+            case "flush" -> manager.flush();
             case "help" -> Common.helpCommand();
             case "exit" -> true;
             default -> false;

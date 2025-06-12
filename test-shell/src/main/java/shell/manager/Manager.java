@@ -24,17 +24,23 @@ public class Manager implements IManager {
 
     @Override
     public boolean erase(int address, int size) {
-        return false;
+        return runProcess("erase " + address).equals("DONE");
     }
 
     @Override
     public boolean erase_range(int startLBA, int endLBA) {
-        return false;
+        return runProcess("erase_range " + startLBA + " " + endLBA).equals("DONE");
+    }
+
+    @Override
+    public boolean flush() {
+        return runProcess("flush").equals("DONE");
     }
 
     private String runProcess(String command) {
         String[] parts = command.split("\\s+");
-        if (processor.execute(command)) return output.checkResult(parts[0], parts[1]);
+        if (processor.execute(command))
+            return output.checkResult(parts[0], parts[1]);
         return "ERROR";
     }
 }
