@@ -29,6 +29,7 @@ class SsdTest {
     public static final String WRITE_TEST_VALUE = "0xFFFFFFF0";
     public static final String READ_TEST_VALUE = "0xFFFFFFF0";
     public static final String NO_WRITE_VALUE = "0x00000000";
+    public static final String INIT_VALUE = "0x00000000";
 
 
     @Mock
@@ -123,7 +124,6 @@ class SsdTest {
 
     @Test
     void 같은_LBA영역_다른_값_쓰고_읽기_여러번() throws IOException {
-
         //Arrange
         int retryCnt = 3;
 
@@ -140,4 +140,40 @@ class SsdTest {
             assertThat(readStringList.get(i)).isEqualTo(String.valueOf(WRITE_TEST_VALUE + i));
         }
     }
+
+    @Test
+    void 지우는_크기_0일때_아무변화없음() {
+        //Arrange
+        int writeSize = 5;
+        int eraseSize = 0;
+        for (int i = 0; i < writeSize; i++) {
+            ssd.write(WRITE_TEST_ADDRESS + i, WRITE_TEST_VALUE);
+        }
+
+        //Act
+        ssd.erase(WRITE_TEST_ADDRESS, eraseSize);
+
+        //Assert
+        assertThat(ssd.read(WRITE_TEST_ADDRESS)).isEqualTo(WRITE_TEST_VALUE);
+    }
+
+    @Test
+    void 지우는_크기_3일때_해당범위_초기화() {
+        //Arrange
+        int writeSize = 5;
+        int eraseSize = 3;
+        for (int i = 0; i < writeSize; i++) {
+            ssd.write(WRITE_TEST_ADDRESS + i, WRITE_TEST_VALUE);
+        }
+
+        //Act
+        ssd.erase(WRITE_TEST_ADDRESS, eraseSize);
+
+        //Assert
+        for (int i = 0; i < writeSize; i++) {
+            if (i < eraseSize) assertThat(ssd.read(WRITE_TEST_ADDRESS + i)).isEqualTo(NO_WRITE_VALUE);
+            else assertThat(ssd.read(WRITE_TEST_ADDRESS + i)).isEqualTo(WRITE_TEST_VALUE);
+        }
+    }
+
 }

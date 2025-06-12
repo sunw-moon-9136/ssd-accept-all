@@ -60,6 +60,10 @@ public class Ssd implements ReadWritable {
         driver.write(SSD_NAND_TXT, getWriteContent(address, value).getBytes());
     }
 
+    @Override
+    public void erase(int address, int size) {
+    }
+
     private String getWriteContent(int writeAddress, String writeValue) {
         String fileContent = driver.read(SSD_NAND_TXT);
 
