@@ -54,9 +54,18 @@ public class SsdController {
                 isValidValue(args[2]);
     }
 
+    private boolean isValidEraseCommand(String[] args) {
+        int maxLBA = Integer.parseInt(args[1]) + (args[2].equals("0") ? 0 : Integer.parseInt(args[2]) - 1);
+        return args.length == 3 &&
+                args[0].equals("E") &&
+                isValidLBA(args[1]) &&
+                isValidLBA(String.valueOf(maxLBA));
+    }
+
     private boolean isValidArgs(String[] args) {
         return isValidReadCommand(args) ||
-                isValidWriteCommand(args);
+                isValidWriteCommand(args) ||
+                isValidEraseCommand(args);
     }
 
     private void write(int lba, String value) {
@@ -70,6 +79,10 @@ public class SsdController {
         driver.write(SSD_OUTPUT_TXT, ret.getBytes());
     }
 
+    private void erase(int lba, int size) {
+        disk.erase(lba, size);
+    }
+
     public void run(String[] args) {
         try {
             if (!isValidArgs(args)) throw new IllegalArgumentException();
@@ -77,11 +90,18 @@ public class SsdController {
             // cmd: ssd mode lba [value]
             String mode = args[0];
             int lba = Integer.parseInt(args[1]);
-
-            if (mode.equals("R")) read(lba);
-            if (mode.equals("W")) {
-                String value = args[2];
-                write(lba, value);
+            String value = args.length >= 3 ? args[2] : "";
+            switch (mode) {
+                case "R" ->{
+                    read(lba);
+                }
+                case "W"->{
+                    write(lba, value);
+                }
+                case "E"->{
+                    erase(lba, Integer.parseInt(value));
+                }
+                default -> throw new IllegalArgumentException();
             }
         } catch (Exception e) {
             error();

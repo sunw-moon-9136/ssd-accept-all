@@ -2,6 +2,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.*;
@@ -204,5 +205,30 @@ class SsdControllerTest {
             verify(mockDisk, times(1)).write(anyInt(), anyString());
             verify(mockDriver, times(1)).write(anyString(), any());
         }
+    }
+
+    @Nested
+    @DisplayName("지우기 테스트")
+    class EraseTest {
+        @Test
+        void 지우기_명령이_제대로_들어왔는가() {
+            doNothing().when(mockDisk).erase(anyInt(), anyInt());
+            String[] args = {"E", "12", "3"};
+
+            controller.run(args);
+
+            verify(mockDisk, times(1)).erase(anyInt(), anyInt());
+        }
+
+        @Test
+        void 지우기_명령이_이상하게_뜰어오면() {
+            doNothing().when(mockDriver).write(anyString(), any());
+            String[] args = {"E", "96", "5"};
+
+            controller.run(args);
+
+            verify(mockDriver, times(1)).write(anyString(), any());
+        }
+
     }
 }
