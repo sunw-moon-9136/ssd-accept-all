@@ -13,7 +13,9 @@ import java.util.Scanner;
 
 public class Main {
     private static final String INVALID_COMMAND = "INVALID COMMAND";
-    public static final List<String> SCENARIO_COMMAND = Arrays.asList("1_FullWriteAndReadCompare", "2_PartialLBAWrite", "3_WriteReadAging", "4_EraseAndWriteAging", "1_", "2_", "3_", "4_");
+    public static final List<String> SCENARIO_COMMAND = Arrays.asList(
+            "1_FullWriteAndReadCompare", "2_PartialLBAWrite", "3_WriteReadAging", "4_EraseAndWriteAging",
+            "1_", "2_", "3_", "4_");
 
     private static Processor processor = new Processor();
     private static Output output = new Output();
@@ -88,9 +90,9 @@ public class Main {
                 yield false;
             }
 
-            case "help" -> Common.helpCommand();
             case "erase" -> manager.erase(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
             case "erase_range" -> manager.erase_range(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+            case "help" -> Common.helpCommand();
             case "exit" -> true;
             default -> false;
         };
