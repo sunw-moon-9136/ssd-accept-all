@@ -1,13 +1,17 @@
 package utils;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class Valid {
-    public static final String[] REGISTERED_COMMAND = new String[]{"read", "write", "fullread", "fullwrite", "help", "exit"};
-    public static final String[] ONE_LENGTH_COMMAND = new String[]{"fullread", "help", "exit", "1_FullWriteAndReadCompare", "2_PartialLBAWrite", "3_WriteReadAging", "1_", "2_", "3_"};
-    public static final String[] COMMAND_LBA = new String[]{"read"};
-    public static final String[] COMMAND_DATA = new String[]{"fullwrite"};
-    public static final String[] COMMAND_LBA_DATA = new String[]{"write"};
+    public static final List<String> REGISTERED_COMMAND = Arrays.asList("read", "write", "fullread", "fullwrite", "help", "exit");
+    public static final List<String> SCENARIO_COMMAND = Arrays.asList("1_FullWriteAndReadCompare", "2_PartialLBAWrite", "3_WriteReadAging", "4_EraseAndWriteAging", "1_", "2_", "3_", "4_");
+    public static final List<String> ONE_LENGTH_COMMAND = Arrays.asList("fullread", "help", "exit", "1_FullWriteAndReadCompare", "2_PartialLBAWrite", "3_WriteReadAging", "4_EraseAndWriteAging", "1_", "2_", "3_", "4_");
+    public static final List<String> COMMAND_LBA = List.of("read");
+    public static final List<String> COMMAND_DATA = List.of("fullwrite");
+    public static final List<String> COMMAND_LBA_DATA = List.of("write");
+    public static final List<String> COMMAND_LBA_SIZE = List.of("erase");
+    public static final List<String> COMMAND_LBA_LBA = List.of("erase_range");
 
     public static boolean isNullEmpty(String command) {
         return command == null || command.isEmpty();
@@ -15,17 +19,18 @@ public class Valid {
 
     public static boolean isValidCommand(String[] parts) {
         if (checkRegisteredCommand(parts[0])) return true;
-        if (Arrays.asList(ONE_LENGTH_COMMAND).contains(parts[0])) return isValidOneLength(parts);
-        if (Arrays.asList(COMMAND_LBA).contains(parts[0])) return isValidCmdLBA(parts);
-        if (Arrays.asList(COMMAND_DATA).contains(parts[0])) return isValidCmdData(parts);
-        if (Arrays.asList(COMMAND_LBA_DATA).contains(parts[0])) return isValidCmdLBAData(parts);
+        if (ONE_LENGTH_COMMAND.contains(parts[0])) return isValidOneLength(parts);
+        if (COMMAND_LBA.contains(parts[0])) return isValidCmdLBA(parts);
+        if (COMMAND_DATA.contains(parts[0])) return isValidCmdData(parts);
+        if (COMMAND_LBA_DATA.contains(parts[0])) return isValidCmdLBAData(parts);
 
         return false;
     }
 
     public static boolean checkRegisteredCommand(String command) {
-        if (!Arrays.asList(REGISTERED_COMMAND).contains(command)) return true;
-        if (!command.matches("[a-z]+")) return true;
+        if (!(REGISTERED_COMMAND.contains(command) || SCENARIO_COMMAND.contains(command))) return true;
+        if (REGISTERED_COMMAND.contains(command) && !command.matches("[a-z]+")) return true;
+        if (SCENARIO_COMMAND.contains(command) && !command.matches("[a-z0-9_]+")) return true;
 
         return false;
     }
