@@ -7,6 +7,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.nio.file.Path;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -15,6 +18,8 @@ class LoggerTest {
 
     private static final String NOT_IMPORTANT_METHOD_NAME = "Sender.sendMessageWithData()";
     private static final String NOT_IMPORTANT_LOG_MESSAGE = "send and wait sync";
+    private static final long TEST_LOG_MAX_SIZE = 200L;
+
 
     Logger logger;
 
@@ -23,15 +28,23 @@ class LoggerTest {
 
     @BeforeEach
     void setUp() {
-        logger = new Logger(driver);
+        logger = new Logger(driver, TEST_LOG_MAX_SIZE);
     }
 
     @Test
-    void printLogAndConsoleTest() {
+    void printLogAndConsole() {
         doNothing().when(driver).write(any(), any());
 
         logger.printLogAndConsole(NOT_IMPORTANT_METHOD_NAME, NOT_IMPORTANT_LOG_MESSAGE);
 
-        verify(driver, only()).write(any(), any());
+        verify(driver, times(1)).write(any(), any());
+        verify(driver, times(1)).changeNameIfBiggerThan(anyLong(), anyString(), any());
+    }
+
+    @Test
+    void makeOldLogFileName() {
+        Path path = logger.makeOldLogFileName();
+
+        assertThat(path.toString()).matches("^until_\\d{6}_\\d{2}h_\\d{2}m_\\d{2}s\\.log$");
     }
 }

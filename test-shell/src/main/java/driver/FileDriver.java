@@ -1,21 +1,16 @@
 package driver;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
+import java.util.function.Supplier;
 
 public class FileDriver implements Driver {
-
-    public static final String NAND_FILE_NAME = "ssd_nand.txt";
-    public static final String OUTPUT_FILE_NAME = "ssd_output.txt";
 
     @Override
     public String read(String file) {
         requireValidFileName(file);
 
-         try {
+        try {
             return Files.readString(Paths.get(file));
         } catch (NoSuchFileException e) {
             throw new RuntimeException("File Not Found: " + file);
@@ -35,12 +30,25 @@ public class FileDriver implements Driver {
         }
     }
 
-    private void requireValidFileName(String file) {
-        if (isNullOrEmpty(file) || !(file.equals(OUTPUT_FILE_NAME) || file.equals(NAND_FILE_NAME)))
-            throw new IllegalArgumentException("Invalid Argument");
+    @Override
+    public void changeNameIfBiggerThan(long maxSize, String source, Supplier<Path> getTargetPath) {
+        requireValidFileName(source);
+        if (maxSize <= 0L) throw new RuntimeException("MaxFileSize is Invalid: " + maxSize);
+        if (getTargetPath == null) throw new RuntimeException("GetTargetPath Supplier is Null");
+
+        try {
+            Path filePath = Path.of(source);
+            long fileSize = Files.size(filePath);
+            if (fileSize > maxSize) Files.move(filePath, getTargetPath.get(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (NoSuchFileException e) {
+            throw new RuntimeException("File Not Found: " + source);
+        } catch (IOException e) {
+            throw new RuntimeException("Not Expected Error");
+        }
     }
 
-    private boolean isNullOrEmpty(String file) {
-        return file == null || file.isEmpty();
+    private void requireValidFileName(String file) {
+        if (file == null || file.isEmpty())
+            throw new IllegalArgumentException("Invalid Argument");
     }
 }
