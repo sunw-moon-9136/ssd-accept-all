@@ -1,7 +1,6 @@
 package scenario;
 
-import shell.Processor;
-import shell.output.Output;
+import shell.manager.IManager;
 import utils.TestScenarioFactory;
 
 import java.nio.charset.StandardCharsets;
@@ -39,14 +38,14 @@ public class TestRunner {
         }
     }
 
-    public void process(Processor processor, Output output) {
+    public void process(IManager manager) {
 
         readTestScriptFile();
 
 
         for (String scnario : testScenarios) {
             // Test Scenario
-            ITestScenario testScenario = TestScenarioFactory.getTestScenario(scnario, processor, output);
+            ITestScenario testScenario = TestScenarioFactory.getTestScenario(scnario, manager);
             if (testScenario != null) {
                 System.out.print(scnario + " --- RUN...");
                 String result = testScenario.run() ? "PASS" : "FAIL";

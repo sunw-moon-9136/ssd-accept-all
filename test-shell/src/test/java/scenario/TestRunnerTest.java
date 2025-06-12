@@ -6,6 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import shell.Processor;
+import shell.manager.IManager;
+import shell.manager.Manager;
 import shell.output.Output;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -15,15 +17,19 @@ class TestRunnerTest {
 
     TestRunner T;
     @Mock
-    Processor mockProcessor;
+    IManager mockManger;
 
     @Mock
     Output mockOutput;
+
+    @Mock
+    Processor mockProcessor;
 
     @BeforeEach
     void setUp() {
         mockProcessor = new Processor();
         mockOutput = new Output();
+        mockManger = new Manager(mockProcessor, mockOutput);
     }
 
     @Test
@@ -43,7 +49,7 @@ class TestRunnerTest {
     void TestScript실행하는지확인() {
         T = new TestRunner("C:\\Users\\User\\Documents\\test.txt");
         T.readTestScriptFile();
-        T.process(mockProcessor, mockOutput);
+        T.process(mockManger);
         //verify(T,times(2)).()
 
     }

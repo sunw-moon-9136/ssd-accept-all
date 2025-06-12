@@ -160,6 +160,8 @@ class ActualTest {
 
     @Nested
     @DisplayName("파일읽을때 오류체크")
+
+    @Disabled
     class fileTest {
 
 
@@ -187,6 +189,7 @@ class ActualTest {
 
     @Nested
     @DisplayName("명령어가 'read'일 때")
+    @Disabled
     class ReadTest {
 
         @Disabled

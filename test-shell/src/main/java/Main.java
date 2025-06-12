@@ -1,3 +1,4 @@
+import scenario.TestRunner;
 import shell.Processor;
 import shell.manager.Manager;
 import shell.output.Output;
@@ -17,7 +18,7 @@ public class Main {
 
         if (args[0].length() > 0) {
             TestRunner testRunner = new TestRunner(args[0]);
-            testRunner.process(processor, output);
+            testRunner.process(manager);
             return;
         }
 
