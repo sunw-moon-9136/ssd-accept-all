@@ -28,7 +28,7 @@ public class SsdController {
         driver.write(SSD_OUTPUT_TXT, ERROR_BYTES);
     }
 
-    public void flushOut() {
+    public void clear() {
         driver.write(SSD_OUTPUT_TXT, EMPTY_BYTES);
     }
 
@@ -69,7 +69,7 @@ public class SsdController {
     }
 
     private void write(int lba, String value) {
-        flushOut();
+        clear();
 
         disk.write(lba, value);
     }
@@ -80,6 +80,8 @@ public class SsdController {
     }
 
     private void erase(int lba, int size) {
+        clear();
+
         disk.erase(lba, size);
     }
 
