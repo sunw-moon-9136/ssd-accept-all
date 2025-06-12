@@ -1,10 +1,15 @@
+package scenario;
+
+import shell.Processor;
+import shell.output.Output;
+
 public abstract class DefaultTestScenario implements ITestScenario {
     protected final RandomFactory randomFactory;
-    protected final RunCommand runCommand;
+    protected final Processor processor;
     protected final Output output;
 
-    public DefaultTestScenario(RunCommand runCommand, Output output) {
-        this.runCommand = runCommand;
+    public DefaultTestScenario(Processor processor, Output output) {
+        this.processor = processor;
         this.output = output;
         this.randomFactory = new RandomFactory();
     }
@@ -16,7 +21,7 @@ public abstract class DefaultTestScenario implements ITestScenario {
     }
 
     protected boolean readCompare(int testAddress, String testValue) {
-        if (!runCommand.execute(String.format("read %d", testAddress)))
+        if (!processor.execute(String.format("read %d", testAddress)))
             return false;
 
         String value = "0x" + output.checkResult("read", String.valueOf(testAddress))

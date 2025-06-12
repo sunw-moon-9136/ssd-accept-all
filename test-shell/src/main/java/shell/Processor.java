@@ -1,9 +1,11 @@
+package shell;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class RunCommand {
+public class Processor {
     private static class CommandNames {
         public static final String WRITE = "write";
         public static final String READ = "read";

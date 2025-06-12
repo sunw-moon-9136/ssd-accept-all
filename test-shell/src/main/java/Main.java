@@ -1,3 +1,7 @@
+import shell.Processor;
+import shell.manager.Manager;
+import shell.output.Output;
+
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -10,11 +14,11 @@ public class Main {
     public static final String[] COMMAND_LBA_DATA = new String[]{"write"};
 
 
-    public static RunCommand runCommand = new RunCommand();
+    public static Processor processor = new Processor();
     public static Output output = new Output();
 
     public static void main(String[] args) {
-        Manager manager = new Manager(runCommand, output);
+        Manager manager = new Manager(processor, output);
 
         Scanner scanner = new Scanner(System.in);
         while (true) {

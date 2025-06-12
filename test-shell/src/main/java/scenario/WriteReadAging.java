@@ -1,23 +1,29 @@
+package scenario;
+
+import shell.Processor;
+import shell.output.Output;
+import utils.RandomFactory;
+
 public class WriteReadAging extends DefaultTestScenario {
 
     public WriteReadAging(RunCommand runCommand, Output output) {
-        super(runCommand, output);
+        super(processor, output);
     }
 
     public WriteReadAging(RunCommand runCommand, Output output, RandomFactory randomFactory) {
-        super(runCommand, output, randomFactory);
+        super(processor, output, randomFactory);
     }
 
     @Override
     public boolean run() {
         for (int i = 0; i < 200; i++) {
             String value = randomFactory.getRandomHexValue();
-            runCommand.execute("write 0 " + value);
+            processor.execute("write 0 " + value);
             if (!readCompare(0, value))
                 return false;
 
             value = randomFactory.getRandomHexValue();
-            runCommand.execute("write 99 " + value);
+            processor.execute("write 99 " + value);
             if (!readCompare(99, value))
                 return false;
         }

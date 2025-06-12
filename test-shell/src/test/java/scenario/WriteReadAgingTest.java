@@ -1,8 +1,13 @@
+package scenario;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import shell.Processor;
+import shell.output.Output;
+import utils.RandomFactory;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -18,7 +23,7 @@ class WriteReadAgingTest {
     ITestScenario testScenario;
 
     @Mock
-    RunCommand runCommand;
+    Processor processor;
 
     @Mock
     Output output;
@@ -28,7 +33,7 @@ class WriteReadAgingTest {
 
     @BeforeEach
     void setUp() {
-        testScenario = new WriteReadAging(runCommand, output, randomFactory);
+        testScenario = new WriteReadAging(processor, output, randomFactory);
     }
 
     @Test
@@ -36,7 +41,7 @@ class WriteReadAgingTest {
         AtomicBoolean isAddress00 = new AtomicBoolean(false);
         String testValue = "0x00000000";
         doReturn(testValue).when(randomFactory).getRandomHexValue();
-        doReturn(true).when(runCommand).execute(any());
+        doReturn(true).when(processor).execute(any());
         doAnswer(invocation -> {
             isAddress00.set(!isAddress00.get());
             if (isAddress00.get())
@@ -52,7 +57,7 @@ class WriteReadAgingTest {
     @Test
     void value가_달라서_readCompare_실패한_경우_return_false() {
         doReturn("0x12488321").when(randomFactory).getRandomHexValue();
-        doReturn(true).when(runCommand).execute(any());
+        doReturn(true).when(processor).execute(any());
         doReturn("LBA 00 : 0x12345678").when(output).checkResult(anyString(), anyString());
 
         boolean actual = testScenario.run();
@@ -62,7 +67,7 @@ class WriteReadAgingTest {
 
     @Test
     void runCommand에서_execute가_false로_나온_경우_return_false() {
-        doReturn(false).when(runCommand).execute(any());
+        doReturn(false).when(processor).execute(any());
 
         boolean actual = testScenario.run();
 

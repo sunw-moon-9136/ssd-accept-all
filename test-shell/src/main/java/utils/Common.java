@@ -1,3 +1,5 @@
+package utils;
+
 public class Common {
     public static final String HELP_TEXT = """
             [Team Name]

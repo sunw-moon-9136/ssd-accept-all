@@ -1,3 +1,5 @@
+package shell;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -12,35 +14,35 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class RunCommandTest {
+class ProcessorTest {
     @Spy
     @InjectMocks
-    RunCommand runCommand;
+    Processor processor;
 
     @Test
     void write_SSDjar파일없을때_IOException_발생() {
-        doReturn(false).when(runCommand).runSSDCommand(any(), any(), any());
+        doReturn(false).when(processor).runSSDCommand(any(), any(), any());
 
-        boolean result = runCommand.execute("write 3 0xAAAABBBB");
+        boolean result = processor.execute("write 3 0xAAAABBBB");
 
         assertFalse(result);
     }
 
     @Test
     void write_호출시_SSDjar_실행되어_true반환_확인() {
-        doReturn(true).when(runCommand).runSSDCommand(any(), any(), any());
+        doReturn(true).when(processor).runSSDCommand(any(), any(), any());
 
-        boolean result = runCommand.execute("write 3 0xAAAABBBB");
+        boolean result = processor.execute("write 3 0xAAAABBBB");
 
         assertTrue(result);
-        verify(runCommand).runSSDCommand("W", "3", "0xAAAABBBB");
+        verify(processor).runSSDCommand("W", "3", "0xAAAABBBB");
     }
 
     @Test
     void write_호출시_SSDjar_실행안되어_false반환_확인() {
-        doReturn(false).when(runCommand).runSSDCommand(any(), any(), any());
+        doReturn(false).when(processor).runSSDCommand(any(), any(), any());
 
-        boolean result = runCommand.execute("write 3 0xAAAABBBB");
+        boolean result = processor.execute("write 3 0xAAAABBBB");
 
 
         assertFalse(result);
@@ -48,17 +50,17 @@ class RunCommandTest {
 
     @Test
     void read_호출시_SSDjar_실행되어_true반환_확인() {
-        doReturn(true).when(runCommand).runSSDCommand(any(), any());
+        doReturn(true).when(processor).runSSDCommand(any(), any());
 
-        boolean result = runCommand.execute("read 3");
+        boolean result = processor.execute("read 3");
 
         assertTrue(result);
-        verify(runCommand).runSSDCommand("R", "3");
+        verify(processor).runSSDCommand("R", "3");
     }
 
     @Test
     void 존재하지_않는_명령어_입력시_IllegalArgumentException_발생() {
-        assertThatThrownBy(() -> runCommand.execute("abnormal 1 0xABCDFFFF"))
+        assertThatThrownBy(() -> processor.execute("abnormal 1 0xABCDFFFF"))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

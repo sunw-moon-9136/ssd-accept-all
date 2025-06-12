@@ -1,9 +1,13 @@
+package shell.manager;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import shell.Processor;
+import shell.output.Output;
 
 import java.util.Scanner;
 
@@ -12,10 +16,10 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class TestShellTest {
+class ManagerTest {
     public static final String INVALID_COMMAND = "INVALID COMMAND";
     @Mock
-    RunCommand mockRunCommand;
+    Processor mockProcessor;
 
     @Mock
     Output mockOutput;
@@ -24,7 +28,7 @@ class TestShellTest {
 
     @BeforeEach
     void setUp() {
-        shell = new Manager(mockRunCommand, mockOutput);
+        shell = new Manager(mockProcessor, mockOutput);
     }
 
     private String getOutputResult(String input) {
@@ -161,38 +165,38 @@ class TestShellTest {
 
         @Test
         void read_실행_true() {
-            doReturn(true).when(mockRunCommand).execute(anyString());
+            doReturn(true).when(mockProcessor).execute(anyString());
 
             String actual = getOutputResult("read 3\n");
 
-            verify(mockRunCommand, times(1)).execute(anyString());
+            verify(mockProcessor, times(1)).execute(anyString());
         }
 
         @Test
         void write_실행_true() {
-            doReturn(true).when(mockRunCommand).execute(anyString());
+            doReturn(true).when(mockProcessor).execute(anyString());
 
             String actual = getOutputResult("write 3 0xAAAAFFFF\n");
 
-            verify(mockRunCommand, times(1)).execute(anyString());
+            verify(mockProcessor, times(1)).execute(anyString());
         }
 
         @Test
         void fullread_실행_true() {
-            doReturn(true).when(mockRunCommand).execute(anyString());
+            doReturn(true).when(mockProcessor).execute(anyString());
 
             String actual = getOutputResult("fullread\n");
 
-            verify(mockRunCommand, times(100)).execute(anyString());
+            verify(mockProcessor, times(100)).execute(anyString());
         }
 
         @Test
         void fullwrite_실행_true() {
-            doReturn(true).when(mockRunCommand).execute(anyString());
+            doReturn(true).when(mockProcessor).execute(anyString());
 
             String actual = getOutputResult("fullwrite 0xAAAAFFFF\n");
 
-            verify(mockRunCommand, times(100)).execute(anyString());
+            verify(mockProcessor, times(100)).execute(anyString());
         }
     }
 
@@ -200,7 +204,7 @@ class TestShellTest {
     class outputTest {
         @Test
         void write_정상입력시_output_checkResult_호출확인() {
-            doReturn(true).when(mockRunCommand).execute("write 3 0xABCDFFFF");
+            doReturn(true).when(mockProcessor).execute("write 3 0xABCDFFFF");
             doReturn("[write] DONE").when(mockOutput).checkResult("write", "3");
 
             getOutputResult("write 03 0xABCDFFFF\n");
@@ -210,7 +214,7 @@ class TestShellTest {
 
         @Test
         void read_정상입력시_output_checkResult_호출확인() {
-            doReturn(true).when(mockRunCommand).execute("read 3");
+            doReturn(true).when(mockProcessor).execute("read 3");
             doReturn("[read] LBA 03 : 0xABCDFFFF").when(mockOutput).checkResult("read", "3");
 
             String actual = getOutputResult("read 3\n");
