@@ -1,3 +1,5 @@
+package shell.output;
+
 public class Output {
 
     //TODO

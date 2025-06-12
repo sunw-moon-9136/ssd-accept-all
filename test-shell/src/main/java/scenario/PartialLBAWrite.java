@@ -1,10 +1,15 @@
+package scenario;
+
+import shell.Processor;
+import shell.output.Output;
+
 public class PartialLBAWrite extends DefaultTestScenario {
     public final int repeatCnt = 30;
     public final String[] inputAddressList = {"4", "0", "3", "1", "2"};
     public static final String WRITE_EXPECT_VALUE = "0xAAAABBBB";
-    
-    public PartialLBAWrite(RunCommand runCommand, Output output) {
-        super(runCommand, output);
+
+    public PartialLBAWrite(Processor processor, Output output) {
+        super(processor, output);
     }
 
     @Override
@@ -31,7 +36,7 @@ public class PartialLBAWrite extends DefaultTestScenario {
 
     private void doWriteCmd(String Address) {
         String cmd = generateWriteCommand(Address, WRITE_EXPECT_VALUE);
-        runCommand.execute(cmd);
+        processor.execute(cmd);
     }
 
     private String generateWriteCommand(String writeAddress, String writeValue) {
