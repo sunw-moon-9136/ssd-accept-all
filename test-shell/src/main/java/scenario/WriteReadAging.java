@@ -6,11 +6,11 @@ import utils.RandomFactory;
 
 public class WriteReadAging extends DefaultTestScenario {
 
-    public WriteReadAging(RunCommand runCommand, Output output) {
+    public WriteReadAging(Processor processor, Output output) {
         super(processor, output);
     }
 
-    public WriteReadAging(RunCommand runCommand, Output output, RandomFactory randomFactory) {
+    public WriteReadAging(Processor processor, Output output, RandomFactory randomFactory) {
         super(processor, output, randomFactory);
     }
 

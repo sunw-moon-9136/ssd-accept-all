@@ -2,6 +2,7 @@ package scenario;
 
 import shell.Processor;
 import shell.output.Output;
+import utils.RandomFactory;
 
 public abstract class DefaultTestScenario implements ITestScenario {
     protected final RandomFactory randomFactory;
@@ -14,8 +15,8 @@ public abstract class DefaultTestScenario implements ITestScenario {
         this.randomFactory = new RandomFactory();
     }
 
-    public DefaultTestScenario(RunCommand runCommand, Output output, RandomFactory randomFactory) {
-        this.runCommand = runCommand;
+    public DefaultTestScenario(Processor processor, Output output, RandomFactory randomFactory) {
+        this.processor = processor;
         this.output = output;
         this.randomFactory = randomFactory;
     }

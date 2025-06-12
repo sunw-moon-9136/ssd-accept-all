@@ -2,6 +2,7 @@ package scenario;
 
 import shell.Processor;
 import shell.output.Output;
+import utils.RandomFactory;
 
 public class FullWriteAndReadCompare extends DefaultTestScenario {
 
@@ -9,8 +10,8 @@ public class FullWriteAndReadCompare extends DefaultTestScenario {
         super(processor, output);
     }
 
-    public FullWriteAndReadCompare(RunCommand runCommand, Output output, RandomFactory randomFactory) {
-        super(runCommand, output, randomFactory);
+    public FullWriteAndReadCompare(Processor processor, Output output, RandomFactory randomFactory) {
+        super(processor, output, randomFactory);
     }
 
     @Override
