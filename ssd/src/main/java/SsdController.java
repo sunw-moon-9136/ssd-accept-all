@@ -1,6 +1,10 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class SsdController {
     private Driver driver;
     private ReadWritable disk;
+    private Buffer buffer;
 
     public static final String SSD_OUTPUT_TXT = "ssd_output.txt";
     public static final byte[] ERROR_BYTES = "ERROR".getBytes();
@@ -9,6 +13,7 @@ public class SsdController {
     public SsdController() {
         this.driver = new FileDriver();
         this.disk = new Ssd();
+        this.buffer = new Buffer();
     }
 
     public SsdController(Driver driver, ReadWritable disk) {
@@ -74,20 +79,45 @@ public class SsdController {
     }
 
     private void write(int lba, String value) {
+        // TODO: BUFFER에 쓰기, SIZE check랑 full이면 flush
+        if (buffer.isFull()) {
+            handleBufferFlush();
+        }
+        buffer.write(lba,value);
         clear();
-
-        disk.write(lba, value);
     }
 
     private void read(int lba) {
-        String ret = disk.read(lba);
+        // TODO: BUFFER에서 가져오기
+        String ret = buffer.read(lba);
+
+        // TODO: 없으면 아래 코드
+        if(ret == null) {
+            ret = disk.read(lba);
+        }
+
         driver.write(SSD_OUTPUT_TXT, ret.getBytes());
     }
 
     private void erase(int lba, int size) {
+        // TODO: BUFFER에 쓰기, SIZE check랑 full이면 flush
+        if (buffer.isFull()) {
+            handleBufferFlush();
+        }
+        buffer.erase(lba,size);
         clear();
+    }
 
-        disk.erase(lba, size);
+    private void handleBufferFlush() {
+        List<Buffer.Command> commands = buffer.flush();
+        for (Buffer.Command c : commands) {
+            if (c.mode.equals("W")) {
+                disk.write(c.lba,c.value);
+            } else if(c.mode.equals("E")) {
+                disk.erase(c.lba, Integer.parseInt(c.value));
+            }
+        }
+        buffer.init();
     }
 
     public void run(String[] args) {
