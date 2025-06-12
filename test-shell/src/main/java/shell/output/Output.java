@@ -25,47 +25,33 @@ public class Output {
         return dataReader.readLine();
     }
 
-
     public String checkResult(String commandLine, String address) {
-        String checkResult = "[" + commandLine + "] ";
+        return checkResult(commandLine);
+    }
+
+    public String checkResult(String commandLine) {
+
         String readResult;
         try {
-            if (!existFileCheck()) return checkResult += "ERROR";
-
+            if (!existFileCheck()) return "ERROR";
             readResult = readLine();
-
-
             if (commandLine.equals("write")) {
                 if (readResult == null || readResult.isEmpty()) {
-                    checkResult += "DONE";
-                    return checkResult;
+                    return "DONE";
                 }
-
-                if (readResult.contains("ERROR")) return checkResult += "ERROR";
-                return checkResult += "ERROR";
-
+                if (readResult.contains("ERROR")) return "ERROR";
+                return "ERROR";
             }
 
             if (commandLine.equals("read")) {
-                if (readResult == null || readResult.isEmpty()) return checkResult += "ERROR";
-                if (!readResult.contains("0x")) return checkResult += "ERROR";
-                if (readResult.contains("ERROR")) return checkResult += "ERROR";
-                checkResult += "LBA ";
-                if (address.length() == 1) {
-                    address = "0" + address + " : ";
-                } else {
-                    address = address + " : ";
-                }
-                checkResult += address;
-                checkResult += readResult;
-                return checkResult;
+                if (readResult == null || readResult.isEmpty()) return "ERROR";
+                if (!readResult.contains("0x")) return "ERROR";
+                if (readResult.contains("ERROR")) return "ERROR";
+                return readResult;
             }
-
-
         } catch (Exception e) {
-            return checkResult += "ERROR";
+            return "ERROR";
         }
-
-        return checkResult += "ERROR";
+        return "ERROR";
     }
 }
