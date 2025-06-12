@@ -230,5 +230,14 @@ class SsdControllerTest {
             verify(mockDriver, times(1)).write(anyString(), any());
         }
 
+        @Test
+        void 지우기_명령이_이상하게_뜰어오면_size가_10이상() {
+            doNothing().when(mockDriver).write(anyString(), any());
+            String[] args = {"E", "55", "14"};
+
+            controller.run(args);
+
+            verify(mockDriver, times(1)).write(anyString(), any());
+        }
     }
 }

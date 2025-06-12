@@ -41,6 +41,10 @@ public class SsdController {
         return value.matches("0x[A-F0-9]{8}$");
     }
 
+    private boolean isValidEraseSize(int size) {
+        return size >= 0 && size <= 10;
+    }
+
     private boolean isValidReadCommand(String[] args) {
         return args.length == 2 &&
                 args[0].equals("R") &&
@@ -59,6 +63,7 @@ public class SsdController {
         return args.length == 3 &&
                 args[0].equals("E") &&
                 isValidLBA(args[1]) &&
+                isValidEraseSize(Integer.parseInt(args[2])) &&
                 isValidLBA(String.valueOf(maxLBA));
     }
 
