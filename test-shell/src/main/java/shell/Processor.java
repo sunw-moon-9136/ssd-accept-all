@@ -62,7 +62,6 @@ public class Processor {
 
         for (int i = start; i <= end; i += 10) {
             int len = Math.min(10, end - i + 1);
-            //System.out.println("E " + i + " " + len);
             if (!runSSDCommand("E", String.valueOf(i), String.valueOf(len))) {
                 return false;
             }
@@ -77,7 +76,6 @@ public class Processor {
 
         for (int i = start; i <= end; i += 10) {
             int len = Math.min(10, end - i + 1);
-            //System.out.println("E " + i + " " + len);
             if (!runSSDCommand("E", String.valueOf(i), String.valueOf(len))) {
                 return false;
             }
