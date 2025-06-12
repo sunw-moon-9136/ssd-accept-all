@@ -17,29 +17,33 @@ public class Logger {
 
     private static final Logger instance = new Logger();
     public static final String LATEST_LOG_FILE_NAME = "latest.log";
-    public final long logMaxSize;
+    private static final long TEST_LOG_MAX_SIZE = 10 * 1024 * 1024;
+
     private final Driver fileDriver;
 
     private Logger() {
-        logMaxSize = 10 * 1024 * 1024;
         this.fileDriver = new FileDriver();
     }
 
     // @VisibleForTesting
-    Logger(Driver fileDriver, long logMaxSize) {
+    Logger(Driver fileDriver) {
         this.fileDriver = fileDriver;
-        this.logMaxSize = logMaxSize;
     }
 
     public static Logger getInstance() {
         return instance;
     }
 
-    public void printLogAndConsole(String methodFullName, String logMessage) {
+    public void printConsoleAndLog(String methodFullName, String logMessage) {
         String fullMessage = makeFullMessage(methodFullName, logMessage);
         System.out.println(fullMessage);
+        printAndManageLogFile(fullMessage);
+    }
+
+    private void printAndManageLogFile(String fullMessage) {
         fileDriver.write(LATEST_LOG_FILE_NAME, fullMessage.getBytes(StandardCharsets.UTF_8));
-        fileDriver.changeNameIfBiggerThan(logMaxSize, LATEST_LOG_FILE_NAME, this::makeOldLogFileName);
+        fileDriver.changeNameIfBiggerThan(TEST_LOG_MAX_SIZE, LATEST_LOG_FILE_NAME, this::makeOldLogFileName);
+        fileDriver.changeOldLogFileName(LATEST_LOG_FILE_NAME);
     }
 
     private String makeFullMessage(String methodFullName, String logMessage) {

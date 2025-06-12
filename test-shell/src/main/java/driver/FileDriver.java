@@ -1,10 +1,16 @@
 package driver;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class FileDriver implements Driver {
+
+    public static final String LOG_EXTENSION_POSTFIX = ".log";
 
     @Override
     public String read(String file) {
@@ -31,6 +37,22 @@ public class FileDriver implements Driver {
     }
 
     @Override
+    public void changeOldLogFileName(String latestLogFileName) {
+        List<String> logFileNames = getLogFileNames().stream()
+                .filter(name -> !name.equals(latestLogFileName))
+                .sorted()
+                .collect(Collectors.toList());
+
+        int size = logFileNames.size();
+        if (size <= 1) return;
+
+        logFileNames.remove(size - 1);
+        for (String oldLogFileName : logFileNames) {
+            convertToZipFile(oldLogFileName);
+        }
+    }
+
+    @Override
     public void changeNameIfBiggerThan(long maxSize, String source, Supplier<Path> getTargetPath) {
         requireValidFileName(source);
         if (maxSize <= 0L) throw new RuntimeException("MaxFileSize is Invalid: " + maxSize);
@@ -45,6 +67,34 @@ public class FileDriver implements Driver {
         } catch (IOException e) {
             throw new RuntimeException("Not Expected Error");
         }
+    }
+
+//    @VisibleForTesting
+    void convertToZipFile(String oldLogFileName) {
+        try {
+            String zipFileName = oldLogFileName.replace(".log", ".zip");
+            Files.move(Path.of(oldLogFileName), Path.of(zipFileName), StandardCopyOption.REPLACE_EXISTING);
+        } catch (NoSuchFileException e) {
+            throw new RuntimeException("File Not Found: " + oldLogFileName);
+        } catch (IOException e) {
+            throw new RuntimeException("Not Expected Error");
+        }
+    }
+
+    // @VisibleForTesting
+    List<String> getLogFileNames() {
+        // 참조 : 협업을 위해 JAVA NIO + Stream API 사용을 피해 JAVA IO를 사용함
+        File[] files = new File(".").listFiles();
+
+        if (files == null) {
+            return List.of();
+        }
+
+        List<String> fileNames = new ArrayList<>();
+        for (File file : files)
+            if (file.isFile() && file.getName().endsWith(LOG_EXTENSION_POSTFIX))
+                fileNames.add(file.getName());
+        return fileNames;
     }
 
     private void requireValidFileName(String file) {
