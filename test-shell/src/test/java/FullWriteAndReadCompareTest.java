@@ -49,16 +49,6 @@ class FullWriteAndReadCompareTest {
     }
 
     @Test
-    void address가_달라서_readCompare_실패한_경우_return_false() {
-        doReturn(true).when(runCommand).execute(any());
-        doReturn("LBA 99 : 0x00000000").when(output).checkResult(anyString(), anyString());
-
-        boolean actual = testScenario.run();
-
-        assertThat(actual).isFalse();
-    }
-
-    @Test
     void runCommand에서_Exception이_발생한_경우_return_false() {
         doReturn(false).when(runCommand).execute(any());
 

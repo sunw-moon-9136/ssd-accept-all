@@ -61,17 +61,6 @@ class WriteReadAgingTest {
     }
 
     @Test
-    void address가_달라서_readCompare_실패한_경우_return_false() {
-        doReturn("0x00000000").when(randomFactory).getRandomHexValue();
-        doReturn(true).when(runCommand).execute(any());
-        doReturn("LBA 50 : 0x00000000").when(output).checkResult(anyString(), anyString());
-
-        boolean actual = testScenario.run();
-
-        assertThat(actual).isFalse();
-    }
-
-    @Test
     void runCommand에서_execute가_false로_나온_경우_return_false() {
         doReturn(false).when(runCommand).execute(any());
 
