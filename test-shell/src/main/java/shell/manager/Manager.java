@@ -19,8 +19,7 @@ public class Manager implements IManager {
 
     @Override
     public boolean write(int address, String value) {
-        runProcess("write " + address + " " + value);
-        return false;
+        return runProcess("write " + address + " " + value).equals("DONE");
     }
 
     @Override

@@ -49,48 +49,71 @@ public class Main {
     }
 
     public static boolean shellProcess(String[] parts) {
-        boolean exitFlag = false;
-
-        switch (parts[0]) {
-            case "read":
-                System.out.println(manager.read(Integer.parseInt(parts[1])));
-                break;
-
-            case "write":
-                System.out.println(manager.write(Integer.parseInt(parts[1]), parts[2]));
-                break;
-
-            case "fullread":
-                for (int i = 0; i < 100; i++) {
-                    System.out.println(manager.read(i));
-                }
-                break;
-
-            case "fullwrite":
-                for (int i = 0; i < 100; i++) {
-                    System.out.println(manager.write(i, parts[1]));
-                }
-                break;
-
-            case "erase":
-                manager.erase(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
-                break;
-
-            case "erase_range":
-                manager.erase_range(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
-                break;
-
-            case "help":
-                System.out.println(Common.HELP_TEXT);
-                break;
-
-            case "exit":
-                exitFlag = true;
-                break;
-
-            default:
-                break;
+        if (SCENARIO_COMMAND.contains(parts[0])) {
+            ITestScenario testScenario = TestScenarioFactory.getTestScenario(parts[0], manager);
+            if (testScenario != null) {
+                String result = testScenario.run() ? "PASS" : "FAIL";
+                System.out.println(result);
+            }
+            return false;
         }
-        return exitFlag;
+
+        return switch (parts[0]) {
+            case "read" -> {
+                readFormatPrint(parts[1], manager.read(Integer.parseInt(parts[1])));
+                yield false;
+            }
+
+            case "write" -> {
+                writeFormatPrint(manager.write(Integer.parseInt(parts[1]), parts[2]));
+                yield false;
+            }
+
+            case "fullread" -> {
+                for (int i = 0; i < 100; i++) {
+                    readFormatPrint(String.format("%02d", i), manager.read(i));
+                }
+                yield false;
+            }
+
+            case "fullwrite" -> {
+                for (int i = 0; i < 100; i++) {
+                    writeFormatPrint(manager.write(i, parts[1]));
+                }
+                yield false;
+            }
+
+            case "erase" -> {
+                manager.erase(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+                yield false;
+            }
+
+            case "erase_range" -> {
+                manager.erase_range(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+                yield false;
+            }
+
+            case "help" -> {
+                System.out.println(Common.HELP_TEXT);
+                yield false;
+            }
+
+            case "exit" -> true;
+
+            default -> false;
+        };
     }
+
+    private static void writeFormatPrint(boolean write) {
+        if (write) {
+            System.out.println("[Write] DONE");
+            return;
+        }
+        System.out.println("ERROR");
+    }
+
+    private static void readFormatPrint(String address, String read) {
+        System.out.printf("[Read] %s %s\n", address, read);
+    }
+
 }
