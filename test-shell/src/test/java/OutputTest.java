@@ -193,7 +193,7 @@ class ActualTest {
 
             boolean expected = false;
             String act = output.checkResult("read", "1");
-            assertEquals("[read] ERROR", act);
+            assertEquals("ERROR", act);
 
         }
 
@@ -201,7 +201,7 @@ class ActualTest {
         @Test
         void 받은명령어가_READ이면_OUTPUT파일을_읽는다() throws IOException {
 
-            String expected = "[read] LBA 01 : 0xFFFFFFF";
+            String expected = "0xFFFFFFF";
             String act = output.checkResult("read", "1");
             System.out.println(act);
 
@@ -221,13 +221,13 @@ class ActualTest {
 
             boolean expected = true;
             String act = output.checkResult("write", "1");
-            assertEquals("[write] DONE", act);
+            assertEquals("DONE", act);
         }
 
         @Test
         void 받은명령어가_write일때_ERROR() throws IOException {
 
-            String expected = "[write] ERROR";
+            String expected = "ERROR";
             String act = output.checkResult("write", "1");
             assertEquals(expected, act);
         }
