@@ -18,7 +18,7 @@ class OutputTest {
 
     final static String RESULT_STRING_READ_PASS = OUTPUT_TEXT_READ_PASS;
     final static String RESULT_STRING_READ_ERROR = OUTPUT_TEXT_ERROR;
-    final static String RESULT_STRING_WRITE_PASS = null;
+    final static String RESULT_STRING_WRITE_PASS = "DONE";
     final static String RESULT_STRING_WRITE_ERROR = OUTPUT_TEXT_ERROR;
 
 
