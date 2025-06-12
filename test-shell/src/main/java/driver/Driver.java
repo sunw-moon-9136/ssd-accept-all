@@ -9,5 +9,7 @@ public interface Driver {
 
     void write(String file, byte[] bytes);
 
+    void changeOldLogFileName(String latestLogFileName);
+
     void changeNameIfBiggerThan(long maxSize, String source, Supplier<Path> getTargetPath);
 }

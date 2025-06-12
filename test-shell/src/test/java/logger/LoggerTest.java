@@ -18,8 +18,6 @@ class LoggerTest {
 
     private static final String NOT_IMPORTANT_METHOD_NAME = "Sender.sendMessageWithData()";
     private static final String NOT_IMPORTANT_LOG_MESSAGE = "send and wait sync";
-    private static final long TEST_LOG_MAX_SIZE = 200L;
-
 
     Logger logger;
 
@@ -28,17 +26,18 @@ class LoggerTest {
 
     @BeforeEach
     void setUp() {
-        logger = new Logger(driver, TEST_LOG_MAX_SIZE);
+        logger = new Logger(driver);
     }
 
     @Test
-    void printLogAndConsole() {
+    void printConsoleAndLog() {
         doNothing().when(driver).write(any(), any());
 
-        logger.printLogAndConsole(NOT_IMPORTANT_METHOD_NAME, NOT_IMPORTANT_LOG_MESSAGE);
+        logger.printConsoleAndLog(NOT_IMPORTANT_METHOD_NAME, NOT_IMPORTANT_LOG_MESSAGE);
 
         verify(driver, times(1)).write(any(), any());
         verify(driver, times(1)).changeNameIfBiggerThan(anyLong(), anyString(), any());
+        verify(driver, times(1)).changeOldLogFileName(Logger.LATEST_LOG_FILE_NAME);
     }
 
     @Test
