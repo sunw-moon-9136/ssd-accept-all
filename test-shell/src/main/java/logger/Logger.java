@@ -4,6 +4,7 @@ import driver.Driver;
 import driver.FileDriver;
 
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -16,18 +17,21 @@ public class Logger {
 
     private static final Logger instance = new Logger();
     public static final String LATEST_LOG_FILE_NAME = "latest.log";
+    public final long logMaxSize;
     private final Driver fileDriver;
 
     private Logger() {
+        logMaxSize = 10 * 1024 * 1024;
         this.fileDriver = new FileDriver();
     }
 
     // @VisibleForTesting
-    Logger(Driver fileDriver) {
+    Logger(Driver fileDriver, long logMaxSize) {
         this.fileDriver = fileDriver;
+        this.logMaxSize = logMaxSize;
     }
 
-    static Logger getInstance() {
+    public static Logger getInstance() {
         return instance;
     }
 
@@ -35,9 +39,10 @@ public class Logger {
         String fullMessage = makeFullMessage(methodFullName, logMessage);
         System.out.println(fullMessage);
         fileDriver.write(LATEST_LOG_FILE_NAME, fullMessage.getBytes(StandardCharsets.UTF_8));
+        fileDriver.changeNameIfBiggerThan(logMaxSize, LATEST_LOG_FILE_NAME, this::makeOldLogFileName);
     }
 
-    public String makeFullMessage(String methodFullName, String logMessage) {
+    private String makeFullMessage(String methodFullName, String logMessage) {
         String dateTimeString = getCurrentFormattedDateTime();
         String paddedPrefix = generatePaddedMethodPrefix(methodFullName);
         return String.format("[%s] %s%s", dateTimeString, paddedPrefix, logMessage);
@@ -58,5 +63,10 @@ public class Logger {
         prefixBuilder.append(COLON_SEPARATOR);
 
         return prefixBuilder.toString();
+    }
+
+    public Path makeOldLogFileName() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd_HH'h'_mm'm'_ss's'");
+        return Path.of("until_" + LocalDateTime.now().format(formatter) + ".log");
     }
 }
