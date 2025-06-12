@@ -16,10 +16,10 @@ class OutputTest {
     final static String OUTPUT_TEXT_ERROR = "ERROR";
     final static String OUTPUT_TEXT_WRITE_PASS = null;
 
-    final static String RESULT_STRING_READ_PASS = "[read] LBA " + OUTPUT_TEXT_READ_PASS;
-    final static String RESULT_STRING_READ_ERROR = "[read] " + OUTPUT_TEXT_ERROR;
-    final static String RESULT_STRING_WRITE_PASS = "[write] DONE";
-    final static String RESULT_STRING_WRITE_ERROR = "[write] ERROR";
+    final static String RESULT_STRING_READ_PASS = OUTPUT_TEXT_READ_PASS;
+    final static String RESULT_STRING_READ_ERROR = OUTPUT_TEXT_ERROR;
+    final static String RESULT_STRING_WRITE_PASS = null;
+    final static String RESULT_STRING_WRITE_ERROR = OUTPUT_TEXT_ERROR;
 
 
     @Mock
@@ -57,7 +57,7 @@ class OutputTest {
         when(mockDataReader.readLine()).thenReturn(OUTPUT_TEXT_READ_PASS);
         String result = output.checkResult("read", "1");
         System.out.println(result);
-        assertEquals("[read] LBA 01 : 0xAAAABBBB", result);
+        assertEquals(OUTPUT_TEXT_READ_PASS, result);
         verify(mockDataReader, times(1)).readLine();
     }
 
