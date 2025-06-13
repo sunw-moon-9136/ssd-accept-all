@@ -21,12 +21,10 @@ public class Main {
 
     public static void main(String[] args) {
         logger.printConsoleAndLog("Main.main()", "================================");
-        logger.printConsoleAndLog("Main.main()", "main START.");
 
         if (args.length == 1) {
             TestRunner testRunner = new TestRunner(args[0]);
             testRunner.process(manager);
-            logger.printConsoleAndLog("Main.main()", "main END.");
             logger.printConsoleAndLog("Main.main()", "================================\n");
             return;
         }
@@ -34,7 +32,6 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         run(scanner);
         scanner.close();
-        logger.printConsoleAndLog("Main.main()", "main END.");
         logger.printConsoleAndLog("Main.main()", "================================\n");
     }
 
@@ -43,6 +40,7 @@ public class Main {
         while (true) {
             System.out.print("Shell> ");
             String command = scanner.nextLine().trim();
+            logger.printConsoleAndLog("Main.run()", String.format("command: %s", command));
 
             String[] parts = command.split("\\s+");
             if (Valid.isNullEmpty(command)) {
@@ -52,7 +50,7 @@ public class Main {
             }
 
             if (Valid.isValidCommand(parts)) {
-                logger.printConsoleAndLog("Main.run()", "That command is not a valid command.");
+                logger.printConsoleAndLog("Main.run()", "That command is not a valid command");
                 System.out.println(INVALID_COMMAND);
                 continue;
             }
