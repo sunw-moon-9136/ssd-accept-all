@@ -19,7 +19,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class DefaultSsdTest {
+class DefaultSsdOperatorTest {
     public static final String DELIMITER = "\t";
     public static final String SSD_OUTPUT_TXT = "ssd_output.txt";
     public static final String SSD_NAND_TXT = "ssd_nand.txt";
@@ -33,13 +33,13 @@ class DefaultSsdTest {
 
 
     @Mock
-    Driver fileDriver;
+    NandDriver nandDriver;
 
-    DefaultSsd defaultSsd;
+    DefaultSsdOperator defaultSsdOperator;
 
     @BeforeEach
     void setUp() throws IOException {
-        defaultSsd = new DefaultSsd(fileDriver);
+        defaultSsdOperator = new DefaultSsdOperator(nandDriver);
 
         Files.deleteIfExists(Paths.get(SSD_OUTPUT_TXT));
         Files.deleteIfExists(Paths.get(SSD_NAND_TXT));
@@ -49,9 +49,9 @@ class DefaultSsdTest {
             byte[] data = invocation.getArgument(1);
             Files.write(Paths.get(path), data);
             return null;
-        }).when(fileDriver).write(anyString(), any());
+        }).when(nandDriver).write(anyString(), any());
 
-        when(fileDriver.read(anyString())).thenAnswer(invocation -> {
+        when(nandDriver.read(anyString())).thenAnswer(invocation -> {
             String path = invocation.getArgument(0);
             try {
                 return new String(Files.readAllBytes(Paths.get(path)));
@@ -75,7 +75,7 @@ class DefaultSsdTest {
     void LBA_영역_값_쓰기_ssd_nand_txt_미존재() throws IOException {
         //Arrange
         //Act
-        defaultSsd.write(WRITE_TEST_ADDRESS, WRITE_TEST_VALUE);
+        defaultSsdOperator.write(WRITE_TEST_ADDRESS, WRITE_TEST_VALUE);
 
         //Assert
         assertTrue(new File(SSD_NAND_TXT).exists(), "파일이 생성되지 않았습니다.");
@@ -87,8 +87,8 @@ class DefaultSsdTest {
         //Arrange
 
         //Act
-        defaultSsd.write(WRITE_TEST_ADDRESS, WRITE_TEST_VALUE);
-        defaultSsd.write(WRITE_TEST_ADDRESS, WRITE_TEST_VALUE);
+        defaultSsdOperator.write(WRITE_TEST_ADDRESS, WRITE_TEST_VALUE);
+        defaultSsdOperator.write(WRITE_TEST_ADDRESS, WRITE_TEST_VALUE);
 
         //Assert
         assertTrue(new File(SSD_NAND_TXT).exists(), "파일이 생성되지 않았습니다.");
@@ -102,8 +102,8 @@ class DefaultSsdTest {
         String content = "";
 
         //Act
-        defaultSsd.write(READ_TEST_ADDRESS, READ_TEST_VALUE);
-        content = defaultSsd.read(READ_TEST_ADDRESS);
+        defaultSsdOperator.write(READ_TEST_ADDRESS, READ_TEST_VALUE);
+        content = defaultSsdOperator.read(READ_TEST_ADDRESS);
 
         //Assert
         assertThat(content).isEqualTo(READ_TEST_VALUE);
@@ -116,7 +116,7 @@ class DefaultSsdTest {
         String content = "";
 
         //Act
-        content = defaultSsd.read(READ_TEST_ADDRESS);
+        content = defaultSsdOperator.read(READ_TEST_ADDRESS);
 
         //Assert
         assertThat(content).isEqualTo(NO_WRITE_VALUE);
@@ -130,8 +130,8 @@ class DefaultSsdTest {
         //Act
         List<String> readStringList = new ArrayList<>();
         for (int i = 0; i < retryCnt; i++) {
-            defaultSsd.write(WRITE_TEST_ADDRESS, WRITE_TEST_VALUE + i);
-            String content = defaultSsd.read(WRITE_TEST_ADDRESS);
+            defaultSsdOperator.write(WRITE_TEST_ADDRESS, WRITE_TEST_VALUE + i);
+            String content = defaultSsdOperator.read(WRITE_TEST_ADDRESS);
             readStringList.add(content);
         }
 
@@ -147,14 +147,14 @@ class DefaultSsdTest {
         int writeSize = 5;
         int eraseSize = 0;
         for (int i = 0; i < writeSize; i++) {
-            defaultSsd.write(WRITE_TEST_ADDRESS + i, WRITE_TEST_VALUE);
+            defaultSsdOperator.write(WRITE_TEST_ADDRESS + i, WRITE_TEST_VALUE);
         }
 
         //Act
-        defaultSsd.erase(WRITE_TEST_ADDRESS, eraseSize);
+        defaultSsdOperator.erase(WRITE_TEST_ADDRESS, eraseSize);
 
         //Assert
-        assertThat(defaultSsd.read(WRITE_TEST_ADDRESS)).isEqualTo(WRITE_TEST_VALUE);
+        assertThat(defaultSsdOperator.read(WRITE_TEST_ADDRESS)).isEqualTo(WRITE_TEST_VALUE);
     }
 
     @Test
@@ -163,16 +163,16 @@ class DefaultSsdTest {
         int writeSize = 5;
         int eraseSize = 3;
         for (int i = 0; i < writeSize; i++) {
-            defaultSsd.write(WRITE_TEST_ADDRESS + i, WRITE_TEST_VALUE);
+            defaultSsdOperator.write(WRITE_TEST_ADDRESS + i, WRITE_TEST_VALUE);
         }
 
         //Act
-        defaultSsd.erase(WRITE_TEST_ADDRESS, eraseSize);
+        defaultSsdOperator.erase(WRITE_TEST_ADDRESS, eraseSize);
 
         //Assert
         for (int i = 0; i < writeSize; i++) {
-            if (i < eraseSize) assertThat(defaultSsd.read(WRITE_TEST_ADDRESS + i)).isEqualTo(NO_WRITE_VALUE);
-            else assertThat(defaultSsd.read(WRITE_TEST_ADDRESS + i)).isEqualTo(WRITE_TEST_VALUE);
+            if (i < eraseSize) assertThat(defaultSsdOperator.read(WRITE_TEST_ADDRESS + i)).isEqualTo(NO_WRITE_VALUE);
+            else assertThat(defaultSsdOperator.read(WRITE_TEST_ADDRESS + i)).isEqualTo(WRITE_TEST_VALUE);
         }
     }
 

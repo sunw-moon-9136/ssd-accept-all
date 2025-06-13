@@ -4,7 +4,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
-public class FileDriver implements Driver {
+public class NandFileDriver implements NandDriver {
 
     public static final String NAND_FILE_NAME = "ssd_nand.txt";
     public static final String OUTPUT_FILE_NAME = "ssd_output.txt";
