@@ -1,5 +1,7 @@
 package utils;
 
+import logger.Logger;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -19,11 +21,14 @@ public class Valid {
     public static final List<String> COMMAND_LBA_SIZE = List.of("erase");
     public static final List<String> COMMAND_LBA_LBA = List.of("erase_range");
 
+    private static final Logger logger = Logger.getInstance();
+
     public static boolean isNullEmpty(String command) {
         return command == null || command.isEmpty();
     }
 
     public static boolean isValidCommand(String[] parts) {
+        logger.printConsoleAndLog("Valid.isValidCommand()", "isValidCommand START.");
         if (checkRegisteredCommand(parts[0])) return true;
         if (ONE_LENGTH_COMMAND.contains(parts[0])) return isValidOneLength(parts);
         if (COMMAND_LBA.contains(parts[0])) return isValidCmdLBA(parts);
@@ -32,10 +37,12 @@ public class Valid {
         if (COMMAND_LBA_SIZE.contains(parts[0])) return isValidCmdLBASize(parts);
         if (COMMAND_LBA_LBA.contains(parts[0])) return isValidCmdLBALBA(parts);
 
+        logger.printConsoleAndLog("Valid.isValidCommand()", "isValidCommand END.");
         return false;
     }
 
     public static boolean checkRegisteredCommand(String command) {
+        logger.printConsoleAndLog("Valid.checkRegisteredCommand()", "checkRegisteredCommand RUN.");
         if (!(REGISTERED_COMMAND.contains(command) || REGISTERED_SCENARIO_COMMAND.contains(command))) return true;
         if (REGISTERED_COMMAND.contains(command) && !command.matches("[a-z]+")) return true;
         if (REGISTERED_SCENARIO_COMMAND.contains(command) && !command.matches("[a-z0-9_]+")) return true;
@@ -44,6 +51,7 @@ public class Valid {
     }
 
     public static boolean isValidOneLength(String[] parts) {
+        logger.printConsoleAndLog("Valid.isValidOneLength()", "isValidOneLength RUN.");
         if (parts.length != 1) return true;
 
         return false;
@@ -51,6 +59,7 @@ public class Valid {
 
     public static boolean isValidCmdLBA(String[] parts) {
         // COMMAND LBA (ex. read 3)
+        logger.printConsoleAndLog("Valid.isValidCmdLBA()", "isValidCmdLBA RUN.");
         if (parts.length != 2) return true;
         if (isValidLBAPositionArgument(parts[1])) return true;
 
@@ -59,6 +68,7 @@ public class Valid {
 
     public static boolean isValidCmdData(String[] parts) {
         // COMMAND DATA (ex. fullwrite 0xSSSSSSSS)
+        logger.printConsoleAndLog("Valid.isValidCmdData()", "isValidCmdData RUN.");
         if (parts.length != 2) return true;
         if (isValidDataArgument(parts[1])) return true;
 
@@ -67,6 +77,7 @@ public class Valid {
 
     public static boolean isValidCmdLBAData(String[] parts) {
         // COMMAND LBA DATA (ex. write 3 0xSSSSSSSS)
+        logger.printConsoleAndLog("Valid.isValidCmdLBAData()", "isValidCmdLBAData RUN.");
         if (parts.length != 3) return true;
         if (isValidLBAPositionArgument(parts[1])) return true;
         if (isValidDataArgument(parts[2])) return true;
@@ -76,6 +87,7 @@ public class Valid {
 
     public static boolean isValidCmdLBASize(String[] parts) {
         // COMMAND LBA SIZE (ex. erase 3 100, erase 50 -10)
+        logger.printConsoleAndLog("Valid.isValidCmdLBASize()", "isValidCmdLBASize RUN.");
         if (parts.length != 3) return true;
         if (isValidLBAPositionArgument(parts[1])) return true;
         if (isValidSizeArgument(parts[2])) return true;
@@ -85,6 +97,7 @@ public class Valid {
 
     public static boolean isValidCmdLBALBA(String[] parts) {
         // COMMAND LBA LBA (ex. erase_range 4 10)
+        logger.printConsoleAndLog("Valid.isValidCmdLBALBA()", "isValidCmdLBALBA RUN.");
         if (parts.length != 3) return true;
         if (isValidLBAPositionArgument(parts[1])) return true;
         if (isValidLBAPositionArgument(parts[2])) return true;
