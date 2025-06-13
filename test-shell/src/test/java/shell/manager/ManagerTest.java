@@ -1,5 +1,6 @@
 package shell.manager;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -9,9 +10,9 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import shell.Processor;
 import shell.output.Output;
+import utils.LogFileDeleter;
 
-import java.io.ByteArrayInputStream;
-import java.util.Scanner;
+import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,9 +37,9 @@ class ManagerTest {
         manager = new Manager(mockProcessor, mockOutput);
     }
 
-    private Scanner getScanner(String text) {
-        ByteArrayInputStream input = new ByteArrayInputStream(text.getBytes());
-        return new Scanner(input);
+    @AfterEach
+    void cleanUp() throws IOException {
+        LogFileDeleter.deleteRecursivelyLogDirectory();
     }
 
     @Nested
@@ -70,25 +71,24 @@ class ManagerTest {
 
     @Nested
     class outputTest {
-
         @Test
         void read_정상입력시_output_checkResult_호출확인() {
             doReturn(true).when(mockProcessor).execute("read 3");
-            doReturn("[read] LBA 03 : 0xABCDFFFF").when(mockOutput).checkResult("read");
+            doReturn("0xABCDFFFF").when(mockOutput).checkResult("read 3");
 
             String actual = manager.read(3);
 
-            assertEquals("[read] LBA 03 : 0xABCDFFFF", actual);
+            assertEquals("0xABCDFFFF", actual);
         }
 
         @Test
         void write_정상입력시_output_checkResult_호출확인() {
             doReturn(true).when(mockProcessor).execute("write 3 0xABCDFFFF");
-            doReturn("[write] DONE").when(mockOutput).checkResult("write");
+            doReturn("DONE").when(mockOutput).checkResult("write 3 0xABCDFFFF");
 
             manager.write(3, "0xABCDFFFF");
 
-            verify(mockOutput).checkResult("write");
+            verify(mockOutput).checkResult("write 3 0xABCDFFFF");
         }
     }
 }

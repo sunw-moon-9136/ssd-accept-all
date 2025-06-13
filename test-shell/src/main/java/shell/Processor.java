@@ -1,11 +1,15 @@
 package shell;
 
+import logger.Logger;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class Processor {
+    private static final Logger logger = Logger.getInstance();
+
     private static class CommandNames {
         public static final String WRITE = "write";
         public static final String READ = "read";
@@ -15,6 +19,7 @@ public class Processor {
     }
 
     public boolean execute(String input) {
+        logger.printConsoleAndLog("Processor.execute()", "input is " + input);
         String[] parts = input.trim().split("\\s+");
         String command = parts[0].toLowerCase();
 
@@ -90,6 +95,7 @@ public class Processor {
     }
 
     boolean runSSDCommand(String... args) {
+        logger.printConsoleAndLog("Processor.runSSDCommand()", "args = " + Arrays.toString(args));
         List<String> command = new ArrayList<>();
         command.add("java");
         command.add("-jar");
@@ -102,8 +108,10 @@ public class Processor {
 
             int exitCode = process.waitFor();
 
+            logger.printConsoleAndLog("Processor.runSSDCommand()", "action Passed");
             return exitCode == 0;
         } catch (IOException | InterruptedException e) {
+            logger.printConsoleAndLog("Processor.runSSDCommand()", "action Failed");
             return false;
         }
     }
