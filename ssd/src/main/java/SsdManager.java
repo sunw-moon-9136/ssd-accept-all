@@ -54,6 +54,7 @@ public class SsdManager {
     }
 
     private boolean isValidEraseCommand(String[] args) {
+        if(args.length != 3) return false;
         int maxLBA = Integer.parseInt(args[1]) + (args[2].equals("0") ? 0 : Integer.parseInt(args[2]) - 1);
         return args.length == 3 &&
                 args[0].equals("E") &&
@@ -62,10 +63,16 @@ public class SsdManager {
                 isValidLBA(String.valueOf(maxLBA));
     }
 
+    private boolean isValidFlushCommand(String[] args) {
+        return args.length == 1 && args[0].equals("F");
+    }
+
     private boolean isValidArgs(String[] args) {
+        if(args.length == 0) return false;
         return isValidReadCommand(args) ||
                 isValidWriteCommand(args) ||
-                isValidEraseCommand(args);
+                isValidEraseCommand(args) ||
+                isValidFlushCommand(args);
     }
 
     private void write(int lba, String value) {
@@ -120,7 +127,7 @@ public class SsdManager {
             if (!isValidArgs(args)) throw new IllegalArgumentException();
 
             String mode = args[0];
-            int lba = Integer.parseInt(args[1]);
+            int lba = args.length >= 2 ? Integer.parseInt(args[1]) : -1;
             String value = args.length >= 3 ? args[2] : "";
             switch (mode) {
                 case "R" -> {
@@ -131,6 +138,9 @@ public class SsdManager {
                 }
                 case "E" -> {
                     erase(lba, Integer.parseInt(value));
+                }
+                case "F" -> {
+                    this.flushBuffer();
                 }
                 default -> throw new IllegalArgumentException();
             }
@@ -170,6 +180,7 @@ public class SsdManager {
             return new SsdManager(this);
         }
     }
+
     public static SsdManagerBuilder builder() {
         return new SsdManagerBuilder();
     }
