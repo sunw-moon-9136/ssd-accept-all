@@ -1,7 +1,12 @@
-import java.io.IOException;
-import java.nio.file.*;
+package NAND;
 
-public class FileDriver implements Driver {
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+
+public class NandFileDriver implements NandDriver {
 
     public static final String NAND_FILE_NAME = "ssd_nand.txt";
     public static final String OUTPUT_FILE_NAME = "ssd_output.txt";
@@ -10,7 +15,7 @@ public class FileDriver implements Driver {
     public String read(String file) {
         requireValidFileName(file);
 
-         try {
+        try {
             return Files.readString(Paths.get(file));
         } catch (NoSuchFileException e) {
             throw new RuntimeException("File Not Found: " + file);
