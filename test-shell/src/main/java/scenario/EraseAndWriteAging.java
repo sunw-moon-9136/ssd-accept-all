@@ -12,12 +12,6 @@ public class EraseAndWriteAging extends DefaultTestScenario {
         return testScenario;
     }
 
-    public static ITestScenario getInstance(IManager manager, RandomFactory randomFactory) {
-        if (testScenario == null)
-            testScenario = new EraseAndWriteAging(manager, randomFactory);
-        return testScenario;
-    }
-
     private EraseAndWriteAging(IManager manager) {
         super(manager);
     }

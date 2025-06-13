@@ -16,12 +16,6 @@ public class PartialLBAWrite extends DefaultTestScenario {
         return testScenario;
     }
 
-    public static ITestScenario getInstance(IManager manager, RandomFactory randomFactory) {
-        if (testScenario == null)
-            testScenario = new PartialLBAWrite(manager, randomFactory);
-        return testScenario;
-    }
-
     private PartialLBAWrite(IManager manager) {
         super(manager);
     }

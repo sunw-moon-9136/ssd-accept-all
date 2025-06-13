@@ -26,7 +26,6 @@ public class Logger {
 
     private Logger() {
         this.fileDriver = new FileDriver();
-        this.fileDriver.createDirectoryIfAbsent(LOG_DIRECTORY_NAME);
     }
 
     // @VisibleForTesting
@@ -39,6 +38,7 @@ public class Logger {
     }
 
     public void printConsoleAndLog(String methodFullName, String logMessage) {
+        this.fileDriver.createDirectoryIfAbsent(LOG_DIRECTORY_NAME);
         String fullMessage = makeFullMessage(methodFullName, logMessage) + LINE_BREAK;
         printAndManageLogFile(fullMessage);
     }

@@ -13,12 +13,6 @@ public class WriteReadAging extends DefaultTestScenario {
         return testScenario;
     }
 
-    public static ITestScenario getInstance(IManager manager, RandomFactory randomFactory) {
-        if (testScenario == null)
-            testScenario = new WriteReadAging(manager, randomFactory);
-        return testScenario;
-    }
-
     private WriteReadAging(IManager manager) {
         super(manager);
     }
