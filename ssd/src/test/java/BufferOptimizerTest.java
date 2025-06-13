@@ -1,3 +1,5 @@
+import SSD.InputFileHandler;
+import SSD.InputHandler;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,13 +16,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BufferOptimizerTest {
 
-    public SsdCommandBufferOptimizer ssdCommandBufferOptimizer;
+    public InputHandler inputHandler;
 
     String BUFFER_PATH = "buffer";
 
     @BeforeEach
     void setUp() {
-        ssdCommandBufferOptimizer = new SsdCommandBufferOptimizer();
+        inputHandler = new InputFileHandler();
         try {
             DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(BUFFER_PATH));
             for (Path file : stream) {
@@ -49,10 +51,10 @@ class BufferOptimizerTest {
 
     @Test
     void WRITE_IGNORE_AND_ERASE_MERGE() {
-        ssdCommandBufferOptimizer.add("E 0 6");
-        ssdCommandBufferOptimizer.add("W 3 0xABCDABCD");
-        ssdCommandBufferOptimizer.add("E 0 4");
-        List<String> answer = ssdCommandBufferOptimizer.flush();
+        inputHandler.add("E 0 6");
+        inputHandler.add("W 3 0xABCDABCD");
+        inputHandler.add("E 0 4");
+        List<String> answer = inputHandler.flush();
         List<String> expected = List.of(
                 "E 0 6"
         );
@@ -61,21 +63,21 @@ class BufferOptimizerTest {
 
     @Test
     void test1() {
-        ssdCommandBufferOptimizer.add("W 33 0x33333333");
-        ssdCommandBufferOptimizer.add("E 43 10");
-        ssdCommandBufferOptimizer.add("W 44 0x33333333");
-        ssdCommandBufferOptimizer.add("W 33 0x44444444");
+        inputHandler.add("W 33 0x33333333");
+        inputHandler.add("E 43 10");
+        inputHandler.add("W 44 0x33333333");
+        inputHandler.add("W 33 0x44444444");
 
-        List<String> answer = ssdCommandBufferOptimizer.flush();
+        List<String> answer = inputHandler.flush();
     }
 
 
     @Test
     void IGNORE_COMMAND1() {
-        ssdCommandBufferOptimizer.add("W 20 0xABCDABCD");
-        ssdCommandBufferOptimizer.add("W 21 0x12341234");
-        ssdCommandBufferOptimizer.add("W 20 0xEEEEFFFF");
-        List<String> answer = ssdCommandBufferOptimizer.flush();
+        inputHandler.add("W 20 0xABCDABCD");
+        inputHandler.add("W 21 0x12341234");
+        inputHandler.add("W 20 0xEEEEFFFF");
+        List<String> answer = inputHandler.flush();
         List<String> expected = List.of(
                 "W 21 0x12341234",
                 "W 20 0xEEEEFFFF"
@@ -86,10 +88,10 @@ class BufferOptimizerTest {
 
     @Test
     void IGNORE_COMMAND2() {
-        ssdCommandBufferOptimizer.add("E 18 3");
-        ssdCommandBufferOptimizer.add("W 21 0x12341234");
-        ssdCommandBufferOptimizer.add("E 18 5");
-        List<String> answer = ssdCommandBufferOptimizer.flush();
+        inputHandler.add("E 18 3");
+        inputHandler.add("W 21 0x12341234");
+        inputHandler.add("E 18 5");
+        List<String> answer = inputHandler.flush();
         List<String> expected = List.of(
                 "E 18 5"
         );
@@ -98,11 +100,11 @@ class BufferOptimizerTest {
 
     @Test
     void MERGE_ERASE_TEST() {
-        ssdCommandBufferOptimizer.add("W 20 0xABCDABCD");
-        ssdCommandBufferOptimizer.add("E 10 4");
-        ssdCommandBufferOptimizer.add("E 12 3");
+        inputHandler.add("W 20 0xABCDABCD");
+        inputHandler.add("E 10 4");
+        inputHandler.add("E 12 3");
 
-        List<String> answer = ssdCommandBufferOptimizer.flush();
+        List<String> answer = inputHandler.flush();
 
         List<String> expected = List.of(
                 "W 20 0xABCDABCD",
@@ -113,31 +115,31 @@ class BufferOptimizerTest {
 
     @Test
     void FAST_READ_TEST() {
-        ssdCommandBufferOptimizer.add("W 10 0xABCDABCD");
-        ssdCommandBufferOptimizer.add("E 10 4");
-        ssdCommandBufferOptimizer.add("W 11 0xABCDABCD");
-        assertThat(ssdCommandBufferOptimizer.read(10)).isEqualTo("0x00000000");
-        assertThat(ssdCommandBufferOptimizer.read(11)).isEqualTo("0xABCDABCD");
+        inputHandler.add("W 10 0xABCDABCD");
+        inputHandler.add("E 10 4");
+        inputHandler.add("W 11 0xABCDABCD");
+        assertThat(inputHandler.read(10)).isEqualTo("0x00000000");
+        assertThat(inputHandler.read(11)).isEqualTo("0xABCDABCD");
     }
 
     @Test
     void BUFFER에_없는_값_FAST_READ_TEST() {
-        assertThat(ssdCommandBufferOptimizer.read(10)).isEqualTo("");
-        assertThat(ssdCommandBufferOptimizer.read(11)).isEqualTo("");
+        assertThat(inputHandler.read(10)).isEqualTo("");
+        assertThat(inputHandler.read(11)).isEqualTo("");
     }
 
     @Test
     void ERASE_SIZE_0일때_버퍼_미생성() {
-        ssdCommandBufferOptimizer.add("E 10 0");
-        List<String> answer = ssdCommandBufferOptimizer.flush();
+        inputHandler.add("E 10 0");
+        List<String> answer = inputHandler.flush();
         assertTrue(answer.isEmpty());
     }
 
     @Test
     void ERASE_SIZE_1이_존재할때_동일주소_WRITE() {
-        ssdCommandBufferOptimizer.add("E 10 1");
-        ssdCommandBufferOptimizer.add("W 10 0xABCDABCD");
-        List<String> answer = ssdCommandBufferOptimizer.flush();
+        inputHandler.add("E 10 1");
+        inputHandler.add("W 10 0xABCDABCD");
+        List<String> answer = inputHandler.flush();
         for (String str : answer) {
             System.out.println(str);
         }
@@ -150,9 +152,9 @@ class BufferOptimizerTest {
 
     @Test
     void WRITE가_ERASE_START_부분이면_ERASE범위_조절() {
-        ssdCommandBufferOptimizer.add("E 10 5");
-        ssdCommandBufferOptimizer.add("W 10 0xABCDABCD");
-        List<String> answer = ssdCommandBufferOptimizer.flush();
+        inputHandler.add("E 10 5");
+        inputHandler.add("W 10 0xABCDABCD");
+        List<String> answer = inputHandler.flush();
         List<String> expected = List.of(
                 "W 10 0xABCDABCD",
                 "E 11 4"
@@ -162,9 +164,9 @@ class BufferOptimizerTest {
 
     @Test
     void WRITE가_ERASE_END_부분이면_ERASE범위_조절() {
-        ssdCommandBufferOptimizer.add("E 10 5");
-        ssdCommandBufferOptimizer.add("W 14 0xABCDABCD");
-        List<String> answer = ssdCommandBufferOptimizer.flush();
+        inputHandler.add("E 10 5");
+        inputHandler.add("W 14 0xABCDABCD");
+        List<String> answer = inputHandler.flush();
         List<String> expected = List.of(
                 "W 14 0xABCDABCD",
                 "E 10 4"
@@ -174,9 +176,9 @@ class BufferOptimizerTest {
 
     @Test
     void ERASE_중복_범위_삽입() {
-        ssdCommandBufferOptimizer.add("E 0 5");
-        ssdCommandBufferOptimizer.add("E 2 1");
-        List<String> answer = ssdCommandBufferOptimizer.flush();
+        inputHandler.add("E 0 5");
+        inputHandler.add("E 2 1");
+        List<String> answer = inputHandler.flush();
         List<String> expected = List.of(
                 "E 0 5"
         );
