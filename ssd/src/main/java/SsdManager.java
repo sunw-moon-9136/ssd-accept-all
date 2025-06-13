@@ -1,39 +1,33 @@
+import NAND.DefaultSsdOperator;
+import NAND.ReadWritable;
+import SSD.InputFileHandler;
+import SSD.InputHandler;
+import SSD.OutputFileHandler;
+import SSD.OutputHandler;
+
 import java.util.List;
 
-public class SsdController {
-    private Driver driver;
+public class SsdManager {
     private ReadWritable ssd;
-    private SsdCommandBufferOptimizer buffer;
+    private InputHandler inputHandler;
+    private OutputHandler outputHandler;
 
     public static final String SSD_OUTPUT_TXT = "ssd_output.txt";
     public static final byte[] ERROR_BYTES = "ERROR".getBytes();
     public static final byte[] EMPTY_BYTES = "".getBytes();
 
-    public SsdController() {
-        this.driver = new FileDriver();
+    public SsdManager() {
         this.ssd = new DefaultSsdOperator();
-        this.buffer = new SsdCommandBufferOptimizer();
-    }
-
-    public SsdController(Driver driver, ReadWritable ssd) {
-        this.driver = driver;
-        this.ssd = ssd;
-    }
-
-    public void setDriver(Driver driver) {
-        this.driver = driver;
-    }
-
-    public void setSsd(DefaultSsdOperator defaultSsdOperator) {
-        this.ssd = defaultSsdOperator;
+        this.inputHandler = new InputFileHandler();
+        this.outputHandler = new OutputFileHandler();
     }
 
     public void error() {
-        driver.write(SSD_OUTPUT_TXT, ERROR_BYTES);
+        outputHandler.write(SSD_OUTPUT_TXT, ERROR_BYTES);
     }
 
     public void clear() {
-        driver.write(SSD_OUTPUT_TXT, EMPTY_BYTES);
+        outputHandler.write(SSD_OUTPUT_TXT, EMPTY_BYTES);
     }
 
     private boolean isValidLBA(String lba) {
@@ -78,33 +72,38 @@ public class SsdController {
     }
 
     private void write(int lba, String value) {
-        if (buffer.isFull()) {
+        if (inputHandler.isFull()) {
             flushBuffer();
         }
-        buffer.add(String.join(" ", "W", String.valueOf(lba), value));
+
+        inputHandler.add(String.join(" ", "W", String.valueOf(lba), value));
 
         clear();
     }
 
     private void read(int lba) {
-        String ret = buffer.read(lba);
+        String ret = inputHandler.read(lba);
+
         if (ret.isBlank()) {
             ret = ssd.read(lba);
         }
-        driver.write(SSD_OUTPUT_TXT, ret.getBytes());
+
+        outputHandler.write(SSD_OUTPUT_TXT, ret.getBytes());
     }
 
     private void erase(int lba, int size) {
-        if (buffer.isFull()) {
+        if (inputHandler.isFull()) {
             flushBuffer();
         }
-        buffer.add(String.join(" ", "E", String.valueOf(lba), String.valueOf(size)));
+
+        inputHandler.add(String.join(" ", "E", String.valueOf(lba), String.valueOf(size)));
 
         clear();
     }
 
     private void flushBuffer() {
-        List<String> commands = buffer.flush();
+        List<String> commands = inputHandler.flush();
+
         for (String cmd : commands) {
             String[] parts = cmd.split(" ");
             String mode = parts[0];
@@ -123,7 +122,6 @@ public class SsdController {
         try {
             if (!isValidArgs(args)) throw new IllegalArgumentException();
 
-            // cmd: ssd mode lba [value]
             String mode = args[0];
             int lba = Integer.parseInt(args[1]);
             String value = args.length >= 3 ? args[2] : "";

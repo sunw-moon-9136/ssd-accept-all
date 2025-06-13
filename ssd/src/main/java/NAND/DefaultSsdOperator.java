@@ -1,3 +1,5 @@
+package NAND;
+
 public class DefaultSsdOperator extends AbstractSsdOperator {
     public static final int MAX_ADDRESS_LENGTH = 100;
     public static final String INIT_VALUE = "0x00000000";

@@ -1,3 +1,5 @@
+package NAND;
+
 public interface NandDriver {
     String read(String file);
 

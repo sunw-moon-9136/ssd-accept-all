@@ -1,17 +1,19 @@
+package SSD;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
-public class FileDriver implements Driver {
-
-    public static final String NAND_FILE_NAME = "ssd_nand.txt";
+public class OutputFileHandler implements OutputHandler {
     public static final String OUTPUT_FILE_NAME = "ssd_output.txt";
 
     @Override
     public String read(String file) {
-        requireValidFileName(file);
+        if (!isValidFileName(file)) {
+            throw new IllegalArgumentException("Invalid File Name");
+        }
 
         try {
             return Files.readString(Paths.get(file));
@@ -24,7 +26,9 @@ public class FileDriver implements Driver {
 
     @Override
     public void write(String file, byte[] bytes) {
-        requireValidFileName(file);
+        if (!isValidFileName(file)) {
+            throw new IllegalArgumentException("Invalid File Name");
+        }
 
         try {
             Files.write(Paths.get(file), bytes, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
@@ -33,9 +37,8 @@ public class FileDriver implements Driver {
         }
     }
 
-    private void requireValidFileName(String file) {
-        if (isNullOrEmpty(file) || !(file.equals(OUTPUT_FILE_NAME) || file.equals(NAND_FILE_NAME)))
-            throw new IllegalArgumentException("Invalid Argument");
+    private boolean isValidFileName(String file) {
+        return !isNullOrEmpty(file) && (file.equals(OUTPUT_FILE_NAME));
     }
 
     private boolean isNullOrEmpty(String file) {

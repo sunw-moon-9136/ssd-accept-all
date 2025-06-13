@@ -1,3 +1,5 @@
+package SSD;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
@@ -5,89 +7,39 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class SsdCommandBufferOptimizer {
+class Command {
+    enum Type {WRITE, ERASE}
+
+    Command.Type type;
+    int address;
+    int size;
+    long value;
+
+    Command(int address, long value) {
+        this.type = Command.Type.WRITE;
+        this.address = address;
+        this.value = value;
+    }
+
+    Command(int address, int size, boolean isErase) {
+        this.type = Command.Type.ERASE;
+        this.size = size;
+        this.address = address;
+    }
+}
+
+public class InputFileHandler implements InputHandler {
+
     private static final int MAX_BUFFER_SIZE = 5;
     private final List<Command> buffer = new ArrayList<>();
     private final String BUFFER_PATH = "buffer";
 
-    private static class Command {
-        enum Type {WRITE, ERASE}
-
-        Type type;
-        int address;
-        int size;
-        long value;
-
-        Command(int address, long value) {
-            this.type = Type.WRITE;
-            this.address = address;
-            this.value = value;
-        }
-
-        Command(int address, int size, boolean isErase) {
-            this.type = Type.ERASE;
-            this.size = size;
-            this.address = address;
-        }
-    }
-
-
-    public SsdCommandBufferOptimizer() {
+    public InputFileHandler() {
         initializeFromFiles();
     }
 
-    private void removeAllFileBufferFolder() {
-        try {
-            DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(BUFFER_PATH));
-            for (Path file : stream) {
-                if (Files.isRegularFile(file)) {
-                    Files.delete(file);
-                }
-            }
-        } catch (Exception e) {
-            return;
-        }
-    }
-
-    public boolean isFull() {
-        return buffer.size() == MAX_BUFFER_SIZE;
-    }
-
-    private void initializeFromFiles() {
-        try {
-            File folder = new File("buffer");
-            if (!folder.exists()) {
-                folder.mkdir();
-            }
-
-            List<Path> fileList = Files.list(Paths.get(BUFFER_PATH)).filter(p -> p.toString().endsWith(".txt")).collect(Collectors.toList());
-            removeAllFileBufferFolder();
-            for (Path path : fileList) {
-                String cmd = path.getFileName().toString().substring(2).split(".txt")[0];
-                if (!cmd.isEmpty() && (cmd.startsWith("W") || cmd.startsWith("E"))) {
-                    add(cmd.replace("_", " "));
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void deleteFileStartWith(String string) {
-        try (Stream<Path> files = Files.list(Path.of(BUFFER_PATH))) {
-            files.filter(path -> Files.isRegularFile(path) && path.getFileName().toString().startsWith(string)).forEach(path -> {
-                try {
-                    Files.delete(path);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     // add(String command): WRITE/ERASE 명령 추가 및 최적화 수행
+    @Override
     public void add(String command) {
         String[] parts = command.split("\\s+");
         String op = parts[0].toUpperCase();
@@ -177,7 +129,7 @@ public class SsdCommandBufferOptimizer {
         }
     }
 
-
+    @Override
     public String read(int address) {
         for (int i = buffer.size() - 1; i >= 0; i--) {
             Command c = buffer.get(i);
@@ -195,10 +147,12 @@ public class SsdCommandBufferOptimizer {
         return "";
     }
 
-    public int size() {
-        return buffer.size();
+    @Override
+    public boolean isFull() {
+        return buffer.size() == MAX_BUFFER_SIZE;
     }
 
+    @Override
     public List<String> flush() {
         List<String> out = new ArrayList<>();
         for (Command c : buffer) {
@@ -223,10 +177,6 @@ public class SsdCommandBufferOptimizer {
             }
         }
         return out;
-    }
-
-    public void optimize() {
-        mergeAdjacentErases();
     }
 
     private void mergeAdjacentErases() {
@@ -260,5 +210,52 @@ public class SsdCommandBufferOptimizer {
         }
         buffer.removeIf(c -> c.type == Command.Type.ERASE);
         buffer.addAll(merged);
+    }
+
+    private void deleteFileStartWith(String string) {
+        try (Stream<Path> files = Files.list(Path.of(BUFFER_PATH))) {
+            files.filter(path -> Files.isRegularFile(path) && path.getFileName().toString().startsWith(string)).forEach(path -> {
+                try {
+                    Files.delete(path);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void removeAllFileBufferFolder() {
+        try {
+            DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(BUFFER_PATH));
+            for (Path file : stream) {
+                if (Files.isRegularFile(file)) {
+                    Files.delete(file);
+                }
+            }
+        } catch (Exception e) {
+            return;
+        }
+    }
+
+    private void initializeFromFiles() {
+        try {
+            File folder = new File("buffer");
+            if (!folder.exists()) {
+                folder.mkdir();
+            }
+
+            List<Path> fileList = Files.list(Paths.get(BUFFER_PATH)).filter(p -> p.toString().endsWith(".txt")).collect(Collectors.toList());
+            removeAllFileBufferFolder();
+            for (Path path : fileList) {
+                String cmd = path.getFileName().toString().substring(2).split(".txt")[0];
+                if (!cmd.isEmpty() && (cmd.startsWith("W") || cmd.startsWith("E"))) {
+                    add(cmd.replace("_", " "));
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

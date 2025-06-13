@@ -1,3 +1,5 @@
+package NAND;
+
 public interface ReadWritable {
     String read(int address);
 
