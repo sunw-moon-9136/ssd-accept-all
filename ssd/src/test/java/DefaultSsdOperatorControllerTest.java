@@ -1,4 +1,7 @@
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -6,7 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class DefaultSsdControllerTest {
+class DefaultSsdOperatorControllerTest {
     private static final String[] INVALID_FIRST_ARG = {"Q", "12"};
     private static final String[] VALID_READ_ARGS = {"R", "56"};
     private static final String[] INVALID_READ_ARGS_CNT = {"R", "12", "77", "(!"};
@@ -24,7 +27,7 @@ class DefaultSsdControllerTest {
     Driver mockDriver;
 
     @Mock
-    SsdOperator mockDisk;
+    ReadWritable mockDisk;
 
     @BeforeEach
     void setUp() {

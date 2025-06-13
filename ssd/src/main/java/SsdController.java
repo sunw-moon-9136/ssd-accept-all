@@ -2,7 +2,7 @@ import java.util.List;
 
 public class SsdController {
     private Driver driver;
-    private SsdOperator ssd;
+    private ReadWritable ssd;
     private SsdCommandBufferOptimizer buffer;
 
     public static final String SSD_OUTPUT_TXT = "ssd_output.txt";
@@ -11,11 +11,11 @@ public class SsdController {
 
     public SsdController() {
         this.driver = new FileDriver();
-        this.ssd = new DefaultSsd();
+        this.ssd = new DefaultSsdOperator();
         this.buffer = new SsdCommandBufferOptimizer();
     }
 
-    public SsdController(Driver driver, SsdOperator ssd) {
+    public SsdController(Driver driver, ReadWritable ssd) {
         this.driver = driver;
         this.ssd = ssd;
     }
@@ -24,8 +24,8 @@ public class SsdController {
         this.driver = driver;
     }
 
-    public void setSsd(DefaultSsd defaultSsd) {
-        this.ssd = defaultSsd;
+    public void setSsd(DefaultSsdOperator defaultSsdOperator) {
+        this.ssd = defaultSsdOperator;
     }
 
     public void error() {
@@ -88,7 +88,7 @@ public class SsdController {
 
     private void read(int lba) {
         String ret = buffer.read(lba);
-        if(ret.isBlank()) {
+        if (ret.isBlank()) {
             ret = ssd.read(lba);
         }
         driver.write(SSD_OUTPUT_TXT, ret.getBytes());
@@ -128,13 +128,13 @@ public class SsdController {
             int lba = Integer.parseInt(args[1]);
             String value = args.length >= 3 ? args[2] : "";
             switch (mode) {
-                case "R" ->{
+                case "R" -> {
                     read(lba);
                 }
-                case "W"->{
+                case "W" -> {
                     write(lba, value);
                 }
-                case "E"->{
+                case "E" -> {
                     erase(lba, Integer.parseInt(value));
                 }
                 default -> throw new IllegalArgumentException();

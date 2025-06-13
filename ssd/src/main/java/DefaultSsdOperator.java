@@ -1,4 +1,4 @@
-public class DefaultSsd implements SsdOperator {
+public class DefaultSsdOperator extends AbstractSsdOperator {
     public static final int MAX_ADDRESS_LENGTH = 100;
     public static final String INIT_VALUE = "0x00000000";
 
@@ -7,14 +7,14 @@ public class DefaultSsd implements SsdOperator {
     private final String ADDRESS_VALUE_DELIMITER = "\t";
     private final String NEW_LINE_CHAR = "\n";
 
-    private Driver driver;
+    private NandDriver nandDriver;
 
-    public DefaultSsd() {
-        this.driver = new FileDriver();
+    public DefaultSsdOperator() {
+        this.nandDriver = new NandFileDriver();
     }
 
-    public DefaultSsd(Driver driver) {
-        this.driver = driver;
+    public DefaultSsdOperator(NandDriver nandDriver) {
+        this.nandDriver = nandDriver;
     }
 
     @Override
@@ -26,7 +26,7 @@ public class DefaultSsd implements SsdOperator {
 
     private boolean isFileExist(String fileName) {
         try {
-            driver.read(fileName);
+            nandDriver.read(fileName);
             return true;
         } catch (RuntimeException e) {
             return false;
@@ -39,12 +39,12 @@ public class DefaultSsd implements SsdOperator {
             String writeString = generateWriteString(writeAddress, INIT_VALUE);
             sb.append(writeString);
         }
-        driver.write(SSD_NAND_TXT, sb.toString().getBytes());
+        nandDriver.write(SSD_NAND_TXT, sb.toString().getBytes());
     }
 
 
     private String getAddressValue(int readAddress) {
-        String nandFullContents = driver.read(SSD_NAND_TXT);
+        String nandFullContents = nandDriver.read(SSD_NAND_TXT);
 
         for (String line : nandFullContents.split(NEW_LINE_CHAR)) {
             String[] content = line.split(ADDRESS_VALUE_DELIMITER);
@@ -56,7 +56,7 @@ public class DefaultSsd implements SsdOperator {
     @Override
     public void write(int address, String value) {
         if (!isFileExist(SSD_NAND_TXT)) initializeNand();
-        driver.write(SSD_NAND_TXT, getWriteContent(address, value).getBytes());
+        nandDriver.write(SSD_NAND_TXT, getWriteContent(address, value).getBytes());
     }
 
     @Override
@@ -67,7 +67,7 @@ public class DefaultSsd implements SsdOperator {
     }
 
     private String getWriteContent(int writeAddress, String writeValue) {
-        String fileContent = driver.read(SSD_NAND_TXT);
+        String fileContent = nandDriver.read(SSD_NAND_TXT);
 
         StringBuilder sb = new StringBuilder();
         for (String line : fileContent.split(NEW_LINE_CHAR)) {

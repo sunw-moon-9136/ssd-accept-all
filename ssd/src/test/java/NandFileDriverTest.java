@@ -12,16 +12,16 @@ import java.nio.file.StandardOpenOption;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class FileDriverTest {
+class NandFileDriverTest {
 
     public static final byte[] TEST_BYTES = "Hello, World!".getBytes();
-    public static final String TEST_TARGET_FILE_NAME = FileDriver.NAND_FILE_NAME;
+    public static final String TEST_TARGET_FILE_NAME = NandFileDriver.NAND_FILE_NAME;
 
-    private FileDriver fileDriver;
+    private NandDriver fileDriver;
 
     @BeforeEach
     void setUp() {
-        fileDriver = new FileDriver();
+        fileDriver = new NandFileDriver();
     }
 
     @Nested
@@ -97,7 +97,7 @@ class FileDriverTest {
 
     @Nested
     class ReadTest {
-        
+
         public static final String TEST_TEXT = "TEST-TEXT";
 
         @Test
