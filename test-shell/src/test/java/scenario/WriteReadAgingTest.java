@@ -28,7 +28,7 @@ class WriteReadAgingTest {
 
     @BeforeEach
     void setUp() {
-        testScenario = WriteReadAging.getInstance(manager, randomFactory);
+        testScenario = new WriteReadAging(manager, randomFactory);
     }
 
     @Test

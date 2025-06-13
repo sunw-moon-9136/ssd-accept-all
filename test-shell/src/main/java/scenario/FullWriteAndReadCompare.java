@@ -22,7 +22,8 @@ public class FullWriteAndReadCompare extends DefaultTestScenario {
         super(manager);
     }
 
-    private FullWriteAndReadCompare(IManager manager, RandomFactory randomFactory) {
+    // @VisibleForTesting
+    FullWriteAndReadCompare(IManager manager, RandomFactory randomFactory) {
         super(manager, randomFactory);
     }
 

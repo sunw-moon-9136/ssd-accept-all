@@ -23,7 +23,7 @@ class PartialLBAWriteTest {
 
     @BeforeEach
     void test() {
-        testScenario = PartialLBAWrite.getInstance(manager);
+        testScenario = new PartialLBAWrite(manager, null);
     }
 
     @Test

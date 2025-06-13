@@ -26,7 +26,7 @@ class FullWriteAndReadCompareTest {
 
     @BeforeEach
     void setUp() {
-        testScenario = FullWriteAndReadCompare.getInstance(manager, randomFactory);
+        testScenario = new FullWriteAndReadCompare(manager, randomFactory);
     }
 
     @Test

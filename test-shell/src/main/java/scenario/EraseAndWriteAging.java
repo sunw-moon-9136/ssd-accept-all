@@ -22,7 +22,8 @@ public class EraseAndWriteAging extends DefaultTestScenario {
         super(manager);
     }
 
-    private EraseAndWriteAging(IManager manager, RandomFactory randomFactory) {
+    // @VisibleForTesting
+    EraseAndWriteAging(IManager manager, RandomFactory randomFactory) {
         super(manager, randomFactory);
     }
 

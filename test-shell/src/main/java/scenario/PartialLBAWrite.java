@@ -26,7 +26,8 @@ public class PartialLBAWrite extends DefaultTestScenario {
         super(manager);
     }
 
-    private PartialLBAWrite(IManager manager, RandomFactory randomFactory) {
+    // @VisibleForTesting
+    PartialLBAWrite(IManager manager, RandomFactory randomFactory) {
         super(manager, randomFactory);
     }
 

@@ -23,7 +23,8 @@ public class WriteReadAging extends DefaultTestScenario {
         super(manager);
     }
 
-    private WriteReadAging(IManager manager, RandomFactory randomFactory) {
+    // @VisibleForTesting
+    WriteReadAging(IManager manager, RandomFactory randomFactory) {
         super(manager, randomFactory);
     }
 
