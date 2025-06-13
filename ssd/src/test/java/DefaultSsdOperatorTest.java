@@ -1,5 +1,6 @@
-import NAND.NandDriver;
 import NAND.DefaultSsdOperator;
+import NAND.NandDriver;
+import NAND.ReadWritable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,11 +38,13 @@ class DefaultSsdOperatorTest {
     @Mock
     NandDriver nandDriver;
 
-    DefaultSsdOperator defaultSsdOperator;
+    ReadWritable defaultSsdOperator;
 
     @BeforeEach
     void setUp() throws IOException {
-        defaultSsdOperator = new DefaultSsdOperator(nandDriver);
+        defaultSsdOperator = new DefaultSsdOperator.Builder()
+                .nandDriver(nandDriver)
+                .build();
 
         Files.deleteIfExists(Paths.get(SSD_OUTPUT_TXT));
         Files.deleteIfExists(Paths.get(SSD_NAND_TXT));
