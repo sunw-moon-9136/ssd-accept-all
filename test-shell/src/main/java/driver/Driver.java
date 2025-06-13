@@ -5,6 +5,8 @@ import java.util.function.Supplier;
 
 public interface Driver {
 
+    void createDirectoryIfAbsent(String directoryName);
+
     void append(String file, byte[] bytes);
 
     void changeOldLogFileName(String latestLogFileName);
