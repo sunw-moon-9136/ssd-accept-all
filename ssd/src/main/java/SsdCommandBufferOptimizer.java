@@ -1,9 +1,6 @@
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -90,15 +87,37 @@ public class SsdCommandBufferOptimizer {
                 long value = Long.decode(parts[2]);
 
                 buffer.removeIf(c -> c.type == Command.Type.WRITE && c.address == lba);
-
                 buffer.add(new Command(lba, value));
+
+
+                //WRITE가 기존에 존재하는 ERASE 앞뒤인 경우(특이케이스)
+                // ERASE (address == lba)
+                Optional<Command> eraseCmdOpt = buffer.stream()
+                        .filter(c -> c.type == Command.Type.ERASE && c.address == lba)
+                        .findFirst();
+                eraseCmdOpt.ifPresent(cmd -> {
+                    buffer.remove(cmd);
+                    if (cmd.size - 1 > 0) buffer.add(new Command(lba + 1, cmd.size - 1, true));
+                });
+
+                // ERASE (address + size - 1 == lba)
+                Optional<Command> eraseCmdOpt2 = buffer.stream()
+                        .filter(c -> c.type == Command.Type.ERASE && c.address + c.size - 1 == lba)
+                        .findFirst();
+                eraseCmdOpt2.ifPresent(cmd -> {
+                    buffer.remove(cmd);
+                    if (cmd.size - 1 > 0) buffer.add(new Command(cmd.address, cmd.size - 1, true));
+                });
+
+
                 break;
             }
             case "E": {
                 int lba = Integer.parseInt(parts[1]);
                 int size = Integer.parseInt(parts[2]);
                 int eraseStart = lba, eraseEnd = lba + size - 1;
-                if (size == 0) return;
+
+                if (size <= 0) return;
 
                 Iterator<Command> it = buffer.iterator();
                 while (it.hasNext()) {
@@ -114,7 +133,6 @@ public class SsdCommandBufferOptimizer {
                         }
                     }
                 }
-
                 buffer.add(new Command(lba, size, true));
                 mergeAdjacentErases();
                 break;

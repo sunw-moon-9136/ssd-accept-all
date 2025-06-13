@@ -10,6 +10,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BufferOptimizerTest {
 
@@ -111,27 +112,51 @@ class BufferOptimizerTest {
     void BUFFER에_없는_값_FAST_READ_TEST() {
         assertThat(ssdCommandBufferOptimizer.read(10)).isEqualTo("");
         assertThat(ssdCommandBufferOptimizer.read(11)).isEqualTo("");
+    }
+
+    @Test
+    void ERASE_SIZE_0일때_버퍼_미생성() {
+        ssdCommandBufferOptimizer.add("E 10 0");
+        List<String> answer = ssdCommandBufferOptimizer.flush();
+        assertTrue(answer.isEmpty());
+    }
+
+    @Test
+    void ERASE_SIZE_1이_존재할때_동일주소_WRITE() {
+        ssdCommandBufferOptimizer.add("E 10 1");
+        ssdCommandBufferOptimizer.add("W 10 0xABCDABCD");
+        List<String> answer = ssdCommandBufferOptimizer.flush();
+        for (String str : answer) {
+            System.out.println(str);
+        }
+        List<String> expected = List.of(
+                "W 10 0xABCDABCD"
+        );
+        assertIterableEquals(expected, answer);
+
+    }
+
+    @Test
+    void WRITE가_ERASE_START_부분이면_ERASE범위_조절() {
+        ssdCommandBufferOptimizer.add("E 10 5");
+        ssdCommandBufferOptimizer.add("W 10 0xABCDABCD");
         List<String> answer = ssdCommandBufferOptimizer.flush();
         List<String> expected = List.of(
-                "W 20 0xABCDABCD",
-                "E 10 5"
+                "W 10 0xABCDABCD",
+                "E 11 4"
         );
         assertIterableEquals(expected, answer);
     }
-//
-//    @Test
-//    void ERASE_SIZE_0일때_버퍼_미생성() {
-//        ssdCommandBufferOptimizer.add("E 10 0");
-//        List<String> answer = ssdCommandBufferOptimizer.flush();
-//        assertTrue(answer.isEmpty());
-//    }
-//
-//
-//    @Test
-//    void WRITE가_ERASE_START_또는_END부분_삭제() {
-//        ssdCommandBufferOptimizer.add("E 10 0");
-//        List<String> answer = ssdCommandBufferOptimizer.flush();
-//        assertTrue(answer.isEmpty());
-//    }
 
+    @Test
+    void WRITE가_ERASE_END_부분이면_ERASE범위_조절() {
+        ssdCommandBufferOptimizer.add("E 10 5");
+        ssdCommandBufferOptimizer.add("W 14 0xABCDABCD");
+        List<String> answer = ssdCommandBufferOptimizer.flush();
+        List<String> expected = List.of(
+                "W 14 0xABCDABCD",
+                "E 10 4"
+        );
+        assertIterableEquals(expected, answer);
+    }
 }
