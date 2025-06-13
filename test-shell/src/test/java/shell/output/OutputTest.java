@@ -59,7 +59,7 @@ class OutputTest {
 
         when(mockDataReader.exists()).thenReturn(true);
         when(mockDataReader.readLine()).thenReturn(OUTPUT_TEXT_READ_PASS);
-        String result = output.checkResult("read", "1");
+        String result = output.checkResult("read");
         assertEquals(RESULT_STRING_READ_PASS, result);
         verify(mockDataReader, times(1)).readLine();
     }
@@ -67,7 +67,7 @@ class OutputTest {
     @Test
     void 받은명령어가_READ이고_파일이_없으면_ERROR반환() {
         when(mockDataReader.exists()).thenReturn(false);
-        String result = output.checkResult("read", "1");
+        String result = output.checkResult("read");
         assertEquals(RESULT_STRING_READ_ERROR, result);
         verify(mockDataReader, never()).readLine();
     }
@@ -75,7 +75,7 @@ class OutputTest {
     @Test
     void 받은명령어가_READ이고_결과값이_ERROR일때() {
         when(mockDataReader.exists()).thenReturn(true);
-        String result = output.checkResult("read", "1");
+        String result = output.checkResult("read");
         assertEquals(RESULT_STRING_READ_ERROR, result);
         verify(mockDataReader, times(1)).readLine();
     }
@@ -85,7 +85,7 @@ class OutputTest {
 
         when(mockDataReader.exists()).thenReturn(true);
         when(mockDataReader.readLine()).thenThrow(new RuntimeException("Simulated file read error"));
-        String result = output.checkResult("read", "1");
+        String result = output.checkResult("read");
         assertEquals(RESULT_STRING_READ_ERROR, result);
         verify(mockDataReader, times(1)).readLine();
     }
@@ -95,7 +95,7 @@ class OutputTest {
 
         when(mockDataReader.exists()).thenReturn(true);
         when(mockDataReader.readLine()).thenReturn(" 11111");
-        String result = output.checkResult("read", "1");
+        String result = output.checkResult("read");
         assertEquals(RESULT_STRING_READ_ERROR, result);
         verify(mockDataReader, times(1)).readLine();
     }
@@ -106,9 +106,9 @@ class OutputTest {
 
         when(mockDataReader.exists()).thenReturn(true);
         when(mockDataReader.readLine()).thenReturn(OUTPUT_TEXT_READ_PASS);
-        output.checkResult("read", "1");
-        output.checkResult("read", "1");
-        output.checkResult("read", "1");
+        output.checkResult("read");
+        output.checkResult("read");
+        output.checkResult("read");
         verify(mockDataReader, times(3)).readLine();
     }
 
@@ -118,7 +118,7 @@ class OutputTest {
 
         when(mockDataReader.exists()).thenReturn(true);
         when(mockDataReader.readLine()).thenReturn(OUTPUT_TEXT_WRITE_PASS);
-        String result = output.checkResult("write", "1");
+        String result = output.checkResult("write");
         assertEquals(RESULT_STRING_WRITE_PASS, result);
     }
 
@@ -137,7 +137,7 @@ class OutputTest {
 
         when(mockDataReader.exists()).thenReturn(true);
         when(mockDataReader.readLine()).thenReturn(OUTPUT_TEXT_ERROR);
-        String result = output.checkResult("write", "1");
+        String result = output.checkResult("write");
         assertEquals(RESULT_STRING_WRITE_ERROR, result);
     }
 
@@ -155,7 +155,7 @@ class OutputTest {
 
         when(mockDataReader.exists()).thenReturn(true);
         when(mockDataReader.readLine()).thenReturn(OUTPUT_TEXT_WRITE_PASS);
-        String result = output.checkResult("erase", "1");
+        String result = output.checkResult("erase");
         assertEquals(RESULT_STRING_WRITE_PASS, result);
     }
 
@@ -173,7 +173,25 @@ class OutputTest {
 
         when(mockDataReader.exists()).thenReturn(true);
         when(mockDataReader.readLine()).thenReturn(OUTPUT_TEXT_WRITE_PASS);
-        String result = output.checkResult("flush", "1");
+        String result = output.checkResult("flush");
+        assertEquals(RESULT_STRING_WRITE_PASS, result);
+    }
+
+    @Test
+    void 받은명령어가_erase_range이고_파일내용이_있으면_ERROR를_반환() {
+
+        when(mockDataReader.exists()).thenReturn(true);
+        when(mockDataReader.readLine()).thenReturn(OUTPUT_TEXT_ERROR);
+        String result = output.checkResult("erase_range");
+        assertEquals(RESULT_STRING_WRITE_ERROR, result);
+    }
+
+    @Test
+    void 받은명령어가_erase_range이고_파일내용이_비어있으면_DONE을_반환() {
+
+        when(mockDataReader.exists()).thenReturn(true);
+        when(mockDataReader.readLine()).thenReturn(OUTPUT_TEXT_WRITE_PASS);
+        String result = output.checkResult("erase_range");
         assertEquals(RESULT_STRING_WRITE_PASS, result);
     }
 

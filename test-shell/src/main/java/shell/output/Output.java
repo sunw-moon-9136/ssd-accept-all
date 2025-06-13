@@ -58,13 +58,17 @@ public class Output {
 
             readResult = readLine();
 
-            if (command.equals(COMMAND_CHECK_OUTPUT_READ)) getReadOuput(readResult);
-            if (command.equals(COMMAND_CHECK_OUTPUT_NULL)) checkOutputError(readResult);
+            return switch (command) {
+                case COMMAND_CHECK_OUTPUT_NULL -> checkOutputError(readResult);
+                case COMMAND_CHECK_OUTPUT_READ -> getReadOuput(readResult);
+                default -> "ERROR";
+            };
+
 
         } catch (Exception e) {
             return "ERROR";
         }
-        return "ERROR";
+
     }
 
     private String getReadOuput(String readResult) {
@@ -75,9 +79,7 @@ public class Output {
     }
 
     private String checkOutputError(String readResult) {
-        if (readResult == null || readResult.isEmpty()) {
-            return "DONE";
-        }
+        if (readResult == null || readResult.isEmpty()) return "DONE";
         if (readResult.contains("ERROR")) return "ERROR";
         return "ERROR";
     }
