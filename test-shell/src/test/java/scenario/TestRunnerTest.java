@@ -18,10 +18,11 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class TestRunnerTest {
-    public static final String TEST_SCRIPT_SAMPLE = "1_FullWriteAndReadCompare\n" +
-            "2_PartialLBAWrite\n" +
-            "3_WriteReadAging\n" +
-            "4_EraseAndWriteAging";
+    public static final String TEST_SCRIPT_SAMPLE = """
+            1_FullWriteAndReadCompare
+            2_PartialLBAWrite
+            3_WriteReadAging
+            4_EraseAndWriteAging""";
 
     @Spy
     TestRunner testRunner;
@@ -98,10 +99,11 @@ class TestRunnerTest {
 
         @Test
         void TestScript가_Fail된_경우() throws IOException {
-            final String WRONG_TEST_SCRIPT = "1_FullWriteAndReadCompare\n\n" +
-                    "WRONG_TEXT\n" +
-                    "3_WriteReadAging\n" +
-                    "4_EraseAndWriteAging";
+            final String WRONG_TEST_SCRIPT = """
+                    1_FullWriteAndReadCompare
+                    WRONG_TEXT
+                    3_WriteReadAging
+                    4_EraseAndWriteAging""";
             Files.writeString(Path.of(TestRunner.TEST_SCRIPT_TXT_FILE_NAME),
                     WRONG_TEST_SCRIPT, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
