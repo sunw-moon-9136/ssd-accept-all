@@ -18,6 +18,7 @@ public class Logger {
     private static final Logger instance = new Logger();
     public static final String LATEST_LOG_FILE_NAME = "latest.log";
     private static final long TEST_LOG_MAX_SIZE = 10 * 1024 * 1024;
+    public static final String LINE_BREAK = "\n";
 
     private final Driver fileDriver;
 
@@ -35,12 +36,12 @@ public class Logger {
     }
 
     public void printConsoleAndLog(String methodFullName, String logMessage) {
-        String fullMessage = makeFullMessage(methodFullName, logMessage);
+        String fullMessage = makeFullMessage(methodFullName, logMessage) + LINE_BREAK;
         printAndManageLogFile(fullMessage);
     }
 
     private void printAndManageLogFile(String fullMessage) {
-        fileDriver.write(LATEST_LOG_FILE_NAME, fullMessage.getBytes(StandardCharsets.UTF_8));
+        fileDriver.append(LATEST_LOG_FILE_NAME, fullMessage.getBytes(StandardCharsets.UTF_8));
         fileDriver.changeNameIfBiggerThan(TEST_LOG_MAX_SIZE, LATEST_LOG_FILE_NAME, this::makeOldLogFileName);
         fileDriver.changeOldLogFileName(LATEST_LOG_FILE_NAME);
     }
@@ -68,7 +69,8 @@ public class Logger {
         return prefixBuilder.toString();
     }
 
-    public Path makeOldLogFileName() {
+    // @VisibleForTesting
+    Path makeOldLogFileName() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd_HH'h'_mm'm'_ss's'");
         return Path.of("until_" + LocalDateTime.now().format(formatter) + ".log");
     }
