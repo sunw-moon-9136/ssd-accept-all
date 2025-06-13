@@ -31,11 +31,11 @@ class LoggerTest {
 
     @Test
     void printConsoleAndLog() {
-        doNothing().when(driver).write(any(), any());
+        doNothing().when(driver).append(any(), any());
 
         logger.printConsoleAndLog(NOT_IMPORTANT_METHOD_NAME, NOT_IMPORTANT_LOG_MESSAGE);
 
-        verify(driver, times(1)).write(any(), any());
+        verify(driver, times(1)).append(any(), any());
         verify(driver, times(1)).changeNameIfBiggerThan(anyLong(), anyString(), any());
         verify(driver, times(1)).changeOldLogFileName(Logger.LATEST_LOG_FILE_NAME);
     }

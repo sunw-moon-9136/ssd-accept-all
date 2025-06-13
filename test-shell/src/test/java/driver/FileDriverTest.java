@@ -11,8 +11,10 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -27,6 +29,42 @@ class FileDriverTest {
     public static final String TEST_SOURCE_FILE_NAME = "oldFileName.log";
     public static final String TEST_TARGET_FILE_NAME = "newFileName.log";
     public static final String TEST_TEXT = "TEST-TEXT";
+
+    @Nested
+    class AppendTest {
+        private FileDriver fileDriver;
+
+        @BeforeEach
+        void setUp() {
+            fileDriver = new FileDriver();
+        }
+
+        public static final String NOT_IMPORTANT_ALREADY_EXIST_OUTPUT_TEXT = "Bye Bye, World!";
+        public static final String NOT_IMPORTANT_APPEND_OUTPUT_TEXT = "Hello, World!";
+
+        @Test
+        void 대상_파일이_존재하지_않는_경우_파일_새로_생성하여_write() throws IOException {
+            Path path = Paths.get(TEST_TARGET_FILE_NAME);
+            Files.deleteIfExists(path);
+
+            fileDriver.append(TEST_TARGET_FILE_NAME, NOT_IMPORTANT_APPEND_OUTPUT_TEXT.getBytes(StandardCharsets.UTF_8));
+
+            assertThat(Files.exists(path)).isTrue();
+            assertThat(Files.readString(path)).isEqualTo(NOT_IMPORTANT_APPEND_OUTPUT_TEXT);
+        }
+
+        @Test
+        void 이미_파일이_있을때_파일에_추가_내용이_append() throws IOException {
+            Path path = Paths.get(TEST_TARGET_FILE_NAME);
+            Files.writeString(path, NOT_IMPORTANT_ALREADY_EXIST_OUTPUT_TEXT,
+                    StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+
+            fileDriver.append(TEST_TARGET_FILE_NAME, NOT_IMPORTANT_APPEND_OUTPUT_TEXT.getBytes(StandardCharsets.UTF_8));
+
+            assertThat(Files.exists(path)).isTrue();
+            assertThat(Files.readString(path)).isEqualTo(NOT_IMPORTANT_ALREADY_EXIST_OUTPUT_TEXT + NOT_IMPORTANT_APPEND_OUTPUT_TEXT);
+        }
+    }
 
     @Nested
     class ChangeNameIfBiggerThanTest {
@@ -144,7 +182,7 @@ class FileDriverTest {
 
         @AfterEach
         void cleanUp() throws IOException {
-            try (Stream<Path> walk =  Files.walk(Path.of("."))) {
+            try (Stream<Path> walk = Files.walk(Path.of("."))) {
                 walk.filter(Files::isRegularFile) // 일반 파일만 선택
                         .map(p -> p.getFileName().toString())
                         .filter(p -> p.endsWith(".log") || p.endsWith(".zip"))

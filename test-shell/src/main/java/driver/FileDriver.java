@@ -37,6 +37,17 @@ public class FileDriver implements Driver {
     }
 
     @Override
+    public void append(String file, byte[] bytes) {
+        requireValidFileName(file);
+
+        try {
+            Files.write(Paths.get(file), bytes, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public void changeOldLogFileName(String latestLogFileName) {
         List<String> logFileNames = getLogFileNames().stream()
                 .filter(name -> !name.endsWith(".zip"))
