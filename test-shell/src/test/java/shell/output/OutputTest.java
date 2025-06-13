@@ -1,15 +1,12 @@
 package shell.output;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.IOException;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 
@@ -43,14 +40,14 @@ class OutputTest {
 
         when(mockDataReader.exists()).thenReturn(true);
         boolean actual = output.existFileCheck();
-        assertEquals(true, actual);
+        assertTrue(actual);
     }
 
     @Test
     void output_파일이_없으면_false를_반환한다() {
         when(mockDataReader.exists()).thenReturn(false);
         boolean actual = output.existFileCheck();
-        assertEquals(false, actual);
+        assertFalse(actual);
     }
 
     //outputfile 있을 경우 READ TEST
@@ -194,68 +191,4 @@ class OutputTest {
         String result = output.checkResult("erase_range");
         assertEquals(RESULT_STRING_WRITE_PASS, result);
     }
-
-}
-
-@Disabled
-class ActualTest {
-    private Output output;
-
-    @BeforeEach
-    void setUp() {
-        output = new Output();
-    }
-
-
-    @Test
-    void output_파일이_있으면_PASS() throws IOException {
-
-        boolean expected = true;
-        boolean act = output.existFileCheck();
-        assertEquals(expected, act);
-
-    }
-
-    @Test
-    void output_파일이_없으면_FAIL() throws IOException {
-        boolean expected = false;
-        boolean act = output.existFileCheck();
-        assertEquals(expected, act);
-    }
-
-
-    @Test
-    void output_파일이_없을때_checkResult_ERROR() throws IOException {
-
-        boolean expected = false;
-        String act = output.checkResult("read");
-        assertEquals("ERROR", act);
-
-    }
-
-
-    @Test
-    void 받은명령어가_READ이면_OUTPUT파일을_읽는다() throws IOException {
-
-        String expected = "0xFFFFFFF";
-        String act = output.checkResult("read");
-        assertEquals(expected, act);
-
-    }
-
-    @Test
-    void 받은명령어가_write일때_정상동작_확인() throws IOException {
-
-        boolean expected = true;
-        String act = output.checkResult("write");
-        assertEquals("DONE", act);
-    }
-
-    @Test
-    void 받은명령어가_write일때_ERROR() throws IOException {
-        String expected = "ERROR";
-        String act = output.checkResult("write");
-        assertEquals(expected, act);
-    }
-
 }
