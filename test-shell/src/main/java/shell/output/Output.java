@@ -1,10 +1,12 @@
 package shell.output;
 
+import logger.Logger;
+
 import java.util.Set;
 
 public class Output {
 
-
+    private static final Logger logger = Logger.getInstance();
     private static final String OUTPUT_FILE_PATH = "ssd_output.txt";
 
     private final DataReader dataReader;
@@ -51,13 +53,21 @@ public class Output {
 
     public String checkResult(String commandLine) {
 
+
         String command = getCommand(commandLine);
         String readResult;
 
+        logger.printConsoleAndLog("Output.checkResult()", command + " ---- ");
+
         try {
-            if (!existFileCheck()) return OUTPUT_RESULT_ERROR;
+            if (!existFileCheck()) {
+                logger.printConsoleAndLog("Output.checkResult()", "output file not found");
+                return OUTPUT_RESULT_ERROR;
+            }
 
             readResult = readLine();
+
+            logger.printConsoleAndLog("Output.checkResult()", "outputfile read");
 
             return switch (command) {
                 case COMMAND_CHECK_OUTPUT_NULL -> checkOutput(readResult);
