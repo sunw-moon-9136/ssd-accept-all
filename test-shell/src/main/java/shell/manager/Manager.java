@@ -1,7 +1,7 @@
 package shell.manager;
 
 import logger.Logger;
-import shell.Processor;
+import shell.processor.Processor;
 import shell.output.Output;
 
 public class Manager implements IManager {
