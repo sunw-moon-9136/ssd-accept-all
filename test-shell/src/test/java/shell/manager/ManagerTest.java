@@ -74,7 +74,7 @@ class ManagerTest {
         @Test
         void read_정상입력시_output_checkResult_호출확인() {
             doReturn(true).when(mockProcessor).execute("read 3");
-            doReturn("[read] LBA 03 : 0xABCDFFFF").when(mockOutput).checkResult("read", "3");
+            doReturn("[read] LBA 03 : 0xABCDFFFF").when(mockOutput).checkResult("read");
 
             String actual = manager.read(3);
 
@@ -84,11 +84,11 @@ class ManagerTest {
         @Test
         void write_정상입력시_output_checkResult_호출확인() {
             doReturn(true).when(mockProcessor).execute("write 3 0xABCDFFFF");
-            doReturn("[write] DONE").when(mockOutput).checkResult("write", "3");
+            doReturn("[write] DONE").when(mockOutput).checkResult("write");
 
             manager.write(3, "0xABCDFFFF");
 
-            verify(mockOutput).checkResult("write", "3");
+            verify(mockOutput).checkResult("write");
         }
     }
 }

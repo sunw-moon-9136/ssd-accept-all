@@ -1,10 +1,11 @@
 package shell.output;
 
+import java.util.Set;
+
 public class Output {
 
-    //TODO
-    final static String OUTPUT_FILE_PATH = "ssd_output.txt";
-    // final static String OUTPUT_FILE_PATH = "C:\\Users\\User\\Documents\\output.txt";
+
+    private static final String OUTPUT_FILE_PATH = "ssd_output.txt";
 
     private final DataReader dataReader;
 
@@ -16,42 +17,71 @@ public class Output {
         this.dataReader = dataReader;
     }
 
+
+    private static final String OUTPUT_RESULT_PASS = "DONE";
+    private static final String OUTPUT_RESULT_ERROR = "ERROR";
+
+    private static final String COMMAND_CHECK_OUTPUT_NULL = "check_null";
+    private static final String COMMAND_CHECK_OUTPUT_READ = "read";
+    private static final Set<String> COMMANDS_CHECK_OUTPUT_NULL = Set.of(
+            "write",
+            "erase",
+            "erase_range",
+            "flush"
+    );
+
+    public String getCommand(String commandLine) {
+        String[] commandLines = commandLine.split("\\s+");
+
+        if (COMMANDS_CHECK_OUTPUT_NULL.contains(commandLines[0]))
+            return COMMAND_CHECK_OUTPUT_NULL;
+
+        return commandLines[0];
+    }
+
+
     public boolean existFileCheck() {
         return dataReader.exists();
     }
-
 
     public String readLine() {
         return dataReader.readLine();
     }
 
-    public String checkResult(String commandLine, String address) {
-        return checkResult(commandLine);
-    }
 
     public String checkResult(String commandLine) {
 
+        String command = getCommand(commandLine);
         String readResult;
-        try {
-            if (!existFileCheck()) return "ERROR";
-            readResult = readLine();
-            if (commandLine.equals("write")) {
-                if (readResult == null || readResult.isEmpty()) {
-                    return "DONE";
-                }
-                if (readResult.contains("ERROR")) return "ERROR";
-                return "ERROR";
-            }
 
-            if (commandLine.equals("read")) {
-                if (readResult == null || readResult.isEmpty()) return "ERROR";
-                if (!readResult.contains("0x")) return "ERROR";
-                if (readResult.contains("ERROR")) return "ERROR";
-                return readResult;
-            }
+        try {
+            if (!existFileCheck()) return OUTPUT_RESULT_ERROR;
+
+            readResult = readLine();
+
+            return switch (command) {
+                case COMMAND_CHECK_OUTPUT_NULL -> checkOutput(readResult);
+                case COMMAND_CHECK_OUTPUT_READ -> getReadOuput(readResult);
+                default -> OUTPUT_RESULT_ERROR;
+            };
+
+
         } catch (Exception e) {
-            return "ERROR";
+            return OUTPUT_RESULT_ERROR;
         }
-        return "ERROR";
+
+    }
+
+    private String getReadOuput(String readResult) {
+        if (readResult == null || readResult.isEmpty()) return OUTPUT_RESULT_ERROR;
+        if (!readResult.contains("0x")) return OUTPUT_RESULT_ERROR;
+        if (readResult.contains("ERROR")) return OUTPUT_RESULT_ERROR;
+        return readResult;
+    }
+
+    private String checkOutput(String readResult) {
+        if (readResult == null || readResult.isEmpty()) return OUTPUT_RESULT_PASS;
+        if (readResult.contains("ERROR")) return OUTPUT_RESULT_ERROR;
+        return OUTPUT_RESULT_ERROR;
     }
 }
