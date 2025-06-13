@@ -127,7 +127,7 @@ class OutputTest {
 
         when(mockDataReader.exists()).thenReturn(true);
         when(mockDataReader.readLine()).thenThrow(new RuntimeException("Simulated file read error"));
-        String result = output.checkResult("write", "1");
+        String result = output.checkResult("write");
         assertEquals(RESULT_STRING_WRITE_ERROR, result);
         verify(mockDataReader, times(1)).readLine();
     }
@@ -228,7 +228,7 @@ class ActualTest {
     void output_파일이_없을때_checkResult_ERROR() throws IOException {
 
         boolean expected = false;
-        String act = output.checkResult("read", "1");
+        String act = output.checkResult("read");
         assertEquals("ERROR", act);
 
     }
@@ -238,7 +238,7 @@ class ActualTest {
     void 받은명령어가_READ이면_OUTPUT파일을_읽는다() throws IOException {
 
         String expected = "0xFFFFFFF";
-        String act = output.checkResult("read", "1");
+        String act = output.checkResult("read");
         assertEquals(expected, act);
 
     }
@@ -247,14 +247,14 @@ class ActualTest {
     void 받은명령어가_write일때_정상동작_확인() throws IOException {
 
         boolean expected = true;
-        String act = output.checkResult("write", "1");
+        String act = output.checkResult("write");
         assertEquals("DONE", act);
     }
 
     @Test
     void 받은명령어가_write일때_ERROR() throws IOException {
         String expected = "ERROR";
-        String act = output.checkResult("write", "1");
+        String act = output.checkResult("write");
         assertEquals(expected, act);
     }
 

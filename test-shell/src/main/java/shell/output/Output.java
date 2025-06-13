@@ -6,6 +6,7 @@ public class Output {
 
 
     private static final String OUTPUT_FILE_PATH = "ssd_output.txt";
+
     private final DataReader dataReader;
 
     public Output() {
@@ -44,9 +45,6 @@ public class Output {
         return dataReader.readLine();
     }
 
-    public String checkResult(String commandLine, String address) {
-        return checkResult(commandLine);
-    }
 
     public String checkResult(String commandLine) {
 
