@@ -28,4 +28,9 @@ public class Common {
                 ■ help
                   - Displays this help message.
             """;
+
+    public static boolean helpCommand() {
+        System.out.println(HELP_TEXT);
+        return true;
+    }
 }

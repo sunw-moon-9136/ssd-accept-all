@@ -8,4 +8,6 @@ public interface IManager {
     boolean erase(int address, int size);
 
     boolean erase_range(int startLBA, int endLBA);
+
+    boolean flush();
 }
