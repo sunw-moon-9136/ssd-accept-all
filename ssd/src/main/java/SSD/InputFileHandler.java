@@ -1,6 +1,5 @@
 package SSD;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
@@ -10,141 +9,65 @@ import java.util.stream.Stream;
 class Command {
     enum Type {WRITE, ERASE}
 
-    Command.Type type;
-    int address;
+    final Type type;
+    final int address;
     int size;
     long value;
 
-    Command(int address, long value) {
-        this.type = Command.Type.WRITE;
+    private Command(Type type, int address, int size, long value) {
+        this.type = type;
         this.address = address;
+        this.size = size;
         this.value = value;
     }
 
-    Command(int address, int size, boolean isErase) {
-        this.type = Command.Type.ERASE;
-        this.size = size;
-        this.address = address;
+    static Command write(int address, long value) {
+        return new Command(Type.WRITE, address, 0, value);
+    }
+
+    static Command erase(int address, int size) {
+        return new Command(Type.ERASE, address, size, 0L);
     }
 }
 
 public class InputFileHandler implements InputHandler {
-
     private static final int MAX_BUFFER_SIZE = 5;
-    private final List<Command> buffer = new ArrayList<>();
-    private final String BUFFER_PATH = "buffer";
+    private static final Path BUFFER_DIR = Paths.get("buffer");
+    private final Deque<Command> buffer = new ArrayDeque<>();
 
     public InputFileHandler() {
-        initializeFromFiles();
+        initDirectory();
+        loadExistingCommands();
+        clearAndGenerateEmpty();
     }
 
-    // add(String command): WRITE/ERASE 명령 추가 및 최적화 수행
     @Override
-    public void add(String command) {
-        String[] parts = command.split("\\s+");
-        String op = parts[0].toUpperCase();
-        switch (op) {
-            case "W": {
-                int lba = Integer.parseInt(parts[1]);
-                long value = Long.decode(parts[2]);
-
-                buffer.removeIf(c -> c.type == Command.Type.WRITE && c.address == lba);
-                buffer.add(new Command(lba, value));
-
-
-                //WRITE가 기존에 존재하는 ERASE 앞뒤인 경우(특이케이스)
-                // ERASE (address == lba)
-                Optional<Command> eraseCmdOpt = buffer.stream().filter(c -> c.type == Command.Type.ERASE && c.address == lba).findFirst();
-                eraseCmdOpt.ifPresent(cmd -> {
-                    buffer.remove(cmd);
-                    if (cmd.size - 1 > 0) buffer.add(new Command(lba + 1, cmd.size - 1, true));
-                });
-
-                // ERASE (address + size - 1 == lba)
-                Optional<Command> eraseCmdOpt2 = buffer.stream().filter(c -> c.type == Command.Type.ERASE && c.address + c.size - 1 == lba).findFirst();
-                eraseCmdOpt2.ifPresent(cmd -> {
-                    buffer.remove(cmd);
-                    if (cmd.size - 1 > 0) buffer.add(new Command(cmd.address, cmd.size - 1, true));
-                });
-
-
+    public void add(String input) {
+        String[] parts = input.split("\\s+");
+        switch (parts[0].toUpperCase()) {
+            case "W":
+                handleWrite(parseInt(parts[1]), Long.decode(parts[2]));
                 break;
-            }
-            case "E": {
-                int lba = Integer.parseInt(parts[1]);
-                int size = Integer.parseInt(parts[2]);
-                int eraseStart = lba, eraseEnd = lba + size - 1;
-
-                if (size <= 0) return;
-
-                Iterator<Command> it = buffer.iterator();
-                boolean addFlag = true;
-                while (it.hasNext()) {
-                    Command c = it.next();
-                    if (c.type == Command.Type.WRITE) {
-                        if (c.address >= eraseStart && c.address <= eraseEnd) {
-                            it.remove();
-                        }
-                    } else if (c.type == Command.Type.ERASE) {
-                        int prevStart = c.address, prevEnd = c.address + c.size - 1;
-                        if (prevStart <= eraseStart && eraseEnd <= prevEnd) {
-                            addFlag = false;
-                        }
-                    }
-                }
-                if (addFlag) buffer.add(new Command(lba, size, true));
-                mergeAdjacentErases();
+            case "E":
+                handleErase(parseInt(parts[1]), parseInt(parts[2]));
                 break;
-            }
             default:
                 return;
         }
-
-        if (buffer.size() > MAX_BUFFER_SIZE) {
-            buffer.remove(0);
-        }
-
-        for (int i = 0; i < MAX_BUFFER_SIZE; i++) {
-            deleteFileStartWith(String.valueOf(i + 1));
-            String filename = BUFFER_PATH + "/";
-            String content = "";
-            if (i < buffer.size()) {
-                Command c = buffer.get(i);
-                if (c.type == Command.Type.WRITE) {
-                    String hexVal = String.format("0x%08X", c.value);
-                    filename += (i + 1) + "_W_" + c.address + "_" + hexVal + ".txt";
-                } else {  // ERASE
-                    filename += (i + 1) + "_E_" + c.address + "_" + c.size + ".txt";
-                }
-            } else {
-                filename += (i + 1) + "_empty.txt";  // 빈 슬롯
-            }
-            // 파일 생성/갱신
-            try {
-                Path path = Path.of(filename);
-                Files.writeString(path, "", StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        trimBufferSize();
+        clearAndGenerateEmpty();
     }
 
     @Override
     public String read(int address) {
-        for (int i = buffer.size() - 1; i >= 0; i--) {
-            Command c = buffer.get(i);
+        for (Iterator<Command> it = buffer.descendingIterator(); it.hasNext(); ) {
+            Command c = it.next();
             if (c.type == Command.Type.WRITE && c.address == address) {
-                return String.format("0x%08X", c.value);
+                return formatHex(c.value);
             }
         }
-        for (Command c : buffer) {
-            if (c.type == Command.Type.ERASE) {
-                if (address >= c.address && address < c.address + c.size) {
-                    return String.format("0x%08X", 0);
-                }
-            }
-        }
-        return "";
+        String eraseValue = buffer.stream().filter(c -> c.type == Command.Type.ERASE).filter(c -> address >= c.address && address < c.address + c.size).map(c -> formatHex(0L)).findFirst().orElse("");
+        return eraseValue;
     }
 
     @Override
@@ -154,54 +77,71 @@ public class InputFileHandler implements InputHandler {
 
     @Override
     public List<String> flush() {
-        List<String> out = new ArrayList<>();
-        for (Command c : buffer) {
-            if (c.type == Command.Type.WRITE) {
-                String hexVal = String.format("0x%08X", c.value);
-                out.add("W " + c.address + " " + hexVal);
-            } else if (c.type == Command.Type.ERASE) {
-                out.add("E " + c.address + " " + c.size);
-            }
-        }
-        removeAllFileBufferFolder();
+        List<String> commands = buffer.stream().map(c -> c.type == Command.Type.WRITE ? String.format("W %d %s", c.address, formatHex(c.value)) : String.format("E %d %d", c.address, c.size)).collect(Collectors.toList());
         buffer.clear();
-
-        //generate emptyfiles
-        for (int i = 0; i < MAX_BUFFER_SIZE; i++) {
-            try {
-                String filename = BUFFER_PATH + "/" + (i + 1) + "_empty.txt";
-                Path path = Path.of(filename);
-                Files.writeString(path, "", StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-            } catch (Exception e) {
-                throw new RuntimeException();
-            }
-        }
-        return out;
+        clearAndGenerateEmpty();
+        return commands;
     }
 
-    private void mergeAdjacentErases() {
-        List<Command> erases = new ArrayList<>();
-        for (Command c : buffer) {
-            if (c.type == Command.Type.ERASE) {
-                erases.add(c);
+    private void handleWrite(int address, long value) {
+        buffer.removeIf(c -> c.type == Command.Type.WRITE && c.address == address);
+        buffer.addLast(Command.write(address, value));
+        List<Command> updates = splitOverlappingErases(address);
+        buffer.addAll(updates);
+    }
+
+    private List<Command> splitOverlappingErases(int address) {
+        List<Command> updates = new ArrayList<>();
+        for (Command c : buffer.stream().filter(c -> c.type == Command.Type.ERASE).collect(Collectors.toList())) {
+            if (c.address == address) {
+                buffer.remove(c);
+                if (c.size > 1) updates.add(Command.erase(address + 1, c.size - 1));
+            } else if (c.address + c.size - 1 == address) {
+                buffer.remove(c);
+                if (c.size > 1) updates.add(Command.erase(c.address, c.size - 1));
             }
         }
-        if (erases.size() <= 1) return;
-        erases.sort(Comparator.comparingInt(c -> c.address));
+        return updates;
+    }
+
+    private void handleErase(int address, int size) {
+        if (size <= 0) return;
+        int start = address, end = address + size - 1;
+
+        boolean shouldAdd = true;
+        Iterator<Command> it = buffer.iterator();
+        while (it.hasNext()) {
+            Command c = it.next();
+            if (c.type == Command.Type.WRITE && c.address >= start && c.address <= end) {
+                it.remove();
+            } else if (c.type == Command.Type.ERASE) {
+                int s = c.address, e = c.address + c.size - 1;
+                if (s <= start && end <= e) {
+                    shouldAdd = false;
+                }
+            }
+        }
+        if (shouldAdd) buffer.addLast(Command.erase(address, size));
+        mergeErases();
+    }
+
+    private void mergeErases() {
+        List<Command> erases = buffer.stream().filter(c -> c.type == Command.Type.ERASE).sorted(Comparator.comparingInt(c -> c.address)).collect(Collectors.toList());
+        if (erases.size() < 2) return;
+
         List<Command> merged = new ArrayList<>();
         Command prev = erases.get(0);
         merged.add(prev);
+
         for (int i = 1; i < erases.size(); i++) {
             Command curr = erases.get(i);
             if (prev.address + prev.size >= curr.address) {
-                int combined = prev.size + curr.size - (prev.address + prev.size - curr.address);
+                int combined = prev.size + curr.size - Math.max(0, prev.address + prev.size - curr.address);
                 if (combined <= 10) {
                     prev.size = combined;
                 } else {
-                    // 크기 초과 시 10으로 제한하고 나머지 새 ERASE로 처리
-                    int remainder = combined - 10;
                     prev.size = 10;
-                    merged.add(new Command(prev.address + 10, remainder, true));
+                    merged.add(Command.erase(prev.address + 10, combined - 10));
                 }
             } else {
                 merged.add(curr);
@@ -212,50 +152,59 @@ public class InputFileHandler implements InputHandler {
         buffer.addAll(merged);
     }
 
-    private void deleteFileStartWith(String string) {
-        try (Stream<Path> files = Files.list(Path.of(BUFFER_PATH))) {
-            files.filter(path -> Files.isRegularFile(path) && path.getFileName().toString().startsWith(string)).forEach(path -> {
-                try {
-                    Files.delete(path);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
+    private void trimBufferSize() {
+        while (buffer.size() > MAX_BUFFER_SIZE) {
+            buffer.removeFirst();
+        }
+    }
+
+    private void clearAndGenerateEmpty() {
+        try {
+            Files.createDirectories(BUFFER_DIR);
+            try (DirectoryStream<Path> ds = Files.newDirectoryStream(BUFFER_DIR, "*.txt")) {
+                for (Path f : ds) Files.deleteIfExists(f);
+            }
+            for (int i = 0; i < MAX_BUFFER_SIZE; i++) {
+                String name = (i < buffer.size()) ? slotFileName(i + 1, buffer.stream().skip(i).findFirst().orElse(null)) : String.format("%d_empty.txt", i + 1);
+                Files.writeString(BUFFER_DIR.resolve(name), "", StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void removeAllFileBufferFolder() {
-        try {
-            DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(BUFFER_PATH));
-            for (Path file : stream) {
-                if (Files.isRegularFile(file)) {
-                    Files.delete(file);
-                }
-            }
-        } catch (Exception e) {
-            return;
+    private String slotFileName(int slot, Command c) {
+        if (c == null) return String.format("%d_empty.txt", slot);
+        if (c.type == Command.Type.WRITE) {
+            return String.format("%d_W_%d_%s.txt", slot, c.address, formatHex(c.value));
+        } else {
+            return String.format("%d_E_%d_%d.txt", slot, c.address, c.size);
         }
     }
 
-    private void initializeFromFiles() {
+    private void initDirectory() {
         try {
-            File folder = new File("buffer");
-            if (!folder.exists()) {
-                folder.mkdir();
-            }
-
-            List<Path> fileList = Files.list(Paths.get(BUFFER_PATH)).filter(p -> p.toString().endsWith(".txt")).collect(Collectors.toList());
-            removeAllFileBufferFolder();
-            for (Path path : fileList) {
-                String cmd = path.getFileName().toString().substring(2).split(".txt")[0];
-                if (!cmd.isEmpty() && (cmd.startsWith("W") || cmd.startsWith("E"))) {
-                    add(cmd.replace("_", " "));
-                }
-            }
+            Files.createDirectories(BUFFER_DIR);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void loadExistingCommands() {
+        try (Stream<Path> files = Files.list(BUFFER_DIR)) {
+            List<String> cmds = files.map(Path::getFileName).map(Path::toString).filter(n -> (n.endsWith(".txt") && (n.contains("_W_") || n.contains("_E_")))).map(n -> n.substring(n.indexOf('_') + 1).replace(".txt", "").replace('_', ' ')).collect(Collectors.toList());
+            buffer.clear();
+            cmds.forEach(this::add);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static int parseInt(String s) {
+        return Integer.parseInt(s);
+    }
+
+    private static String formatHex(long v) {
+        return String.format("0x%08X", v);
     }
 }
