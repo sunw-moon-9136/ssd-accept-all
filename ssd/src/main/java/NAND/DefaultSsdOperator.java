@@ -9,15 +9,25 @@ public class DefaultSsdOperator extends AbstractSsdOperator {
     private final String ADDRESS_VALUE_DELIMITER = "\t";
     private final String NEW_LINE_CHAR = "\n";
 
-    private NandDriver nandDriver;
+    public static class Builder extends AbstractSsdOperator.Builder<Builder> {
+        @Override
+        protected Builder self() {
+            return this;
+        }
 
-    public DefaultSsdOperator() {
-        this.nandDriver = new NandFileDriver();
+        @Override
+        public DefaultSsdOperator build() {
+            if (this.nandDriver == null) {
+                this.nandDriver = new NandFileDriver(); // 기본값 설정
+            }
+            return new DefaultSsdOperator(this);
+        }
     }
 
-    public DefaultSsdOperator(NandDriver nandDriver) {
-        this.nandDriver = nandDriver;
+    private DefaultSsdOperator(Builder builder) {
+        super(builder);
     }
+
 
     @Override
     public String read(int address) {

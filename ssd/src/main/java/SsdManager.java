@@ -1,4 +1,5 @@
 import NAND.DefaultSsdOperator;
+import NAND.NandFileDriver;
 import NAND.ReadWritable;
 import SSD.InputFileHandler;
 import SSD.InputHandler;
@@ -17,7 +18,7 @@ public class SsdManager {
     public static final byte[] EMPTY_BYTES = "".getBytes();
 
     public SsdManager() {
-        this.ssd = new DefaultSsdOperator();
+        this.ssd = new DefaultSsdOperator.Builder().nandDriver(new NandFileDriver()).build();
         this.inputHandler = new InputFileHandler();
         this.outputHandler = new OutputFileHandler();
     }
