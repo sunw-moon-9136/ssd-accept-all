@@ -48,6 +48,18 @@ class BufferOptimizerTest {
     }
 
     @Test
+    void WRITE_IGNORE_AND_ERASE_MERGE() {
+        ssdCommandBufferOptimizer.add("E 0 6");
+        ssdCommandBufferOptimizer.add("W 3 0xABCDABCD");
+        ssdCommandBufferOptimizer.add("E 0 4");
+        List<String> answer = ssdCommandBufferOptimizer.flush();
+        List<String> expected = List.of(
+                "E 0 6"
+        );
+        assertIterableEquals(expected, answer);
+    }
+
+    @Test
     void test1() {
         ssdCommandBufferOptimizer.add("W 33 0x33333333");
         ssdCommandBufferOptimizer.add("E 43 10");
