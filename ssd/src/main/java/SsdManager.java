@@ -1,9 +1,5 @@
-import NAND.DefaultSsdOperator;
-import NAND.NandFileDriver;
 import NAND.ReadWritable;
-import SSD.InputFileHandler;
 import SSD.InputHandler;
-import SSD.OutputFileHandler;
 import SSD.OutputHandler;
 
 import java.util.List;
@@ -13,15 +9,15 @@ public class SsdManager {
     private InputHandler inputHandler;
     private OutputHandler outputHandler;
 
+    private SsdManager(SsdManagerBuilder builder) {
+        this.ssd = builder.ssd;
+        this.inputHandler = builder.inputHandler;
+        this.outputHandler = builder.outputHandler;
+    }
+
     public static final String SSD_OUTPUT_TXT = "ssd_output.txt";
     public static final byte[] ERROR_BYTES = "ERROR".getBytes();
     public static final byte[] EMPTY_BYTES = "".getBytes();
-
-    public SsdManager() {
-        this.ssd = new DefaultSsdOperator.Builder().nandDriver(new NandFileDriver()).build();
-        this.inputHandler = new InputFileHandler();
-        this.outputHandler = new OutputFileHandler();
-    }
 
     public void error() {
         outputHandler.write(SSD_OUTPUT_TXT, ERROR_BYTES);
@@ -141,5 +137,40 @@ public class SsdManager {
         } catch (Exception e) {
             error();
         }
+    }
+
+    public static final class SsdManagerBuilder {
+        private ReadWritable ssd;
+        private InputHandler inputHandler;
+        private OutputHandler outputHandler;
+
+        private SsdManagerBuilder() {
+        }
+
+        public static SsdManagerBuilder builder() {
+            return new SsdManagerBuilder();
+        }
+
+        public SsdManagerBuilder withSsd(ReadWritable ssd) {
+            this.ssd = ssd;
+            return this;
+        }
+
+        public SsdManagerBuilder withInputHandler(InputHandler inputHandler) {
+            this.inputHandler = inputHandler;
+            return this;
+        }
+
+        public SsdManagerBuilder withOutputHandler(OutputHandler outputHandler) {
+            this.outputHandler = outputHandler;
+            return this;
+        }
+
+        public SsdManager build() {
+            return new SsdManager(this);
+        }
+    }
+    public static SsdManagerBuilder builder() {
+        return new SsdManagerBuilder();
     }
 }
