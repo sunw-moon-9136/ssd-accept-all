@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Valid {
-    public static final List<String> REGISTERED_COMMAND = Arrays.asList("read", "write", "fullread", "fullwrite", "help", "exit");
+    public static final List<String> REGISTERED_COMMAND = Arrays.asList("read", "write", "fullread", "fullwrite", "erase", "erase_range", "flush", "help", "exit");
     public static final List<String> REGISTERED_SCENARIO_COMMAND = Arrays.asList(
             "1_FullWriteAndReadCompare", "2_PartialLBAWrite", "3_WriteReadAging", "4_EraseAndWriteAging",
             "1_", "2_", "3_", "4_");
