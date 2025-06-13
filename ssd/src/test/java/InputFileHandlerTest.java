@@ -55,9 +55,7 @@ class InputFileHandlerTest {
         inputHandler.add("W 3 0xABCDABCD");
         inputHandler.add("E 0 4");
         List<String> answer = inputHandler.flush();
-        List<String> expected = List.of(
-                "E 0 6"
-        );
+        List<String> expected = List.of("E 0 6");
         assertIterableEquals(expected, answer);
     }
 
@@ -78,10 +76,7 @@ class InputFileHandlerTest {
         inputHandler.add("W 21 0x12341234");
         inputHandler.add("W 20 0xEEEEFFFF");
         List<String> answer = inputHandler.flush();
-        List<String> expected = List.of(
-                "W 21 0x12341234",
-                "W 20 0xEEEEFFFF"
-        );
+        List<String> expected = List.of("W 21 0x12341234", "W 20 0xEEEEFFFF");
         assertIterableEquals(expected, answer);
     }
 
@@ -92,9 +87,7 @@ class InputFileHandlerTest {
         inputHandler.add("W 21 0x12341234");
         inputHandler.add("E 18 5");
         List<String> answer = inputHandler.flush();
-        List<String> expected = List.of(
-                "E 18 5"
-        );
+        List<String> expected = List.of("E 18 5");
         assertIterableEquals(expected, answer);
     }
 
@@ -106,10 +99,7 @@ class InputFileHandlerTest {
 
         List<String> answer = inputHandler.flush();
 
-        List<String> expected = List.of(
-                "W 20 0xABCDABCD",
-                "E 10 5"
-        );
+        List<String> expected = List.of("W 20 0xABCDABCD", "E 10 5");
         assertIterableEquals(expected, answer);
     }
 
@@ -143,9 +133,7 @@ class InputFileHandlerTest {
         for (String str : answer) {
             System.out.println(str);
         }
-        List<String> expected = List.of(
-                "W 10 0xABCDABCD"
-        );
+        List<String> expected = List.of("W 10 0xABCDABCD");
         assertIterableEquals(expected, answer);
 
     }
@@ -155,10 +143,7 @@ class InputFileHandlerTest {
         inputHandler.add("E 10 5");
         inputHandler.add("W 10 0xABCDABCD");
         List<String> answer = inputHandler.flush();
-        List<String> expected = List.of(
-                "W 10 0xABCDABCD",
-                "E 11 4"
-        );
+        List<String> expected = List.of("W 10 0xABCDABCD", "E 11 4");
         assertIterableEquals(expected, answer);
     }
 
@@ -167,10 +152,7 @@ class InputFileHandlerTest {
         inputHandler.add("E 10 5");
         inputHandler.add("W 14 0xABCDABCD");
         List<String> answer = inputHandler.flush();
-        List<String> expected = List.of(
-                "W 14 0xABCDABCD",
-                "E 10 4"
-        );
+        List<String> expected = List.of("W 14 0xABCDABCD", "E 10 4");
         assertIterableEquals(expected, answer);
     }
 
@@ -179,9 +161,7 @@ class InputFileHandlerTest {
         inputHandler.add("E 0 5");
         inputHandler.add("E 2 1");
         List<String> answer = inputHandler.flush();
-        List<String> expected = List.of(
-                "E 0 5"
-        );
+        List<String> expected = List.of("E 0 5");
         assertIterableEquals(expected, answer);
     }
 
@@ -190,9 +170,7 @@ class InputFileHandlerTest {
         inputHandler.add("E 10 1");
         inputHandler.add("E 9 3");
         List<String> answer = inputHandler.flush();
-        List<String> expected = List.of(
-                "E 9 3"
-        );
+        List<String> expected = List.of("E 9 3");
         assertIterableEquals(expected, answer);
     }
 
@@ -201,9 +179,7 @@ class InputFileHandlerTest {
         inputHandler.add("E 40 1");
         inputHandler.add("E 39 5");
         List<String> answer = inputHandler.flush();
-        List<String> expected = List.of(
-                "E 39 5"
-        );
+        List<String> expected = List.of("E 39 5");
         assertIterableEquals(expected, answer);
     }
 
@@ -212,9 +188,7 @@ class InputFileHandlerTest {
         inputHandler.add("E 10 1");
         inputHandler.add("E 9 3");
         List<String> answer = inputHandler.flush();
-        List<String> expected = List.of(
-                "E 9 3"
-        );
+        List<String> expected = List.of("E 9 3");
         assertIterableEquals(expected, answer);
     }
 
@@ -223,9 +197,7 @@ class InputFileHandlerTest {
         inputHandler.add("E 39 1");
         inputHandler.add("E 39 6");
         List<String> answer = inputHandler.flush();
-        List<String> expected = List.of(
-                "E 39 6"
-        );
+        List<String> expected = List.of("E 39 6");
         assertIterableEquals(expected, answer);
     }
 
@@ -234,15 +206,13 @@ class InputFileHandlerTest {
         inputHandler.add("E 40 1");
         inputHandler.add("E 39 5");
         List<String> answer = inputHandler.flush();
-        List<String> expected = List.of(
-                "E 39 5"
-        );
+        List<String> expected = List.of("E 39 5");
         assertIterableEquals(expected, answer);
     }
 
 
     @Test
-    void 연속값이_하나씩_WRITE_되는_경우() {
+    void 연속_WRITE가_기존_ERASE_범위를_포함할_경우() {
         inputHandler.add("E 1 3");
         inputHandler.add("W 2 0x33333333");
         inputHandler.add("W 3 0x33333333");
@@ -252,14 +222,13 @@ class InputFileHandlerTest {
                 "W 2 0x33333333",
                 "W 3 0x33333333",
                 "W 1 0x33333333"
-
         );
         assertIterableEquals(expected, answer);
     }
 
 
     @Test
-    void 연속값이_하나씩_WRITE_되는_경우2() {
+    void 연속된_WRITE가_기존_ERASE_범위를_포함할_경우2() {
         inputHandler.add("E 1 3");
         inputHandler.add("W 1 0x33333333");
         inputHandler.add("W 2 0x33333333");
@@ -273,4 +242,51 @@ class InputFileHandlerTest {
         assertIterableEquals(expected, answer);
     }
 
+
+    @Test
+    void 연속된_WRITE가_기존_ERASE_범위를_포함할_경우4() {
+        inputHandler.add("E 1 3");
+        inputHandler.add("W 4 0x33333333");
+        inputHandler.add("W 2 0x33333333");
+        inputHandler.add("W 1 0x33333333");
+        inputHandler.add("W 3 0x33333333");
+        List<String> answer = inputHandler.flush();
+        List<String> expected = List.of(
+                "W 4 0x33333333",
+                "W 2 0x33333333",
+                "W 1 0x33333333",
+                "W 3 0x33333333"
+        );
+        assertIterableEquals(expected, answer);
+    }
+
+    @Test
+    void 연속된_WRITE가_기존_ERASE_범위를_포함할_경우5() {
+        inputHandler.add("E 1 3");
+        inputHandler.add("W 4 0x33333333");
+        inputHandler.add("W 2 0x33333333");
+        inputHandler.add("W 1 0x33333333");
+        inputHandler.add("W 3 0x33333333");
+        inputHandler.add("E 1 3");
+        List<String> answer = inputHandler.flush();
+        List<String> expected = List.of(
+                "W 4 0x33333333",
+                "E 1 3"
+        );
+        assertIterableEquals(expected, answer);
+    }
+
+    @Test
+    void 연속된_WRITE가_기존_ERASE_범위를_포함할_경우6() {
+        inputHandler.add("E 1 3");
+        inputHandler.add("W 4 0x33333333");
+        inputHandler.add("W 2 0x33333333");
+        inputHandler.add("W 1 0x33333333");
+        inputHandler.add("W 3 0x33333333");
+        inputHandler.add("E 1 4");
+        List<String> answer = inputHandler.flush();
+        List<String> expected = List.of(
+                "E 1 4");
+        assertIterableEquals(expected, answer);
+    }
 }
