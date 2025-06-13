@@ -6,7 +6,6 @@ import utils.TestScenarioFactory;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,17 +21,18 @@ public class TestRunner {
 
     public void readTestScriptFile() {
 
-        Path path = Paths.get(TestFileName);
+        Path path = Path.of(TestFileName);
 
         try {
             if (!Files.exists(path)) {
+                //TODO
                 System.out.println("file 없음");
                 return;
             }
             testScenarios = Files.readAllLines(path, StandardCharsets.UTF_8);
 
         } catch (Exception e) {
-            //To-do
+            //TODO
             System.out.println("오류");
         }
     }
@@ -49,6 +49,8 @@ public class TestRunner {
                 String result = testScenario.run() ? "PASS" : "FAIL";
                 System.out.println(result);
 
+            } else {
+                System.out.print("Scenario " + scnario + " not found");
             }
         }
     }
