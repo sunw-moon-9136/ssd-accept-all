@@ -4,12 +4,25 @@ import shell.manager.IManager;
 import utils.RandomFactory;
 
 public class EraseAndWriteAging extends DefaultTestScenario {
+    private static ITestScenario testScenario;
 
-    public EraseAndWriteAging(IManager manager) {
+    public static ITestScenario getInstance(IManager manager) {
+        if (testScenario == null)
+            testScenario = new EraseAndWriteAging(manager);
+        return testScenario;
+    }
+
+    public static ITestScenario getInstance(IManager manager, RandomFactory randomFactory) {
+        if (testScenario == null)
+            testScenario = new EraseAndWriteAging(manager, randomFactory);
+        return testScenario;
+    }
+
+    private EraseAndWriteAging(IManager manager) {
         super(manager);
     }
 
-    public EraseAndWriteAging(IManager manager, RandomFactory randomFactory) {
+    private EraseAndWriteAging(IManager manager, RandomFactory randomFactory) {
         super(manager, randomFactory);
     }
 

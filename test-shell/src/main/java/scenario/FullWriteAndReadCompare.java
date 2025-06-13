@@ -4,12 +4,25 @@ import shell.manager.IManager;
 import utils.RandomFactory;
 
 public class FullWriteAndReadCompare extends DefaultTestScenario {
+    private static ITestScenario testScenario;
 
-    public FullWriteAndReadCompare(IManager manager) {
+    public static ITestScenario getInstance(IManager manager) {
+        if (testScenario == null)
+            testScenario = new FullWriteAndReadCompare(manager);
+        return testScenario;
+    }
+
+    public static ITestScenario getInstance(IManager manager, RandomFactory randomFactory) {
+        if (testScenario == null)
+            testScenario = new FullWriteAndReadCompare(manager, randomFactory);
+        return testScenario;
+    }
+
+    private FullWriteAndReadCompare(IManager manager) {
         super(manager);
     }
 
-    public FullWriteAndReadCompare(IManager manager, RandomFactory randomFactory) {
+    private FullWriteAndReadCompare(IManager manager, RandomFactory randomFactory) {
         super(manager, randomFactory);
     }
 

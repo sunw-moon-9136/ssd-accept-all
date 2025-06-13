@@ -5,11 +5,25 @@ import utils.RandomFactory;
 
 public class WriteReadAging extends DefaultTestScenario {
 
-    public WriteReadAging(IManager manager) {
+    private static ITestScenario testScenario;
+
+    public static ITestScenario getInstance(IManager manager) {
+        if (testScenario == null)
+            testScenario = new WriteReadAging(manager);
+        return testScenario;
+    }
+
+    public static ITestScenario getInstance(IManager manager, RandomFactory randomFactory) {
+        if (testScenario == null)
+            testScenario = new WriteReadAging(manager, randomFactory);
+        return testScenario;
+    }
+
+    private WriteReadAging(IManager manager) {
         super(manager);
     }
 
-    public WriteReadAging(IManager manager, RandomFactory randomFactory) {
+    private WriteReadAging(IManager manager, RandomFactory randomFactory) {
         super(manager, randomFactory);
     }
 

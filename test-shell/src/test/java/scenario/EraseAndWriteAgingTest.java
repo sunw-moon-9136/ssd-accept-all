@@ -26,7 +26,7 @@ class EraseAndWriteAgingTest {
 
     @BeforeEach
     void setUp() {
-        testScenario = new EraseAndWriteAging(manager, randomFactory);
+        testScenario = EraseAndWriteAging.getInstance(manager, randomFactory);
     }
 
     @Test
