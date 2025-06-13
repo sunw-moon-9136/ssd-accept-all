@@ -29,6 +29,7 @@ public class DefaultSsdOperator extends AbstractSsdOperator {
 
     private DefaultSsdOperator(Builder builder) {
         super(builder);
+        if (!isFileExist(SSD_NAND_TXT)) initializeNand();
     }
 
 

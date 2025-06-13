@@ -42,7 +42,7 @@ class DefaultSsdOperatorTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        defaultSsdOperator = new DefaultSsdOperator.Builder()
+        defaultSsdOperator = DefaultSsdOperator.builder()
                 .nandDriver(nandDriver)
                 .build();
 
