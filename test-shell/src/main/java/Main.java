@@ -82,10 +82,22 @@ public class Main {
                 yield false;
             }
 
-            case "erase" -> manager.erase(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
-            case "erase_range" -> manager.erase_range(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
-            case "flush" -> manager.flush();
-            case "help" -> Common.helpCommand();
+            case "erase" -> {
+                manager.erase(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+                yield false;
+            }
+            case "erase_range" -> {
+                manager.erase_range(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+                yield false;
+            }
+            case "flush" -> {
+                manager.flush();
+                yield false;
+            }
+            case "help" -> {
+                Common.helpCommand();
+                yield false;
+            }
             case "exit" -> true;
             default -> {
                 // SCENARIO_COMMAND
