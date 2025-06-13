@@ -30,16 +30,15 @@ public class WriteReadAging extends DefaultTestScenario {
     @Override
     public boolean run() {
         for (int i = 0; i < 200; i++) {
-            String value = randomFactory.getRandomHexValue();
-            if(!manager.write(0, value)) return false;
-            if (!readCompare(0, value))
-                return false;
-
-            value = randomFactory.getRandomHexValue();
-            if(!manager.write(99, value)) return false;
-            if (!readCompare(99, value))
-                return false;
+            if (!runOnceWith(0)) return false;
+            if (!runOnceWith(99)) return false;
         }
         return true;
+    }
+
+    private boolean runOnceWith(int address) {
+        String value = randomFactory.getRandomHexValue();
+        if(!manager.write(address, value)) return false;
+        return readCompare(address, value);
     }
 }
