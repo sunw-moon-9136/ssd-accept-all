@@ -90,6 +90,29 @@ public class InputFileHandler implements InputHandler {
         buffer.addAll(updates);
     }
 
+    private void ignoreCommand() {
+//
+//        Iterator<Command> it = buffer.iterator();
+//        while (it.hasNext()) {
+//            Command c = it.next();
+//            if (c.type == Command.Type.WRITE) {
+//
+//
+//            }
+        //                it.remove();
+//            } else if (c.type == Command.Type.ERASE) {
+//                int s = c.address, e = c.address + c.size - 1;
+//                if ((s <= start && end <= e)) {
+//                    shouldAdd = false;
+//                }
+//                if (s >= start && e <= end) {
+//                    it.remove();
+//                }
+//            }
+//        }
+
+    }
+
     private List<Command> splitOverlappingErases(int address) {
         List<Command> updates = new ArrayList<>();
         for (Command c : buffer.stream().filter(c -> c.type == Command.Type.ERASE).collect(Collectors.toList())) {
@@ -116,8 +139,11 @@ public class InputFileHandler implements InputHandler {
                 it.remove();
             } else if (c.type == Command.Type.ERASE) {
                 int s = c.address, e = c.address + c.size - 1;
-                if (s <= start && end <= e) {
+                if ((s <= start && end <= e)) {
                     shouldAdd = false;
+                }
+                if (s >= start && e <= end) {
+                    it.remove();
                 }
             }
         }
@@ -175,7 +201,7 @@ public class InputFileHandler implements InputHandler {
 
     private String slotFileName(int slot, Command c) {
         if (c == null) return String.format("%d_empty.txt", slot);
-        if (c.type == Command.Type.WRITE) {
+        if (c.type == SSD.Command.Type.WRITE) {
             return String.format("%d_W_%d_%s.txt", slot, c.address, formatHex(c.value));
         } else {
             return String.format("%d_E_%d_%d.txt", slot, c.address, c.size);

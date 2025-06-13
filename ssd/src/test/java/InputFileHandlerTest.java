@@ -185,4 +185,91 @@ class InputFileHandlerTest {
         assertIterableEquals(expected, answer);
     }
 
+    @Test
+    void ERASE_경계_값_체크() {
+        inputHandler.add("E 10 1");
+        inputHandler.add("E 9 3");
+        List<String> answer = inputHandler.flush();
+        List<String> expected = List.of(
+                "E 9 3"
+        );
+        assertIterableEquals(expected, answer);
+    }
+
+    @Test
+    void ERASE_경계_값_체크2() {
+        inputHandler.add("E 40 1");
+        inputHandler.add("E 39 5");
+        List<String> answer = inputHandler.flush();
+        List<String> expected = List.of(
+                "E 39 5"
+        );
+        assertIterableEquals(expected, answer);
+    }
+
+    @Test
+    void ERASE_경계_값_체크3() {
+        inputHandler.add("E 10 1");
+        inputHandler.add("E 9 3");
+        List<String> answer = inputHandler.flush();
+        List<String> expected = List.of(
+                "E 9 3"
+        );
+        assertIterableEquals(expected, answer);
+    }
+
+    @Test
+    void ERASE_경계_값_체크4() {
+        inputHandler.add("E 39 1");
+        inputHandler.add("E 39 6");
+        List<String> answer = inputHandler.flush();
+        List<String> expected = List.of(
+                "E 39 6"
+        );
+        assertIterableEquals(expected, answer);
+    }
+
+    @Test
+    void ERASE_경계_값_체크5() {
+        inputHandler.add("E 40 1");
+        inputHandler.add("E 39 5");
+        List<String> answer = inputHandler.flush();
+        List<String> expected = List.of(
+                "E 39 5"
+        );
+        assertIterableEquals(expected, answer);
+    }
+
+
+    @Test
+    void 연속값이_하나씩_WRITE_되는_경우() {
+        inputHandler.add("E 1 3");
+        inputHandler.add("W 2 0x33333333");
+        inputHandler.add("W 3 0x33333333");
+        inputHandler.add("W 1 0x33333333");
+        List<String> answer = inputHandler.flush();
+        List<String> expected = List.of(
+                "W 1 0X33333333",
+                "W 2 0X33333333",
+                "W 3 0X33333333"
+        );
+        assertIterableEquals(expected, answer);
+    }
+
+
+    @Test
+    void 연속값이_하나씩_WRITE_되는_경우2() {
+        inputHandler.add("E 1 3");
+        inputHandler.add("W 1 0x33333333");
+        inputHandler.add("W 2 0x33333333");
+        inputHandler.add("W 3 0x33333333");
+        List<String> answer = inputHandler.flush();
+        List<String> expected = List.of(
+                "W 1 0x33333333",
+                "W 2 0x33333333",
+                "W 3 0x33333333"
+        );
+        assertIterableEquals(expected, answer);
+    }
+
 }
