@@ -1,9 +1,5 @@
-import NAND.DefaultSsdOperator;
-import NAND.NandFileDriver;
 import NAND.ReadWritable;
-import SSD.InputFileHandler;
 import SSD.InputHandler;
-import SSD.OutputFileHandler;
 import SSD.OutputHandler;
 
 import java.util.List;
@@ -13,15 +9,15 @@ public class SsdManager {
     private InputHandler inputHandler;
     private OutputHandler outputHandler;
 
+    private SsdManager(SsdManagerBuilder builder) {
+        this.ssd = builder.ssd;
+        this.inputHandler = builder.inputHandler;
+        this.outputHandler = builder.outputHandler;
+    }
+
     public static final String SSD_OUTPUT_TXT = "ssd_output.txt";
     public static final byte[] ERROR_BYTES = "ERROR".getBytes();
     public static final byte[] EMPTY_BYTES = "".getBytes();
-
-    public SsdManager() {
-        this.ssd = new DefaultSsdOperator.Builder().nandDriver(new NandFileDriver()).build();
-        this.inputHandler = new InputFileHandler();
-        this.outputHandler = new OutputFileHandler();
-    }
 
     public void error() {
         outputHandler.write(SSD_OUTPUT_TXT, ERROR_BYTES);
@@ -58,6 +54,7 @@ public class SsdManager {
     }
 
     private boolean isValidEraseCommand(String[] args) {
+        if(args.length != 3) return false;
         int maxLBA = Integer.parseInt(args[1]) + (args[2].equals("0") ? 0 : Integer.parseInt(args[2]) - 1);
         return args.length == 3 &&
                 args[0].equals("E") &&
@@ -66,10 +63,16 @@ public class SsdManager {
                 isValidLBA(String.valueOf(maxLBA));
     }
 
+    private boolean isValidFlushCommand(String[] args) {
+        return args.length == 1 && args[0].equals("F");
+    }
+
     private boolean isValidArgs(String[] args) {
+        if(args.length == 0) return false;
         return isValidReadCommand(args) ||
                 isValidWriteCommand(args) ||
-                isValidEraseCommand(args);
+                isValidEraseCommand(args) ||
+                isValidFlushCommand(args);
     }
 
     private void write(int lba, String value) {
@@ -124,7 +127,7 @@ public class SsdManager {
             if (!isValidArgs(args)) throw new IllegalArgumentException();
 
             String mode = args[0];
-            int lba = Integer.parseInt(args[1]);
+            int lba = args.length >= 2 ? Integer.parseInt(args[1]) : -1;
             String value = args.length >= 3 ? args[2] : "";
             switch (mode) {
                 case "R" -> {
@@ -136,10 +139,49 @@ public class SsdManager {
                 case "E" -> {
                     erase(lba, Integer.parseInt(value));
                 }
+                case "F" -> {
+                    this.flushBuffer();
+                }
                 default -> throw new IllegalArgumentException();
             }
         } catch (Exception e) {
             error();
         }
+    }
+
+    public static final class SsdManagerBuilder {
+        private ReadWritable ssd;
+        private InputHandler inputHandler;
+        private OutputHandler outputHandler;
+
+        private SsdManagerBuilder() {
+        }
+
+        public static SsdManagerBuilder builder() {
+            return new SsdManagerBuilder();
+        }
+
+        public SsdManagerBuilder withSsd(ReadWritable ssd) {
+            this.ssd = ssd;
+            return this;
+        }
+
+        public SsdManagerBuilder withInputHandler(InputHandler inputHandler) {
+            this.inputHandler = inputHandler;
+            return this;
+        }
+
+        public SsdManagerBuilder withOutputHandler(OutputHandler outputHandler) {
+            this.outputHandler = outputHandler;
+            return this;
+        }
+
+        public SsdManager build() {
+            return new SsdManager(this);
+        }
+    }
+
+    public static SsdManagerBuilder builder() {
+        return new SsdManagerBuilder();
     }
 }
