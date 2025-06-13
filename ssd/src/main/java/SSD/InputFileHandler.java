@@ -88,7 +88,8 @@ public class InputFileHandler implements InputHandler {
         buffer.addLast(Command.write(address, value));
         ignoreEraseWithCombinedWrites(address);
         List<Command> updates = splitOverlappingErases(address);
-        buffer.addAll(updates);
+        for (int i = 0; i < updates.size(); i++) buffer.addFirst(updates.get(i));
+//        buffer.addAll(updates);
     }
 
     private void ignoreEraseWithCombinedWrites(int address) {
@@ -163,7 +164,6 @@ public class InputFileHandler implements InputHandler {
                 int cEnd = c.address + c.size - 1;
                 if ((cStart <= inputCmdStart && inputCmdEnd <= cEnd)) shouldAdd = false;
                 if (cStart >= inputCmdStart && cEnd <= inputCmdEnd) it.remove();
-
             }
         }
         if (shouldAdd) buffer.addLast(Command.erase(address, size));
@@ -171,30 +171,70 @@ public class InputFileHandler implements InputHandler {
     }
 
     private void mergeEraseCommand() {
-        List<Command> erases = buffer.stream().filter(c -> c.type == Command.Type.ERASE).sorted(Comparator.comparingInt(c -> c.address)).collect(Collectors.toList());
-        if (erases.size() < 2) return;
+        if (buffer.size() < 2) return;
 
-        List<Command> merged = new ArrayList<>();
-        Command prev = erases.get(0);
-        merged.add(prev);
+        List<Command> tempBuffer = new ArrayList<>(buffer);
+        List<Command> mergedBuffer = new ArrayList<>();
 
-        for (int i = 1; i < erases.size(); i++) {
-            Command curr = erases.get(i);
-            if (prev.address + prev.size >= curr.address) {
-                int combined = prev.size + curr.size - Math.max(0, prev.address + prev.size - curr.address);
-                if (combined <= 10) {
-                    prev.size = combined;
+        int index = 0;
+        while (index < tempBuffer.size()) {
+            Command current = tempBuffer.get(index);
+            if (current.type == Command.Type.ERASE) {
+                List<Command> eraseGroup = collectConsecutiveErases(tempBuffer, index);
+                if (eraseGroup.size() >= 2) {
+                    mergedBuffer.addAll(combineOverlappingErases(eraseGroup));
                 } else {
-                    prev.size = 10;
-                    merged.add(Command.erase(prev.address + 10, combined - 10));
+                    mergedBuffer.add(current);
                 }
+                index += eraseGroup.size();
             } else {
-                merged.add(curr);
-                prev = curr;
+                mergedBuffer.add(current);
+                index++;
             }
         }
-        buffer.removeIf(c -> c.type == Command.Type.ERASE);
-        buffer.addAll(merged);
+        buffer.clear();
+        buffer.addAll(mergedBuffer);
+    }
+
+    // 주어진 인덱스부터 연속된 Erase 명령어를 수집하는 헬퍼 메서드
+    private List<Command> collectConsecutiveErases(List<Command> commands, int startIndex) {
+        List<Command> eraseGroup = new ArrayList<>();
+        for (int i = startIndex; i < commands.size(); i++) {
+            Command cmd = commands.get(i);
+            if (cmd.type == Command.Type.ERASE) {
+                eraseGroup.add(cmd);
+            } else {
+                break;
+            }
+        }
+        return eraseGroup;
+    }
+
+    // 연속된 Erase 명령어를 Merge
+    private List<Command> combineOverlappingErases(List<Command> eraseCommands) {
+        List<Command> mergedErases = new ArrayList<>();
+        Command baseCommand = eraseCommands.get(0);
+        mergedErases.add(baseCommand);
+
+        for (int i = 1; i < eraseCommands.size(); i++) {
+            Command currentCommand = eraseCommands.get(i);
+            // 이전 명령어와 주소가 겹치거나 인접한 경우 Merge
+            if (baseCommand.address + baseCommand.size >= currentCommand.address) {
+                int overlap = Math.max(0, baseCommand.address + baseCommand.size - currentCommand.address);
+                int totalSize = baseCommand.size + currentCommand.size - overlap;
+
+                if (totalSize <= 10) {
+                    baseCommand.size = totalSize;
+                } else {
+                    baseCommand.size = 10;
+                    mergedErases.add(Command.erase(baseCommand.address + 10, totalSize - 10));
+                }
+            } else {
+                mergedErases.add(currentCommand);
+                baseCommand = currentCommand;
+            }
+        }
+        return mergedErases;
     }
 
     private void trimBufferSize() {

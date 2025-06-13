@@ -9,7 +9,7 @@ import static org.mockito.Mockito.*;
 
 @Disabled
 @ExtendWith(MockitoExtension.class)
-class DefaultSsdOperatorControllerTest {
+class SsdManagerTest {
     private static final String[] INVALID_FIRST_ARG = {"Q", "12"};
     private static final String[] VALID_READ_ARGS = {"R", "56"};
     private static final String[] INVALID_READ_ARGS_CNT = {"R", "12", "77", "(!"};

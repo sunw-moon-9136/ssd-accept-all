@@ -76,7 +76,10 @@ class InputFileHandlerTest {
         inputHandler.add("W 21 0x12341234");
         inputHandler.add("W 20 0xEEEEFFFF");
         List<String> answer = inputHandler.flush();
-        List<String> expected = List.of("W 21 0x12341234", "W 20 0xEEEEFFFF");
+        List<String> expected = List.of(
+                "W 21 0x12341234",
+                "W 20 0xEEEEFFFF"
+        );
         assertIterableEquals(expected, answer);
     }
 
@@ -99,7 +102,10 @@ class InputFileHandlerTest {
 
         List<String> answer = inputHandler.flush();
 
-        List<String> expected = List.of("W 20 0xABCDABCD", "E 10 5");
+        List<String> expected = List.of(
+                "W 20 0xABCDABCD",
+                "E 10 5"
+        );
         assertIterableEquals(expected, answer);
     }
 
@@ -143,7 +149,11 @@ class InputFileHandlerTest {
         inputHandler.add("E 10 5");
         inputHandler.add("W 10 0xABCDABCD");
         List<String> answer = inputHandler.flush();
-        List<String> expected = List.of("W 10 0xABCDABCD", "E 11 4");
+        List<String> expected = List.of(
+                "E 11 4",
+                "W 10 0xABCDABCD"
+
+        );
         assertIterableEquals(expected, answer);
     }
 
@@ -152,7 +162,10 @@ class InputFileHandlerTest {
         inputHandler.add("E 10 5");
         inputHandler.add("W 14 0xABCDABCD");
         List<String> answer = inputHandler.flush();
-        List<String> expected = List.of("W 14 0xABCDABCD", "E 10 4");
+        List<String> expected = List.of(
+                "E 10 4",
+                "W 14 0xABCDABCD"
+        );
         assertIterableEquals(expected, answer);
     }
 
@@ -287,6 +300,36 @@ class InputFileHandlerTest {
         List<String> answer = inputHandler.flush();
         List<String> expected = List.of(
                 "E 1 4");
+        assertIterableEquals(expected, answer);
+    }
+
+    @Test
+    void 연속_아닌_ERASE_MERGE_ERAGE_존재1() {
+        inputHandler.add("E 1 3");
+        inputHandler.add("W 2 0x33333333");
+        inputHandler.add("E 4 1");
+
+        List<String> answer = inputHandler.flush();
+        List<String> expected = List.of(
+                "E 1 3",
+                "W 2 0x33333333",
+                "E 4 1"
+        );
+        assertIterableEquals(expected, answer);
+    }
+
+    @Test
+    void 연속_아닌_ERASE_MERGE_ERAGE_존재2() {
+        inputHandler.add("E 1 10");
+        inputHandler.add("W 2 0x33333333");
+        inputHandler.add("E 10 6");
+
+        List<String> answer = inputHandler.flush();
+        List<String> expected = List.of(
+                "E 1 10",
+                "W 2 0x33333333",
+                "E 10 6"
+        );
         assertIterableEquals(expected, answer);
     }
 }
