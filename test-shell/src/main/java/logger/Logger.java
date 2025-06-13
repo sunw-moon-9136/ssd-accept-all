@@ -36,7 +36,6 @@ public class Logger {
 
     public void printConsoleAndLog(String methodFullName, String logMessage) {
         String fullMessage = makeFullMessage(methodFullName, logMessage);
-        System.out.println(fullMessage);
         printAndManageLogFile(fullMessage);
     }
 

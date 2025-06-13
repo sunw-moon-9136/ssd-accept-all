@@ -1,3 +1,4 @@
+import logger.Logger;
 import scenario.ITestScenario;
 import scenario.TestRunner;
 import shell.Processor;
@@ -7,64 +8,62 @@ import utils.Common;
 import utils.TestScenarioFactory;
 import utils.Valid;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Scanner;
 
 public class Main {
     private static final String INVALID_COMMAND = "INVALID COMMAND";
-    public static final List<String> SCENARIO_COMMAND = Arrays.asList(
-            "1_FullWriteAndReadCompare", "2_PartialLBAWrite", "3_WriteReadAging", "4_EraseAndWriteAging",
-            "1_", "2_", "3_", "4_");
 
     private static Processor processor = new Processor();
     private static Output output = new Output();
     public static Manager manager = new Manager(processor, output);
 
-    public static void main(String[] args) {
+    private static final Logger logger = Logger.getInstance();
 
-        if (args[0].length() > 0) {
+    public static void main(String[] args) {
+        logger.printConsoleAndLog("Main.main()", "================================");
+        logger.printConsoleAndLog("Main.main()", "main START.");
+
+        if (args.length == 1) {
             TestRunner testRunner = new TestRunner(args[0]);
             testRunner.process(manager);
+            logger.printConsoleAndLog("Main.main()", "main END.");
+            logger.printConsoleAndLog("Main.main()", "================================\n");
             return;
         }
 
-        Manager manager = new Manager(processor, output);
         Scanner scanner = new Scanner(System.in);
         run(scanner);
         scanner.close();
+        logger.printConsoleAndLog("Main.main()", "main END.");
+        logger.printConsoleAndLog("Main.main()", "================================\n");
     }
 
     public static void run(Scanner scanner) {
+        logger.printConsoleAndLog("Main.run()", "run START.");
         while (true) {
             System.out.print("Shell> ");
             String command = scanner.nextLine().trim();
 
             String[] parts = command.split("\\s+");
             if (Valid.isNullEmpty(command)) {
+                logger.printConsoleAndLog("Main.run()", "The command is Null or Empty");
                 System.out.println(INVALID_COMMAND);
                 continue;
             }
 
             if (Valid.isValidCommand(parts)) {
+                logger.printConsoleAndLog("Main.run()", "That command is not a valid command.");
                 System.out.println(INVALID_COMMAND);
                 continue;
             }
 
             if (shellProcess(parts)) break;
         }
+        logger.printConsoleAndLog("Main.run()", "run END.");
     }
 
     public static boolean shellProcess(String[] parts) {
-        if (SCENARIO_COMMAND.contains(parts[0])) {
-            ITestScenario testScenario = TestScenarioFactory.getTestScenario(parts[0], manager);
-            if (testScenario != null) {
-                String result = testScenario.run() ? "PASS" : "FAIL";
-                System.out.println(result);
-            }
-            return false;
-        }
-
+        logger.printConsoleAndLog("Main.shellProcess()", "shellProcess RUN.");
         return switch (parts[0]) {
             case "read" -> {
                 readFormatPrint(parts[1], manager.read(Integer.parseInt(parts[1])));
@@ -95,7 +94,15 @@ public class Main {
             case "flush" -> manager.flush();
             case "help" -> Common.helpCommand();
             case "exit" -> true;
-            default -> false;
+            default -> {
+                // SCENARIO_COMMAND
+                ITestScenario testScenario = TestScenarioFactory.getTestScenario(parts[0], manager);
+                if (testScenario != null) {
+                    String result = testScenario.run() ? "PASS" : "FAIL";
+                    System.out.println(result);
+                }
+                yield false;
+            }
         };
     }
 
