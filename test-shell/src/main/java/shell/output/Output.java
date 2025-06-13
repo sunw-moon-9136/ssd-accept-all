@@ -61,7 +61,7 @@ public class Output {
 
             return switch (command) {
                 case COMMAND_CHECK_OUTPUT_NULL -> checkOutput(readResult);
-                case COMMAND_CHECK_OUTPUT_READ -> getReadOuput(readResult);
+                case COMMAND_CHECK_OUTPUT_READ -> getReadOutput(readResult);
                 default -> OUTPUT_RESULT_ERROR;
             };
 
@@ -72,7 +72,7 @@ public class Output {
 
     }
 
-    private String getReadOuput(String readResult) {
+    private String getReadOutput(String readResult) {
         if (readResult == null || readResult.isEmpty()) return OUTPUT_RESULT_ERROR;
         if (!readResult.contains("0x")) return OUTPUT_RESULT_ERROR;
         if (readResult.contains("ERROR")) return OUTPUT_RESULT_ERROR;

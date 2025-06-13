@@ -37,13 +37,13 @@ public class EraseAndWriteAging extends DefaultTestScenario {
     }
 
     private boolean runOnce() {
-        for (int j = 0; j < 100; j += 2) {
+        for (int j = 2; j < 100; j += 2) {
             if (!manager.write(j, randomFactory.getRandomHexValue())) return false;
             if (!manager.write(j, randomFactory.getRandomHexValue())) return false;
-            if (!manager.erase_range(j, j + 2)) return false;
+            if (!manager.erase_range(j, Math.min(j + 2, 99))) return false;
 
-            for (int k = 0; k <= 2; k++) {
-                if (!readCompare(k, "0x00000000"))
+            for (int k = 0; k <= 2 && k + j < 100; k++) {
+                if (!readCompare(k + j, "0x00000000"))
                     return false;
             }
         }
