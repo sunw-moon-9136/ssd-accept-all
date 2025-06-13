@@ -12,12 +12,6 @@ public class FullWriteAndReadCompare extends DefaultTestScenario {
         return testScenario;
     }
 
-    public static ITestScenario getInstance(IManager manager, RandomFactory randomFactory) {
-        if (testScenario == null)
-            testScenario = new FullWriteAndReadCompare(manager, randomFactory);
-        return testScenario;
-    }
-
     private FullWriteAndReadCompare(IManager manager) {
         super(manager);
     }
