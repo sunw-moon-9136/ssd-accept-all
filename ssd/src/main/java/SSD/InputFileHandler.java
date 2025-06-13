@@ -46,10 +46,10 @@ public class InputFileHandler implements InputHandler {
         String[] parts = input.split("\\s+");
         switch (parts[0].toUpperCase()) {
             case "W":
-                handleWrite(parseInt(parts[1]), Long.decode(parts[2]));
+                processWriteInsertOptimize(parseInt(parts[1]), Long.decode(parts[2]));
                 break;
             case "E":
-                handleErase(parseInt(parts[1]), parseInt(parts[2]));
+                processEraseInsertOptimize(parseInt(parts[1]), parseInt(parts[2]));
                 break;
             default:
                 return;
@@ -83,35 +83,54 @@ public class InputFileHandler implements InputHandler {
         return commands;
     }
 
-    private void handleWrite(int address, long value) {
+    private void processWriteInsertOptimize(int address, long value) {
         buffer.removeIf(c -> c.type == Command.Type.WRITE && c.address == address);
         buffer.addLast(Command.write(address, value));
+        ignoreEraseWithCombinedWrites(address);
         List<Command> updates = splitOverlappingErases(address);
         buffer.addAll(updates);
     }
 
-    private void ignoreCommand() {
-//
-//        Iterator<Command> it = buffer.iterator();
-//        while (it.hasNext()) {
-//            Command c = it.next();
-//            if (c.type == Command.Type.WRITE) {
-//
-//
-//            }
-        //                it.remove();
-//            } else if (c.type == Command.Type.ERASE) {
-//                int s = c.address, e = c.address + c.size - 1;
-//                if ((s <= start && end <= e)) {
-//                    shouldAdd = false;
-//                }
-//                if (s >= start && e <= end) {
-//                    it.remove();
-//                }
-//            }
-//        }
+    private void ignoreEraseWithCombinedWrites(int address) {
+        Iterator<Command> iterator = buffer.iterator();
 
+        while (iterator.hasNext()) {
+            Command command = iterator.next();
+
+            if (command.type != Command.Type.ERASE) continue;
+
+            int start = command.address;
+            int end = command.address + command.size - 1;
+
+            if (address < start || address > end) continue;
+
+            Set<Integer> eraseRange = getEraseRangeSet(start, end);
+            Set<Integer> writeAddresses = getWriteAddressesInEraseRange(eraseRange);
+
+            if (eraseRange.equals(writeAddresses)) {
+                iterator.remove();
+            }
+        }
     }
+
+    private Set<Integer> getEraseRangeSet(int start, int end) {
+        Set<Integer> range = new HashSet<>();
+        for (int i = start; i <= end; i++) {
+            range.add(i);
+        }
+        return range;
+    }
+
+    private Set<Integer> getWriteAddressesInEraseRange(Set<Integer> range) {
+        Set<Integer> writeSet = new HashSet<>();
+        for (Command cmd : buffer) {
+            if (cmd.type == Command.Type.WRITE && range.contains(cmd.address)) {
+                writeSet.add(cmd.address);
+            }
+        }
+        return writeSet;
+    }
+
 
     private List<Command> splitOverlappingErases(int address) {
         List<Command> updates = new ArrayList<>();
@@ -127,31 +146,31 @@ public class InputFileHandler implements InputHandler {
         return updates;
     }
 
-    private void handleErase(int address, int size) {
+    private void processEraseInsertOptimize(int address, int size) {
         if (size <= 0) return;
-        int start = address, end = address + size - 1;
 
+        int inputCmdStart = address;
+        int inputCmdEnd = address + size - 1;
         boolean shouldAdd = true;
+
         Iterator<Command> it = buffer.iterator();
         while (it.hasNext()) {
             Command c = it.next();
-            if (c.type == Command.Type.WRITE && c.address >= start && c.address <= end) {
+            if (c.type == Command.Type.WRITE && c.address >= inputCmdStart && c.address <= inputCmdEnd) {
                 it.remove();
             } else if (c.type == Command.Type.ERASE) {
-                int s = c.address, e = c.address + c.size - 1;
-                if ((s <= start && end <= e)) {
-                    shouldAdd = false;
-                }
-                if (s >= start && e <= end) {
-                    it.remove();
-                }
+                int cStart = c.address;
+                int cEnd = c.address + c.size - 1;
+                if ((cStart <= inputCmdStart && inputCmdEnd <= cEnd)) shouldAdd = false;
+                if (cStart >= inputCmdStart && cEnd <= inputCmdEnd) it.remove();
+
             }
         }
         if (shouldAdd) buffer.addLast(Command.erase(address, size));
-        mergeErases();
+        mergeEraseCommand();
     }
 
-    private void mergeErases() {
+    private void mergeEraseCommand() {
         List<Command> erases = buffer.stream().filter(c -> c.type == Command.Type.ERASE).sorted(Comparator.comparingInt(c -> c.address)).collect(Collectors.toList());
         if (erases.size() < 2) return;
 

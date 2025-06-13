@@ -249,9 +249,10 @@ class InputFileHandlerTest {
         inputHandler.add("W 1 0x33333333");
         List<String> answer = inputHandler.flush();
         List<String> expected = List.of(
-                "W 1 0X33333333",
-                "W 2 0X33333333",
-                "W 3 0X33333333"
+                "W 2 0x33333333",
+                "W 3 0x33333333",
+                "W 1 0x33333333"
+
         );
         assertIterableEquals(expected, answer);
     }
