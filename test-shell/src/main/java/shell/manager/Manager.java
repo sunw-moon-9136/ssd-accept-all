@@ -1,8 +1,8 @@
 package shell.manager;
 
 import logger.Logger;
-import shell.processor.Processor;
 import shell.output.Output;
+import shell.processor.Processor;
 
 public class Manager implements IManager {
     private static final Logger logger = Logger.getInstance();
@@ -39,7 +39,7 @@ public class Manager implements IManager {
     public boolean erase(int address, int size) {
         logger.printConsoleAndLog("Manager.erase()", "erase RUN.");
         logger.printConsoleAndLog("Manager.erase()", String.format("address: %d, size: %d", address, size));
-        return runProcess("erase " + address).equals("DONE");
+        return runProcess("erase " + address + " " + size).equals("DONE");
     }
 
     @Override
