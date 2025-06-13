@@ -1,6 +1,9 @@
+import java.util.List;
+
 public class SsdController {
     private Driver driver;
-    private ReadWritable disk;
+    private SsdOperator ssd;
+    private SsdCommandBufferOptimizer buffer;
 
     public static final String SSD_OUTPUT_TXT = "ssd_output.txt";
     public static final byte[] ERROR_BYTES = "ERROR".getBytes();
@@ -8,20 +11,21 @@ public class SsdController {
 
     public SsdController() {
         this.driver = new FileDriver();
-        this.disk = new Ssd();
+        this.ssd = new DefaultSsd();
+        this.buffer = new SsdCommandBufferOptimizer();
     }
 
-    public SsdController(Driver driver, ReadWritable disk) {
+    public SsdController(Driver driver, SsdOperator ssd) {
         this.driver = driver;
-        this.disk = disk;
+        this.ssd = ssd;
     }
 
     public void setDriver(Driver driver) {
         this.driver = driver;
     }
 
-    public void setDisk(Ssd disk) {
-        this.disk = disk;
+    public void setSsd(DefaultSsd defaultSsd) {
+        this.ssd = defaultSsd;
     }
 
     public void error() {
@@ -74,20 +78,45 @@ public class SsdController {
     }
 
     private void write(int lba, String value) {
-        clear();
+        if (buffer.isFull()) {
+            flushBuffer();
+        }
+        buffer.add(String.join(" ", "W", String.valueOf(lba), value));
 
-        disk.write(lba, value);
+        clear();
     }
 
     private void read(int lba) {
-        String ret = disk.read(lba);
+        String ret = buffer.read(lba);
+        if(ret.isBlank()) {
+            ret = ssd.read(lba);
+        }
         driver.write(SSD_OUTPUT_TXT, ret.getBytes());
     }
 
     private void erase(int lba, int size) {
-        clear();
+        if (buffer.isFull()) {
+            flushBuffer();
+        }
+        buffer.add(String.join(" ", "E", String.valueOf(lba), String.valueOf(size)));
 
-        disk.erase(lba, size);
+        clear();
+    }
+
+    private void flushBuffer() {
+        List<String> commands = buffer.flush();
+        for (String cmd : commands) {
+            String[] parts = cmd.split(" ");
+            String mode = parts[0];
+            int lba = Integer.parseInt(parts[1]);
+            String value = parts[2];
+
+            if (mode.equals("W")) {
+                ssd.write(lba, value);
+            } else if (mode.equals("E")) {
+                ssd.erase(lba, Integer.parseInt(value));
+            }
+        }
     }
 
     public void run(String[] args) {

@@ -159,4 +159,16 @@ class BufferOptimizerTest {
         );
         assertIterableEquals(expected, answer);
     }
+
+    @Test
+    void ERASE_중복_범위_삽입() {
+        ssdCommandBufferOptimizer.add("E 0 5");
+        ssdCommandBufferOptimizer.add("E 2 1");
+        List<String> answer = ssdCommandBufferOptimizer.flush();
+        List<String> expected = List.of(
+                "E 0 5"
+        );
+        assertIterableEquals(expected, answer);
+    }
+
 }
