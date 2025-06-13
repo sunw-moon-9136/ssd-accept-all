@@ -26,8 +26,9 @@ public class PartialLBAWrite extends DefaultTestScenario {
     }
 
     @Override
-    public boolean run() {
+    public boolean runEach() {
         for (int i = 0; i < repeatCnt; i++) {
+            logger.printConsoleAndLog("EraseAndWriteAging.runOnce()", "Loop(" + i + ") running");
             if (!runOnce()) return false;
         }
         return true;
