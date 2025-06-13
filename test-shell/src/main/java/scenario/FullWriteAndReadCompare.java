@@ -22,7 +22,7 @@ public class FullWriteAndReadCompare extends DefaultTestScenario {
     }
 
     @Override
-    public boolean run() {
+    public boolean runEach() {
         for (int addressByFive = 0; addressByFive <= 95; addressByFive += 5) {
             String testValue = randomFactory.getRandomHexValue();
 

@@ -22,10 +22,11 @@ public class EraseAndWriteAging extends DefaultTestScenario {
     }
 
     @Override
-    public boolean run() {
+    public boolean runEach() {
         if (init()) return false;
 
         for (int i = 0; i < 30; i++) {
+            logger.printConsoleAndLog("EraseAndWriteAging.runOnce()", "Loop(" + i + ") running");
             if (!runOnce()) return false;
         }
         return true;
