@@ -1,13 +1,30 @@
-public class FullWriteAndReadCompare extends DefaultTestScenario {
+package scenario;
 
-    public FullWriteAndReadCompare(RunCommand runCommand, Output output) {
-        super(runCommand, output);
+import shell.manager.IManager;
+import utils.RandomFactory;
+
+public class FullWriteAndReadCompare extends DefaultTestScenario {
+    private static ITestScenario testScenario;
+
+    public static ITestScenario getInstance(IManager manager) {
+        if (testScenario == null)
+            testScenario = new FullWriteAndReadCompare(manager);
+        return testScenario;
+    }
+
+    private FullWriteAndReadCompare(IManager manager) {
+        super(manager);
+    }
+
+    // @VisibleForTesting
+    FullWriteAndReadCompare(IManager manager, RandomFactory randomFactory) {
+        super(manager, randomFactory);
     }
 
     @Override
-    public boolean run() {
+    public boolean runEach() {
         for (int addressByFive = 0; addressByFive <= 95; addressByFive += 5) {
-            String testValue = makeHex(addressByFive / 5);
+            String testValue = randomFactory.getRandomHexValue();
 
             if (!writeFiveValues(addressByFive, testValue)) return false;
             if (!readCompareFiveValues(addressByFive, testValue)) return false;
@@ -17,7 +34,7 @@ public class FullWriteAndReadCompare extends DefaultTestScenario {
 
     private boolean writeFiveValues(int baseAddress, String testValue) {
         for (int additionalAddress = 0; additionalAddress <= 4; additionalAddress++) {
-            if (!runCommand.execute(String.format("write %d %s", baseAddress + additionalAddress, testValue)))
+            if (!manager.write(baseAddress + additionalAddress, testValue))
                 return false;
         }
         return true;
@@ -30,9 +47,5 @@ public class FullWriteAndReadCompare extends DefaultTestScenario {
             }
         }
         return true;
-    }
-
-    private String makeHex(int num) {
-        return String.format("0x%02d%02d%02d%02d", num, num, num, num);
     }
 }

@@ -1,15 +1,16 @@
+package shell.output;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class OutputFileReader implements DataReader {
 
     private final Path path;
 
     public OutputFileReader(String filePath) {
-        this.path = Paths.get(filePath);
+        this.path = Path.of(filePath);
     }
 
     @Override
