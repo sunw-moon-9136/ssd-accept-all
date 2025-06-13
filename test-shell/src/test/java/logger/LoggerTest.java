@@ -37,7 +37,7 @@ class LoggerTest {
 
         verify(driver, times(1)).append(any(), any());
         verify(driver, times(1)).changeNameIfBiggerThan(anyLong(), anyString(), any());
-        verify(driver, times(1)).changeOldLogFileName(Logger.LATEST_LOG_FILE_NAME);
+        verify(driver, times(1)).changeOldLogFileName(Logger.LATEST_FILE_FULL_PATH);
     }
 
     @Test

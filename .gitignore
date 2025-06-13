@@ -1,5 +1,6 @@
 ### File ###
-/ssd/*.txt
+ssd/*.txt
+log/
 
 .gradle
 build/

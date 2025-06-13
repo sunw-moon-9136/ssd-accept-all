@@ -5,9 +5,7 @@ import java.util.function.Supplier;
 
 public interface Driver {
 
-    String read(String file);
-
-    void write(String file, byte[] bytes);
+    void createDirectoryIfAbsent(String directoryName);
 
     void append(String file, byte[] bytes);
 

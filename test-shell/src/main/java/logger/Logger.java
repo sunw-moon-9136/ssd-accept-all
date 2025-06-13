@@ -19,11 +19,14 @@ public class Logger {
     public static final String LATEST_LOG_FILE_NAME = "latest.log";
     private static final long TEST_LOG_MAX_SIZE = 10 * 1024 * 1024;
     public static final String LINE_BREAK = "\n";
+    public static final String LOG_DIRECTORY_NAME = "log";
+    public static final String LATEST_FILE_FULL_PATH = LOG_DIRECTORY_NAME + "/" + LATEST_LOG_FILE_NAME;
 
     private final Driver fileDriver;
 
     private Logger() {
         this.fileDriver = new FileDriver();
+        this.fileDriver.createDirectoryIfAbsent(LOG_DIRECTORY_NAME);
     }
 
     // @VisibleForTesting
@@ -41,9 +44,9 @@ public class Logger {
     }
 
     private void printAndManageLogFile(String fullMessage) {
-        fileDriver.append(LATEST_LOG_FILE_NAME, fullMessage.getBytes(StandardCharsets.UTF_8));
-        fileDriver.changeNameIfBiggerThan(TEST_LOG_MAX_SIZE, LATEST_LOG_FILE_NAME, this::makeOldLogFileName);
-        fileDriver.changeOldLogFileName(LATEST_LOG_FILE_NAME);
+        fileDriver.append(LATEST_FILE_FULL_PATH, fullMessage.getBytes(StandardCharsets.UTF_8));
+        fileDriver.changeNameIfBiggerThan(TEST_LOG_MAX_SIZE, LATEST_FILE_FULL_PATH, this::makeOldLogFileName);
+        fileDriver.changeOldLogFileName(LATEST_FILE_FULL_PATH);
     }
 
     private String makeFullMessage(String methodFullName, String logMessage) {

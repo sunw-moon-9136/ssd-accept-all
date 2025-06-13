@@ -13,26 +13,14 @@ public class FileDriver implements Driver {
     public static final String LOG_EXTENSION_POSTFIX = ".log";
 
     @Override
-    public String read(String file) {
-        requireValidFileName(file);
+    public void createDirectoryIfAbsent(String directoryName) {
+        Path dirPath = Path.of(directoryName);
+        if (Files.exists(dirPath) && Files.isDirectory(dirPath)) return;
 
         try {
-            return Files.readString(Paths.get(file));
-        } catch (NoSuchFileException e) {
-            throw new RuntimeException("File Not Found: " + file);
+            Files.createDirectory(dirPath);
         } catch (IOException e) {
             throw new RuntimeException("Not Expected Error");
-        }
-    }
-
-    @Override
-    public void write(String file, byte[] bytes) {
-        requireValidFileName(file);
-
-        try {
-            Files.write(Paths.get(file), bytes, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -43,7 +31,7 @@ public class FileDriver implements Driver {
         try {
             Files.write(Paths.get(file), bytes, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Not Expected Error");
         }
     }
 
@@ -81,7 +69,7 @@ public class FileDriver implements Driver {
         }
     }
 
-//    @VisibleForTesting
+    //    @VisibleForTesting
     void convertToZipFile(String oldLogFileName) {
         try {
             String zipFileName = oldLogFileName.replace(".log", ".zip");
