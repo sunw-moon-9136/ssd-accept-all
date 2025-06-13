@@ -44,7 +44,7 @@ public class Valid {
     public static boolean checkRegisteredCommand(String command) {
         logger.printConsoleAndLog("Valid.checkRegisteredCommand()", "checkRegisteredCommand RUN.");
         if (!(REGISTERED_COMMAND.contains(command) || REGISTERED_SCENARIO_COMMAND.contains(command))) return true;
-        if (REGISTERED_COMMAND.contains(command) && !command.matches("[a-z]+")) return true;
+        if (REGISTERED_COMMAND.contains(command) && !command.matches("[a-z_]+")) return true;
         if (REGISTERED_SCENARIO_COMMAND.contains(command) && !command.matches("[a-z0-9_]+")) return true;
 
         return false;
