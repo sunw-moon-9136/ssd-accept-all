@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
@@ -48,8 +49,17 @@ public class SsdCommandBufferOptimizer {
         }
     }
 
+    public boolean isFull() {
+        return buffer.size() == MAX_BUFFER_SIZE;
+    }
+
     private void initializeFromFiles() {
         try {
+            File folder = new File("buffer");
+            if (!folder.exists()) {
+                folder.mkdir();
+            }
+
             List<Path> fileList = Files.list(Paths.get(BUFFER_PATH)).filter(p -> p.toString().endsWith(".txt")).collect(Collectors.toList());
             removeAllFileBufferFolder();
             for (Path path : fileList) {
@@ -92,18 +102,14 @@ public class SsdCommandBufferOptimizer {
 
                 //WRITE가 기존에 존재하는 ERASE 앞뒤인 경우(특이케이스)
                 // ERASE (address == lba)
-                Optional<Command> eraseCmdOpt = buffer.stream()
-                        .filter(c -> c.type == Command.Type.ERASE && c.address == lba)
-                        .findFirst();
+                Optional<Command> eraseCmdOpt = buffer.stream().filter(c -> c.type == Command.Type.ERASE && c.address == lba).findFirst();
                 eraseCmdOpt.ifPresent(cmd -> {
                     buffer.remove(cmd);
                     if (cmd.size - 1 > 0) buffer.add(new Command(lba + 1, cmd.size - 1, true));
                 });
 
                 // ERASE (address + size - 1 == lba)
-                Optional<Command> eraseCmdOpt2 = buffer.stream()
-                        .filter(c -> c.type == Command.Type.ERASE && c.address + c.size - 1 == lba)
-                        .findFirst();
+                Optional<Command> eraseCmdOpt2 = buffer.stream().filter(c -> c.type == Command.Type.ERASE && c.address + c.size - 1 == lba).findFirst();
                 eraseCmdOpt2.ifPresent(cmd -> {
                     buffer.remove(cmd);
                     if (cmd.size - 1 > 0) buffer.add(new Command(cmd.address, cmd.size - 1, true));
@@ -120,6 +126,7 @@ public class SsdCommandBufferOptimizer {
                 if (size <= 0) return;
 
                 Iterator<Command> it = buffer.iterator();
+                boolean addFlag = true;
                 while (it.hasNext()) {
                     Command c = it.next();
                     if (c.type == Command.Type.WRITE) {
@@ -128,12 +135,12 @@ public class SsdCommandBufferOptimizer {
                         }
                     } else if (c.type == Command.Type.ERASE) {
                         int prevStart = c.address, prevEnd = c.address + c.size - 1;
-                        if (eraseStart <= prevStart || prevEnd >= eraseEnd) {
-                            it.remove();
+                        if (prevStart <= eraseStart && eraseEnd <= prevEnd) {
+                            addFlag = false;
                         }
                     }
                 }
-                buffer.add(new Command(lba, size, true));
+                if (addFlag) buffer.add(new Command(lba, size, true));
                 mergeAdjacentErases();
                 break;
             }
@@ -169,6 +176,7 @@ public class SsdCommandBufferOptimizer {
             }
         }
     }
+
 
     public String read(int address) {
         for (int i = buffer.size() - 1; i >= 0; i--) {
@@ -228,7 +236,7 @@ public class SsdCommandBufferOptimizer {
                 erases.add(c);
             }
         }
-        if (erases.isEmpty()) return;
+        if (erases.size() <= 1) return;
         erases.sort(Comparator.comparingInt(c -> c.address));
         List<Command> merged = new ArrayList<>();
         Command prev = erases.get(0);

@@ -1,8 +1,7 @@
-public class Ssd implements ReadWritable {
+public class DefaultSsd implements SsdOperator {
     public static final int MAX_ADDRESS_LENGTH = 100;
     public static final String INIT_VALUE = "0x00000000";
 
-    public static final String SSD_OUTPUT_TXT = "ssd_output.txt";
     public static final String SSD_NAND_TXT = "ssd_nand.txt";
 
     private final String ADDRESS_VALUE_DELIMITER = "\t";
@@ -10,11 +9,11 @@ public class Ssd implements ReadWritable {
 
     private Driver driver;
 
-    public Ssd() {
+    public DefaultSsd() {
         this.driver = new FileDriver();
     }
 
-    public Ssd(Driver driver) {
+    public DefaultSsd(Driver driver) {
         this.driver = driver;
     }
 

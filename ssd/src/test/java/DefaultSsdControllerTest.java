@@ -1,15 +1,12 @@
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class SsdControllerTest {
+class DefaultSsdControllerTest {
     private static final String[] INVALID_FIRST_ARG = {"Q", "12"};
     private static final String[] VALID_READ_ARGS = {"R", "56"};
     private static final String[] INVALID_READ_ARGS_CNT = {"R", "12", "77", "(!"};
@@ -27,7 +24,7 @@ class SsdControllerTest {
     Driver mockDriver;
 
     @Mock
-    ReadWritable mockDisk;
+    SsdOperator mockDisk;
 
     @BeforeEach
     void setUp() {

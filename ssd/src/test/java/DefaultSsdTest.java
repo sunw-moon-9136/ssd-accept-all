@@ -19,7 +19,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class SsdTest {
+class DefaultSsdTest {
     public static final String DELIMITER = "\t";
     public static final String SSD_OUTPUT_TXT = "ssd_output.txt";
     public static final String SSD_NAND_TXT = "ssd_nand.txt";
@@ -35,11 +35,11 @@ class SsdTest {
     @Mock
     Driver fileDriver;
 
-    Ssd ssd;
+    DefaultSsd defaultSsd;
 
     @BeforeEach
     void setUp() throws IOException {
-        ssd = new Ssd(fileDriver);
+        defaultSsd = new DefaultSsd(fileDriver);
 
         Files.deleteIfExists(Paths.get(SSD_OUTPUT_TXT));
         Files.deleteIfExists(Paths.get(SSD_NAND_TXT));
@@ -75,7 +75,7 @@ class SsdTest {
     void LBA_영역_값_쓰기_ssd_nand_txt_미존재() throws IOException {
         //Arrange
         //Act
-        ssd.write(WRITE_TEST_ADDRESS, WRITE_TEST_VALUE);
+        defaultSsd.write(WRITE_TEST_ADDRESS, WRITE_TEST_VALUE);
 
         //Assert
         assertTrue(new File(SSD_NAND_TXT).exists(), "파일이 생성되지 않았습니다.");
@@ -87,8 +87,8 @@ class SsdTest {
         //Arrange
 
         //Act
-        ssd.write(WRITE_TEST_ADDRESS, WRITE_TEST_VALUE);
-        ssd.write(WRITE_TEST_ADDRESS, WRITE_TEST_VALUE);
+        defaultSsd.write(WRITE_TEST_ADDRESS, WRITE_TEST_VALUE);
+        defaultSsd.write(WRITE_TEST_ADDRESS, WRITE_TEST_VALUE);
 
         //Assert
         assertTrue(new File(SSD_NAND_TXT).exists(), "파일이 생성되지 않았습니다.");
@@ -102,8 +102,8 @@ class SsdTest {
         String content = "";
 
         //Act
-        ssd.write(READ_TEST_ADDRESS, READ_TEST_VALUE);
-        content = ssd.read(READ_TEST_ADDRESS);
+        defaultSsd.write(READ_TEST_ADDRESS, READ_TEST_VALUE);
+        content = defaultSsd.read(READ_TEST_ADDRESS);
 
         //Assert
         assertThat(content).isEqualTo(READ_TEST_VALUE);
@@ -116,7 +116,7 @@ class SsdTest {
         String content = "";
 
         //Act
-        content = ssd.read(READ_TEST_ADDRESS);
+        content = defaultSsd.read(READ_TEST_ADDRESS);
 
         //Assert
         assertThat(content).isEqualTo(NO_WRITE_VALUE);
@@ -130,8 +130,8 @@ class SsdTest {
         //Act
         List<String> readStringList = new ArrayList<>();
         for (int i = 0; i < retryCnt; i++) {
-            ssd.write(WRITE_TEST_ADDRESS, WRITE_TEST_VALUE + i);
-            String content = ssd.read(WRITE_TEST_ADDRESS);
+            defaultSsd.write(WRITE_TEST_ADDRESS, WRITE_TEST_VALUE + i);
+            String content = defaultSsd.read(WRITE_TEST_ADDRESS);
             readStringList.add(content);
         }
 
@@ -147,14 +147,14 @@ class SsdTest {
         int writeSize = 5;
         int eraseSize = 0;
         for (int i = 0; i < writeSize; i++) {
-            ssd.write(WRITE_TEST_ADDRESS + i, WRITE_TEST_VALUE);
+            defaultSsd.write(WRITE_TEST_ADDRESS + i, WRITE_TEST_VALUE);
         }
 
         //Act
-        ssd.erase(WRITE_TEST_ADDRESS, eraseSize);
+        defaultSsd.erase(WRITE_TEST_ADDRESS, eraseSize);
 
         //Assert
-        assertThat(ssd.read(WRITE_TEST_ADDRESS)).isEqualTo(WRITE_TEST_VALUE);
+        assertThat(defaultSsd.read(WRITE_TEST_ADDRESS)).isEqualTo(WRITE_TEST_VALUE);
     }
 
     @Test
@@ -163,16 +163,16 @@ class SsdTest {
         int writeSize = 5;
         int eraseSize = 3;
         for (int i = 0; i < writeSize; i++) {
-            ssd.write(WRITE_TEST_ADDRESS + i, WRITE_TEST_VALUE);
+            defaultSsd.write(WRITE_TEST_ADDRESS + i, WRITE_TEST_VALUE);
         }
 
         //Act
-        ssd.erase(WRITE_TEST_ADDRESS, eraseSize);
+        defaultSsd.erase(WRITE_TEST_ADDRESS, eraseSize);
 
         //Assert
         for (int i = 0; i < writeSize; i++) {
-            if (i < eraseSize) assertThat(ssd.read(WRITE_TEST_ADDRESS + i)).isEqualTo(NO_WRITE_VALUE);
-            else assertThat(ssd.read(WRITE_TEST_ADDRESS + i)).isEqualTo(WRITE_TEST_VALUE);
+            if (i < eraseSize) assertThat(defaultSsd.read(WRITE_TEST_ADDRESS + i)).isEqualTo(NO_WRITE_VALUE);
+            else assertThat(defaultSsd.read(WRITE_TEST_ADDRESS + i)).isEqualTo(WRITE_TEST_VALUE);
         }
     }
 
