@@ -4,7 +4,7 @@ public class Output {
 
     //TODO
     final static String OUTPUT_FILE_PATH = "ssd_output.txt";
-    // final static String OUTPUT_FILE_PATH = "C:\\Users\\User\\Documents\\output.txt";
+    //final static String OUTPUT_FILE_PATH = "C:\\Users\\User\\Documents\\output.txt";
 
     private final DataReader dataReader;
 
@@ -35,7 +35,7 @@ public class Output {
         try {
             if (!existFileCheck()) return "ERROR";
             readResult = readLine();
-            if (commandLine.equals("write")) {
+            if (commandLine.equals("write") || commandLine.equals("erase") || commandLine.equals("flush")) {
                 if (readResult == null || readResult.isEmpty()) {
                     return "DONE";
                 }
