@@ -18,6 +18,9 @@ public class Output {
     }
 
 
+    private static final String OUTPUT_RESULT_PASS = "DONE";
+    private static final String OUTPUT_RESULT_ERROR = "ERROR";
+
     private static final String COMMAND_CHECK_OUTPUT_NULL = "check_null";
     private static final String COMMAND_CHECK_OUTPUT_READ = "read";
     private static final Set<String> COMMANDS_CHECK_OUTPUT_NULL = Set.of(
@@ -52,33 +55,33 @@ public class Output {
         String readResult;
 
         try {
-            if (!existFileCheck()) return "ERROR";
+            if (!existFileCheck()) return OUTPUT_RESULT_ERROR;
 
             readResult = readLine();
 
             return switch (command) {
-                case COMMAND_CHECK_OUTPUT_NULL -> checkOutputError(readResult);
+                case COMMAND_CHECK_OUTPUT_NULL -> checkOutput(readResult);
                 case COMMAND_CHECK_OUTPUT_READ -> getReadOuput(readResult);
-                default -> "ERROR";
+                default -> OUTPUT_RESULT_ERROR;
             };
 
 
         } catch (Exception e) {
-            return "ERROR";
+            return OUTPUT_RESULT_ERROR;
         }
 
     }
 
     private String getReadOuput(String readResult) {
-        if (readResult == null || readResult.isEmpty()) return "ERROR";
-        if (!readResult.contains("0x")) return "ERROR";
-        if (readResult.contains("ERROR")) return "ERROR";
+        if (readResult == null || readResult.isEmpty()) return OUTPUT_RESULT_ERROR;
+        if (!readResult.contains("0x")) return OUTPUT_RESULT_ERROR;
+        if (readResult.contains("ERROR")) return OUTPUT_RESULT_ERROR;
         return readResult;
     }
 
-    private String checkOutputError(String readResult) {
-        if (readResult == null || readResult.isEmpty()) return "DONE";
-        if (readResult.contains("ERROR")) return "ERROR";
-        return "ERROR";
+    private String checkOutput(String readResult) {
+        if (readResult == null || readResult.isEmpty()) return OUTPUT_RESULT_PASS;
+        if (readResult.contains("ERROR")) return OUTPUT_RESULT_ERROR;
+        return OUTPUT_RESULT_ERROR;
     }
 }
