@@ -8,11 +8,26 @@ public class PartialLBAWrite extends DefaultTestScenario {
     public final String[] inputAddressList = {"4", "0", "3", "1", "2"};
     public static final String WRITE_EXPECT_VALUE = "0xAAAABBBB";
 
-    public PartialLBAWrite(IManager manager) {
+    private static ITestScenario testScenario;
+
+    public static ITestScenario getInstance(IManager manager) {
+        if (testScenario == null)
+            testScenario = new PartialLBAWrite(manager);
+        return testScenario;
+    }
+
+    public static ITestScenario getInstance(IManager manager, RandomFactory randomFactory) {
+        if (testScenario == null)
+            testScenario = new PartialLBAWrite(manager, randomFactory);
+        return testScenario;
+    }
+
+    private PartialLBAWrite(IManager manager) {
         super(manager);
     }
 
-    public PartialLBAWrite(IManager manager, RandomFactory randomFactory) {
+    // @VisibleForTesting
+    PartialLBAWrite(IManager manager, RandomFactory randomFactory) {
         super(manager, randomFactory);
     }
 
