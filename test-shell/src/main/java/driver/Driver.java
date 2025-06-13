@@ -5,10 +5,6 @@ import java.util.function.Supplier;
 
 public interface Driver {
 
-    String read(String file);
-
-    void write(String file, byte[] bytes);
-
     void append(String file, byte[] bytes);
 
     void changeOldLogFileName(String latestLogFileName);
