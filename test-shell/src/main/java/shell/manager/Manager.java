@@ -10,6 +10,12 @@ public class Manager implements IManager {
     Processor processor;
     Output output;
 
+    public Manager() {
+        this.processor = new Processor();
+        this.output = new Output();
+    }
+
+    // @VisibleForTesting
     public Manager(Processor processor, Output output) {
         this.processor = processor;
         this.output = output;

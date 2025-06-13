@@ -27,8 +27,6 @@ class TestRunnerTest {
 
     @BeforeEach
     void setUp() {
-        mockProcessor = new Processor();
-        mockOutput = new Output();
         mockManger = new Manager(mockProcessor, mockOutput);
     }
 

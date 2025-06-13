@@ -1,9 +1,7 @@
 import logger.Logger;
 import scenario.ITestScenario;
 import scenario.TestRunner;
-import shell.Processor;
 import shell.manager.Manager;
-import shell.output.Output;
 import utils.Common;
 import utils.TestScenarioFactory;
 import utils.Valid;
@@ -13,11 +11,8 @@ import java.util.Scanner;
 public class Main {
     private static final String INVALID_COMMAND = "INVALID COMMAND";
 
-    private static Processor processor = new Processor();
-    private static Output output = new Output();
-    public static Manager manager = new Manager(processor, output);
-
     private static final Logger logger = Logger.getInstance();
+    public static Manager manager = new Manager();
 
     public static void main(String[] args) {
         logger.printConsoleAndLog("Main.main()", "================================");
@@ -36,28 +31,28 @@ public class Main {
     }
 
     public static void run(Scanner scanner) {
-        logger.printConsoleAndLog("Main.run()", "run START.");
+        logger.printConsoleAndLog("Main.run()", "run RUN.");
         while (true) {
             System.out.print("Shell> ");
             String command = scanner.nextLine().trim();
-            logger.printConsoleAndLog("Main.run()", String.format("command: %s", command));
+            logger.printConsoleAndLog("Main.run()", String.format("[command: %s]", command));
 
             String[] parts = command.split("\\s+");
             if (Valid.isNullEmpty(command)) {
-                logger.printConsoleAndLog("Main.run()", "The command is Null or Empty");
+                logger.printConsoleAndLog("Main.run()", "The command is Null or Empty\n");
                 System.out.println(INVALID_COMMAND);
                 continue;
             }
 
             if (Valid.isValidCommand(parts)) {
-                logger.printConsoleAndLog("Main.run()", "That command is not a valid command");
+                logger.printConsoleAndLog("Main.run()", "That command is not a valid command\n");
                 System.out.println(INVALID_COMMAND);
                 continue;
             }
 
             if (shellProcess(parts)) break;
+            logger.printConsoleAndLog("Main.run()", "run complete!\n");
         }
-        logger.printConsoleAndLog("Main.run()", "run END.");
     }
 
     public static boolean shellProcess(String[] parts) {
