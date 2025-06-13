@@ -1,4 +1,4 @@
-package shell;
+package shell.processor;
 
 import logger.Logger;
 import java.io.IOException;

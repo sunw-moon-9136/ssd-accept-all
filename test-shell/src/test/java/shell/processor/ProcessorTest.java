@@ -1,4 +1,4 @@
-package shell;
+package shell.processor;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
