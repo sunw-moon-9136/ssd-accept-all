@@ -9,8 +9,8 @@ import java.util.stream.Stream;
 class Command {
     enum Type {WRITE, ERASE}
 
-    final Type type;
-    final int address;
+    Type type;
+    int address;
     int size;
     long value;
 
@@ -84,10 +84,17 @@ public class InputFileHandler implements InputHandler {
     }
 
     private void processWriteInsertOptimize(int address, long value) {
+        // 기존과 동일 주소에 Write 하는 명령이 있으면 삭제한다.
         buffer.removeIf(c -> c.type == Command.Type.WRITE && c.address == address);
+        // 버퍼의 맨 뒤에 현재 명령어를 추가한다
         buffer.addLast(Command.write(address, value));
+        // W 들을 합친것이 Erase 명령의 범위와 동일할 경우 Erase 명령을 삭제
         ignoreEraseWithCombinedWrites(address);
+
+        // Erase 범위의 양쪽 끝 단에 속할 경우 삭제
         List<Command> updates = splitOverlappingErases(address);
+
+        // 양쪽 끝단을 자른 명령어들을 버퍼의 앞에 추가.
         for (int i = 0; i < updates.size(); i++) buffer.addFirst(updates.get(i));
 //        buffer.addAll(updates);
     }
@@ -104,10 +111,13 @@ public class InputFileHandler implements InputHandler {
             int end = command.address + command.size - 1;
 
             if (address < start || address > end) continue;
-
+            // 현재 Write 명령을 포함하는 Erase 명령 범위 내 값들을 가져온다.
             Set<Integer> eraseRange = getEraseRangeSet(start, end);
+            // buffer를 순회하면서, Erase 명령 범위 내 Write 명령들을 가져온다
             Set<Integer> writeAddresses = getWriteAddressesInEraseRange(eraseRange);
 
+            // 만약 오래된 Erase 명령이 나머지 최신 Write 들의 범위와 동일하다면,
+            // 해당 Erase 명령은 빼도 된다.
             if (eraseRange.equals(writeAddresses)) {
                 iterator.remove();
             }
@@ -133,6 +143,7 @@ public class InputFileHandler implements InputHandler {
     }
 
 
+    // Erase 범위의 양쪽 끝단을 자르기
     private List<Command> splitOverlappingErases(int address) {
         List<Command> updates = new ArrayList<>();
         for (Command c : buffer.stream().filter(c -> c.type == Command.Type.ERASE).collect(Collectors.toList())) {
@@ -162,6 +173,7 @@ public class InputFileHandler implements InputHandler {
             } else if (c.type == Command.Type.ERASE) {
                 int cStart = c.address;
                 int cEnd = c.address + c.size - 1;
+                // 범위가 완전히 동일할 경우 아래 2개의 if문이 적용돼 버그 발생
                 if ((cStart <= inputCmdStart && inputCmdEnd <= cEnd)) shouldAdd = false;
                 if (cStart >= inputCmdStart && cEnd <= inputCmdEnd) it.remove();
             }
