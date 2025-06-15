@@ -1,5 +1,7 @@
 package SSD;
 
+import org.w3c.dom.ranges.Range;
+
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
@@ -33,7 +35,8 @@ class Command {
 public class InputFileHandler implements InputHandler {
     private static final int MAX_BUFFER_SIZE = 5;
     private static final Path BUFFER_DIR = Paths.get("buffer");
-    private final Deque<Command> buffer = new ArrayDeque<>();
+    private final List<Command> buffer = new LinkedList<>();
+
 
     public InputFileHandler() {
         initDirectory();
@@ -41,10 +44,11 @@ public class InputFileHandler implements InputHandler {
         clearAndGenerateEmpty();
     }
 
+
     @Override
-    public void add(String input) {
-        String[] parts = input.split("\\s+");
-        switch (parts[0].toUpperCase()) {
+    public void add(String command) {
+        String[] parts = command.split(" ");
+        switch (parts[0]) {
             case "W":
                 processWriteInsertOptimize(parseInt(parts[1]), Long.decode(parts[2]));
                 break;
@@ -52,22 +56,24 @@ public class InputFileHandler implements InputHandler {
                 processEraseInsertOptimize(parseInt(parts[1]), parseInt(parts[2]));
                 break;
             default:
-                return;
+                break;
         }
-        trimBufferSize();
         clearAndGenerateEmpty();
     }
 
     @Override
     public String read(int address) {
-        for (Iterator<Command> it = buffer.descendingIterator(); it.hasNext(); ) {
-            Command c = it.next();
-            if (c.type == Command.Type.WRITE && c.address == address) {
-                return formatHex(c.value);
+        ListIterator<Command> iterator = buffer.listIterator(buffer.size());
+        while (iterator.hasPrevious()) {
+            Command command = iterator.previous();
+            if (command.type == Command.Type.WRITE && command.address == address) {
+                return formatHex(command.value);
+            }
+            if (command.type == Command.Type.ERASE && command.address <= address && address <= command.address + command.size - 1) {
+                return formatHex(0L);
             }
         }
-        String eraseValue = buffer.stream().filter(c -> c.type == Command.Type.ERASE).filter(c -> address >= c.address && address < c.address + c.size).map(c -> formatHex(0L)).findFirst().orElse("");
-        return eraseValue;
+        return "";
     }
 
     @Override
@@ -84,175 +90,165 @@ public class InputFileHandler implements InputHandler {
     }
 
     private void processWriteInsertOptimize(int address, long value) {
-        // 기존과 동일 주소에 Write 하는 명령이 있으면 삭제한다.
+        // 1.기존과 동일 주소에 Write 하는 명령이 있으면 삭제한다.
+        // 순서 무관
         buffer.removeIf(c -> c.type == Command.Type.WRITE && c.address == address);
-        // 버퍼의 맨 뒤에 현재 명령어를 추가한다
-        buffer.addLast(Command.write(address, value));
-        // W 들을 합친것이 Erase 명령의 범위와 동일할 경우 Erase 명령을 삭제
-        ignoreEraseWithCombinedWrites(address);
 
-        // Erase 범위의 양쪽 끝 단에 속할 경우 삭제
-        List<Command> updates = splitOverlappingErases(address);
-
-        // 양쪽 끝단을 자른 명령어들을 버퍼의 앞에 추가.
-        for (int i = 0; i < updates.size(); i++) buffer.addFirst(updates.get(i));
-//        buffer.addAll(updates);
-    }
-
-    private void ignoreEraseWithCombinedWrites(int address) {
+        // 2. Erase의 양쪽 끝단에 W 가 속하면 범위를 재설정
+        // 순서 무관
         Iterator<Command> iterator = buffer.iterator();
-
         while (iterator.hasNext()) {
             Command command = iterator.next();
-
-            if (command.type != Command.Type.ERASE) continue;
+            if (command.type != Command.Type.ERASE || address < command.address || address > command.address + command.size - 1) {
+                continue;
+            }
 
             int start = command.address;
             int end = command.address + command.size - 1;
 
-            if (address < start || address > end) continue;
-            // 현재 Write 명령을 포함하는 Erase 명령 범위 내 값들을 가져온다.
-            Set<Integer> eraseRange = getEraseRangeSet(start, end);
-            // buffer를 순회하면서, Erase 명령 범위 내 Write 명령들을 가져온다
-            Set<Integer> writeAddresses = getWriteAddressesInEraseRange(eraseRange);
+            // 시작 점에 속할 경우
+            if (start == address) start += 1;
 
-            // 만약 오래된 Erase 명령이 나머지 최신 Write 들의 범위와 동일하다면,
-            // 해당 Erase 명령은 빼도 된다.
-            if (eraseRange.equals(writeAddresses)) {
-                iterator.remove();
+            // 끝점에 속할 경우
+            if (end == address) end -= 1;
+
+            // command.size() == 1 일 경우, 겹친다면 해당 명령을 삭제
+            if (start > end) iterator.remove();
+            else {
+                // command.size() > 1 일 경우, command를 업데이트 해준다
+                command.address = start;
+                command.size = end - start + 1;
             }
         }
-    }
 
-    private Set<Integer> getEraseRangeSet(int start, int end) {
-        Set<Integer> range = new HashSet<>();
-        for (int i = start; i <= end; i++) {
-            range.add(i);
-        }
-        return range;
-    }
+        // 명령어를 삽입
+        buffer.add(Command.write(address, value));
 
-    private Set<Integer> getWriteAddressesInEraseRange(Set<Integer> range) {
-        Set<Integer> writeSet = new HashSet<>();
-        for (Command cmd : buffer) {
-            if (cmd.type == Command.Type.WRITE && range.contains(cmd.address)) {
-                writeSet.add(cmd.address);
+        // 3. 현재 명령과 다른 W 명령들을 합쳤을 때, E의 범위와 동일하면 해당 E를 삭제한다
+        iterator = buffer.iterator();
+        while (iterator.hasNext()) {
+            Command command = iterator.next();
+            if (command.type != Command.Type.ERASE) continue;
+
+            int currentIndex = buffer.indexOf(command);
+
+            // 현재 Erase 명령 뒤에 나오는 Write 명령이 Erase 명령 범위에 포함이 되면,
+            // Erase 앞에 있는 W 명령이 해당 Erase 명령을 지울수는 없다 -> 해당 범위에 있다면 이미 지워졌을 것이기 때문이다.
+            // 집합에 추가한다.
+            Set<Integer> writeSets = new HashSet<>();
+            for (int i = currentIndex + 1; i < buffer.size(); i++) {
+                Command next = buffer.get(i);
+                if (next.type != Command.Type.WRITE) continue;
+                if (command.address <= next.address && next.address <= command.address + command.size - 1) {
+                    writeSets.add(next.address);
+                }
             }
-        }
-        return writeSet;
-    }
 
-
-    // Erase 범위의 양쪽 끝단을 자르기
-    private List<Command> splitOverlappingErases(int address) {
-        List<Command> updates = new ArrayList<>();
-        for (Command c : buffer.stream().filter(c -> c.type == Command.Type.ERASE).collect(Collectors.toList())) {
-            if (c.address == address) {
-                buffer.remove(c);
-                if (c.size > 1) updates.add(Command.erase(address + 1, c.size - 1));
-            } else if (c.address + c.size - 1 == address) {
-                buffer.remove(c);
-                if (c.size > 1) updates.add(Command.erase(c.address, c.size - 1));
+            // Write 집합이 Erase 명령을 모두 포함하면 현재 Erase 명령은 지워도 된다.
+            boolean fullyCovered = true;
+            for (int addr = command.address; addr <= command.address + command.size - 1; addr++) {
+                if (!writeSets.contains(addr)) {
+                    fullyCovered = false;
+                    break;
+                }
             }
+
+            if (fullyCovered) iterator.remove();
         }
-        return updates;
     }
 
     private void processEraseInsertOptimize(int address, int size) {
         if (size <= 0) return;
 
-        int inputCmdStart = address;
-        int inputCmdEnd = address + size - 1;
+        int start = address;
+        int end = address + size - 1;
+
+        /*
+         * 1. Write 명령이 현재 Erase 명령 범위 안에 속하면 해당 Write 명령을 지운다
+         * - 순서 무관
+         */
+        buffer.removeIf(c -> {
+            if (c.type != Command.Type.WRITE) return false;
+            return start <= c.address && c.address <= end;
+        });
+
+
+        /*
+         * 2. Erase 명령이 현재 Erase 명령 범위 안에 속하면 해당 Erase 명령을 지운다.
+         * - 순서 무관
+         * E 4 2
+         * E 0 10 시
+         * E 4 2 를 지운다.
+         * 참고) 완전 동일한 범위에 대해서도 삭제가 된다.
+         */
+        buffer.removeIf(c -> {
+            if (c.type != Command.Type.ERASE) return false;
+            int prevStart = c.address;
+            int prevEnd = c.address + c.size - 1;
+            return start <= prevStart && prevEnd <= end;
+        });
+
+        /*
+         * 만약에 현재 Erase가 이전 Erase 범위 안에 속하면
+         * 현재 Erase를 넣을 필요가 없다.
+         */
         boolean shouldAdd = true;
+        Iterator<Command> iterator = buffer.iterator();
+        while (iterator.hasNext()) {
+            Command command = iterator.next();
+            if (command.type != Command.Type.ERASE) continue;
+            int prevSize = command.address;
+            int prevEnd = command.address + command.size - 1;
 
-        Iterator<Command> it = buffer.iterator();
-        while (it.hasNext()) {
-            Command c = it.next();
-            if (c.type == Command.Type.WRITE && c.address >= inputCmdStart && c.address <= inputCmdEnd) {
-                it.remove();
-            } else if (c.type == Command.Type.ERASE) {
-                int cStart = c.address;
-                int cEnd = c.address + c.size - 1;
-                // 범위가 완전히 동일할 경우 아래 2개의 if문이 적용돼 버그 발생
-                if ((cStart <= inputCmdStart && inputCmdEnd <= cEnd)) shouldAdd = false;
-                if (cStart >= inputCmdStart && cEnd <= inputCmdEnd) it.remove();
-            }
-        }
-        if (shouldAdd) buffer.addLast(Command.erase(address, size));
-        mergeEraseCommand();
-    }
-
-    private void mergeEraseCommand() {
-        if (buffer.size() < 2) return;
-
-        List<Command> tempBuffer = new ArrayList<>(buffer);
-        List<Command> mergedBuffer = new ArrayList<>();
-
-        int index = 0;
-        while (index < tempBuffer.size()) {
-            Command current = tempBuffer.get(index);
-            if (current.type == Command.Type.ERASE) {
-                List<Command> eraseGroup = collectConsecutiveErases(tempBuffer, index);
-                if (eraseGroup.size() >= 2) {
-                    mergedBuffer.addAll(combineOverlappingErases(eraseGroup));
-                } else {
-                    mergedBuffer.add(current);
-                }
-                index += eraseGroup.size();
-            } else {
-                mergedBuffer.add(current);
-                index++;
-            }
-        }
-        buffer.clear();
-        buffer.addAll(mergedBuffer);
-    }
-
-    // 주어진 인덱스부터 연속된 Erase 명령어를 수집하는 헬퍼 메서드
-    private List<Command> collectConsecutiveErases(List<Command> commands, int startIndex) {
-        List<Command> eraseGroup = new ArrayList<>();
-        for (int i = startIndex; i < commands.size(); i++) {
-            Command cmd = commands.get(i);
-            if (cmd.type == Command.Type.ERASE) {
-                eraseGroup.add(cmd);
-            } else {
+            if (prevSize <= start && end <= prevEnd) {
+                shouldAdd = false;
                 break;
             }
         }
-        return eraseGroup;
+
+        if (shouldAdd) {
+            mergeEraseCommand(address, size);
+        }
     }
 
-    // 연속된 Erase 명령어를 Merge
-    private List<Command> combineOverlappingErases(List<Command> eraseCommands) {
-        List<Command> mergedErases = new ArrayList<>();
-        Command baseCommand = eraseCommands.get(0);
-        mergedErases.add(baseCommand);
+    private void mergeEraseCommand(int address, int size) {
+        // 연속된 E들을 모아서 합친 다음에 다시 넣는다.
+        // 연속된 E들을 다시 넣을 때는 순서를 정렬해서 넣어도 작동에는 문제가 없다.
+        buffer.add(Command.erase(address, size));
 
-        for (int i = 1; i < eraseCommands.size(); i++) {
-            Command currentCommand = eraseCommands.get(i);
-            // 이전 명령어와 주소가 겹치거나 인접한 경우 Merge
-            if (baseCommand.address + baseCommand.size >= currentCommand.address) {
-                int overlap = Math.max(0, baseCommand.address + baseCommand.size - currentCommand.address);
-                int totalSize = baseCommand.size + currentCommand.size - overlap;
+        List<Command> eraseCommands = new LinkedList<>();
 
-                if (totalSize <= 10) {
-                    baseCommand.size = totalSize;
-                } else {
-                    baseCommand.size = 10;
-                    mergedErases.add(Command.erase(baseCommand.address + 10, totalSize - 10));
+        // 먼저 buffer에서 뒤에서부터 연속으로 나오는 Erase를 모아준다.
+        while (!buffer.isEmpty() && buffer.get(buffer.size() - 1).type == Command.Type.ERASE) {
+            eraseCommands.add(buffer.remove(buffer.size() - 1));
+        }
+
+        // 0~99 의 범위에서 Erase 에 적용되는 범위를 체크한다.
+        LinkedList<Command> newEraseCommands = new LinkedList<>();
+        boolean[] list = new boolean[100];
+        for (int i = 0; i < 100; i++) list[i] = false;
+        for (Command cmd : eraseCommands) {
+            int start = cmd.address;
+            int end = cmd.address + cmd.size - 1;
+            for (int i = start; i <= end; i++) list[i] = true;
+        }
+
+        // Erase가 적용되는 범위들을 재조립
+        int count = 0;
+        for (int i = 0; i < 100; i++) {
+            if (list[i]) {
+                count += 1;
+
+                if (count == 10) {
+                    newEraseCommands.add(Command.erase(i - count + 1, 10));
+                    count = 0;
                 }
-            } else {
-                mergedErases.add(currentCommand);
-                baseCommand = currentCommand;
+            } else if (count > 0) {
+                newEraseCommands.add(Command.erase(i - count, count));
+                count = 0;
             }
         }
-        return mergedErases;
-    }
-
-    private void trimBufferSize() {
-        while (buffer.size() > MAX_BUFFER_SIZE) {
-            buffer.removeFirst();
-        }
+        buffer.addAll(newEraseCommands);
     }
 
     private void clearAndGenerateEmpty() {
@@ -287,9 +283,29 @@ public class InputFileHandler implements InputHandler {
         }
     }
 
+    // 파일 이름 순서대로 가져오기
     private void loadExistingCommands() {
         try (Stream<Path> files = Files.list(BUFFER_DIR)) {
-            List<String> cmds = files.map(Path::getFileName).map(Path::toString).filter(n -> (n.endsWith(".txt") && (n.contains("_W_") || n.contains("_E_")))).map(n -> n.substring(n.indexOf('_') + 1).replace(".txt", "").replace('_', ' ')).collect(Collectors.toList());
+            List<String> cmds = files
+                    .filter(f -> {
+                        String name = f.getFileName().toString();
+                        return name.endsWith(".txt") && (name.contains("_W_") || name.contains("_E_"));
+                    })
+                    // 숫자 접두사로 정렬
+                    .sorted(Comparator.comparingInt(f -> {
+                        String name = f.getFileName().toString();
+                        try {
+                            return Integer.parseInt(name.split("_")[0]);
+                        } catch (NumberFormatException e) {
+                            return Integer.MAX_VALUE; // 숫자 파싱 실패 시 맨 뒤로
+                        }
+                    }))
+                    .map(f -> f.getFileName().toString())
+                    .map(n -> n.substring(n.indexOf('_') + 1) // 앞 숫자 제거
+                            .replace(".txt", "")
+                            .replace('_', ' '))
+                    .collect(Collectors.toList());
+
             buffer.clear();
             cmds.forEach(this::add);
         } catch (IOException e) {
