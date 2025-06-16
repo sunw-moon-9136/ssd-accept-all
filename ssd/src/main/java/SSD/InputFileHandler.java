@@ -228,9 +228,9 @@ public class InputFileHandler implements InputHandler {
                 break;
             }
         }
+
+        // 현재 명령을 완전히 커버하는 경우
         if(startErase == -1 || endErase == -1) return;
-        address = startErase;
-        size = endErase - startErase + 1;
 
         if (shouldAdd) {
             mergeEraseCommand(address, size);
