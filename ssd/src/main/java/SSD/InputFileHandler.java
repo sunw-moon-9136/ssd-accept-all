@@ -206,6 +206,32 @@ public class InputFileHandler implements InputHandler {
             }
         }
 
+        boolean[] list = new boolean[100];
+        for (int i = 0; i < 100; i++) list[i] = false;
+        for (Command command : buffer) {
+            if (command.type == Command.Type.ERASE) {
+                for (int j = command.address; j <= command.address + command.size - 1; j++) list[j] = true;
+            }
+        }
+
+        int startErase = -1;
+        int endErase = -1;
+        for(int i = address; i <= address + size - 1; i++) {
+            if(!list[i]) {
+                startErase = i;
+                break;
+            }
+        }
+        for(int i = address + size - 1; i >= address; i--){
+            if(!list[i]) {
+                endErase = i;
+                break;
+            }
+        }
+        if(startErase == -1 || endErase == -1) return;
+        address = startErase;
+        size = endErase - startErase + 1;
+
         if (shouldAdd) {
             mergeEraseCommand(address, size);
         }
