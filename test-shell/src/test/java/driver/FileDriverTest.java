@@ -131,6 +131,7 @@ class FileDriverTest {
     @Nested
     class ChangeOldLogFileNameTest {
 
+        public static final String CURRENT_DIRECTORY_NAME = ".";
         final String LOG_FILE_NAME_260306 = "until_260306_00h_00m_00s.log";
         final String LOG_FILE_NAME_260307 = "until_260307_00h_00m_00s.log";
         final String LOG_FILE_NAME_260308 = "until_260308_00h_00m_00s.log";
@@ -142,18 +143,18 @@ class FileDriverTest {
 
         @Test
         void Log파일이_없는_경우_doNothing() {
-            fileDriver.changeOldLogFileName(Logger.LATEST_LOG_FILE_NAME);
+            fileDriver.changeOldLogFileName(Logger.LATEST_LOG_FILE_NAME, CURRENT_DIRECTORY_NAME);
 
-            verify(fileDriver, times(0)).convertToZipFile(anyString());
+            verify(fileDriver, times(0)).convertToZipFile(anyString(), anyString());
         }
 
         @Test
         void Log파일이_latest_log만_있는_경우_doNothing() throws IOException {
             Files.writeString(Path.of(Logger.LATEST_LOG_FILE_NAME), TEST_TEXT, StandardOpenOption.CREATE);
 
-            fileDriver.changeOldLogFileName(Logger.LATEST_LOG_FILE_NAME);
+            fileDriver.changeOldLogFileName(Logger.LATEST_LOG_FILE_NAME, CURRENT_DIRECTORY_NAME);
 
-            verify(fileDriver, times(0)).convertToZipFile(anyString());
+            verify(fileDriver, times(0)).convertToZipFile(anyString(), anyString());
         }
 
         @Test
@@ -161,9 +162,9 @@ class FileDriverTest {
             Files.writeString(Path.of(Logger.LATEST_LOG_FILE_NAME), TEST_TEXT, StandardOpenOption.CREATE);
             Files.writeString(Path.of(LOG_FILE_NAME_260306), TEST_TEXT, StandardOpenOption.CREATE);
 
-            fileDriver.changeOldLogFileName(Logger.LATEST_LOG_FILE_NAME);
+            fileDriver.changeOldLogFileName(Logger.LATEST_LOG_FILE_NAME, CURRENT_DIRECTORY_NAME);
 
-            verify(fileDriver, times(0)).convertToZipFile(anyString());
+            verify(fileDriver, times(0)).convertToZipFile(anyString(), anyString());
         }
 
         @Test
@@ -175,9 +176,9 @@ class FileDriverTest {
             Files.writeString(Path.of(LOG_FILE_NAME_260309), TEST_TEXT, StandardOpenOption.CREATE);
             Files.writeString(Path.of(LOG_FILE_NAME_260310), TEST_TEXT, StandardOpenOption.CREATE);
 
-            fileDriver.changeOldLogFileName(Logger.LATEST_LOG_FILE_NAME);
+            fileDriver.changeOldLogFileName(Logger.LATEST_LOG_FILE_NAME, CURRENT_DIRECTORY_NAME);
 
-            verify(fileDriver, times(4)).convertToZipFile(anyString());
+            verify(fileDriver, times(4)).convertToZipFile(anyString(), anyString());
         }
 
         @AfterEach

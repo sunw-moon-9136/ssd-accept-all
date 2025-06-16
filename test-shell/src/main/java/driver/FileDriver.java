@@ -36,8 +36,8 @@ public class FileDriver implements Driver {
     }
 
     @Override
-    public void changeOldLogFileName(String latestLogFileName) {
-        List<String> logFileNames = getLogFileNames().stream()
+    public void changeOldLogFileName(String latestLogFileName, String directoryName) {
+        List<String> logFileNames = getLogFileNames(directoryName).stream()
                 .filter(name -> !name.endsWith(".zip"))
                 .filter(name -> !name.equals(latestLogFileName))
                 .sorted()
@@ -48,7 +48,7 @@ public class FileDriver implements Driver {
 
         logFileNames.remove(size - 1);
         for (String oldLogFileName : logFileNames) {
-            convertToZipFile(oldLogFileName);
+            convertToZipFile(oldLogFileName, directoryName);
         }
     }
 
@@ -61,7 +61,8 @@ public class FileDriver implements Driver {
         try {
             Path filePath = Path.of(source);
             long fileSize = Files.size(filePath);
-            if (fileSize > maxSize) Files.move(filePath, getTargetPath.get(), StandardCopyOption.REPLACE_EXISTING);
+            if (fileSize > maxSize)
+                Files.move(filePath, getTargetPath.get(), StandardCopyOption.REPLACE_EXISTING);
         } catch (NoSuchFileException e) {
             throw new RuntimeException("File Not Found: " + source);
         } catch (IOException e) {
@@ -70,10 +71,10 @@ public class FileDriver implements Driver {
     }
 
     //    @VisibleForTesting
-    void convertToZipFile(String oldLogFileName) {
+    void convertToZipFile(String oldLogFileName, String directoryName) {
         try {
             String zipFileName = oldLogFileName.replace(".log", ".zip");
-            Files.move(Path.of(oldLogFileName), Path.of(zipFileName), StandardCopyOption.REPLACE_EXISTING);
+            Files.move(Path.of(directoryName + "/" + oldLogFileName), Path.of(directoryName + "/" + zipFileName), StandardCopyOption.REPLACE_EXISTING);
         } catch (NoSuchFileException e) {
             throw new RuntimeException("File Not Found: " + oldLogFileName);
         } catch (IOException e) {
@@ -82,9 +83,9 @@ public class FileDriver implements Driver {
     }
 
     // @VisibleForTesting
-    List<String> getLogFileNames() {
+    List<String> getLogFileNames(String directoryName) {
         // 참조 : 협업을 위해 JAVA NIO + Stream API 사용을 피해 JAVA IO를 사용함
-        File[] files = new File(".").listFiles();
+        File[] files = new File(directoryName).listFiles();
 
         if (files == null) {
             return List.of();

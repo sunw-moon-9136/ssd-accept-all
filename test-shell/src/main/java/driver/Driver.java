@@ -9,7 +9,7 @@ public interface Driver {
 
     void append(String file, byte[] bytes);
 
-    void changeOldLogFileName(String latestLogFileName);
+    void changeOldLogFileName(String latestLogFileName, String directoryName);
 
     void changeNameIfBiggerThan(long maxSize, String source, Supplier<Path> getTargetPath);
 }

@@ -37,13 +37,13 @@ class LoggerTest {
 
         verify(driver, times(1)).append(any(), any());
         verify(driver, times(1)).changeNameIfBiggerThan(anyLong(), anyString(), any());
-        verify(driver, times(1)).changeOldLogFileName(Logger.LATEST_FILE_FULL_PATH);
+        verify(driver, times(1)).changeOldLogFileName(Logger.LATEST_FILE_FULL_PATH, Logger.LOG_DIRECTORY_NAME);
     }
 
     @Test
     void makeOldLogFileName() {
         Path path = logger.makeOldLogFileName();
 
-        assertThat(path.toString()).matches("^until_\\d{6}_\\d{2}h_\\d{2}m_\\d{2}s\\.log$");
+        assertThat(path.toString()).matches(".*until_\\d{6}_\\d{2}h_\\d{2}m_\\d{2}s\\.log$");
     }
 }
