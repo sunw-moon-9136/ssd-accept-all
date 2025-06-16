@@ -83,15 +83,15 @@ public class Main {
             }
 
             case "erase" -> {
-                manager.erase(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+                isFormatPrint(manager.erase(Integer.parseInt(parts[1]), Integer.parseInt(parts[2])));
                 yield false;
             }
             case "erase_range" -> {
-                manager.erase_range(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+                isFormatPrint(manager.erase_range(Integer.parseInt(parts[1]), Integer.parseInt(parts[2])));
                 yield false;
             }
             case "flush" -> {
-                manager.flush();
+                isFormatPrint(manager.flush());
                 yield false;
             }
             case "help" -> {
@@ -109,6 +109,11 @@ public class Main {
                 yield false;
             }
         };
+    }
+
+    private static void isFormatPrint(boolean ret) {
+        if (ret) return;
+        System.out.println("ERROR");
     }
 
     private static void writeFormatPrint(boolean write) {
