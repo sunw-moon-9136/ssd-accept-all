@@ -265,9 +265,13 @@ public class InputFileHandler implements InputHandler {
             if (list[i]) {
                 count += 1;
 
+                // address의 마지막 부분에서 예외 처리
                 if (count == 10) {
                     newEraseCommands.add(Command.erase(i - count + 1, 10));
                     count = 0;
+                }
+                 else if(i == 99){
+                    newEraseCommands.add(Command.erase(99 - count + 1, count));
                 }
             } else if (count > 0) {
                 newEraseCommands.add(Command.erase(i - count, count));

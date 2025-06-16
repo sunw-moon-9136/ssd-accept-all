@@ -120,6 +120,7 @@ public class SsdManager {
                 ssd.erase(lba, Integer.parseInt(value));
             }
         }
+        clear();
     }
 
     public void run(String[] args) {
